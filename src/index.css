@@ -2,6 +2,14 @@
    TERRAIN — Global Styles
    ============================================ */
 
+@font-face {
+  font-family: 'Daydream';
+  src: url('/fonts/Daydream-DEMO.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Color Palette */
   --bg-base: #0D0A06;
@@ -46,7 +54,7 @@
   --text-5xl: 96px;
 
   /* Fonts */
-  --font-display: 'Boogaloo', cursive;
+  --font-display: 'Daydream', 'Boogaloo', cursive;
   --font-heading: 'Fredoka One', cursive;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Courier New', 'Courier', monospace;
@@ -195,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-6);
-  font-family: var(--font-heading);
+  font-family: var(--font-display);
   font-size: var(--text-base);
   color: var(--bg-base);
   background: var(--accent-gold);
@@ -204,7 +212,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 3px 0 #8A6B2A, var(--shadow-sm);
   transition: all var(--duration-fast) var(--ease-out);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   user-select: none;
 }
 

@@ -286,8 +286,8 @@ export default function Landing() {
               every region is a life area you're building.
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link to="/signup" className="btn-retro" style={{
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Link to="/demo" className="btn-retro" style={{
                 textDecoration: 'none',
                 fontSize: '15px',
                 padding: '14px 32px',
@@ -302,6 +302,14 @@ export default function Landing() {
                 borderRadius: '50px',
               }}>
                 Log In
+              </Link>
+              <Link to="/signup" style={{
+                fontSize: '14px',
+                color: 'var(--text-muted)',
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
+              }}>
+                or Sign Up
               </Link>
             </div>
           </div>
@@ -352,21 +360,52 @@ export default function Landing() {
               Each goal becomes a region on your terrain — mountains, forests, cities, coasts. The map breathes: weather shifts with your check-in recency.
             </p>
           </div>
+          {/* Mini map preview with icons placed on terrain */}
           <div className="glass-panel" style={{
-            padding: '40px',
+            padding: 0,
             aspectRatio: '4/3',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            background: 'linear-gradient(135deg, rgba(124,158,186,0.08) 0%, rgba(94,158,110,0.08) 100%)',
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'var(--bg-base)',
           }}>
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', flexWrap: 'wrap' }}>
-              <PixelMountain size={56} />
-              <PixelTree size={56} />
-              <PixelCity size={56} />
-              <PixelWave size={56} />
+            {/* Grid dots background */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: 'radial-gradient(circle, rgba(245,230,200,0.06) 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+            }} />
+            {/* Terrain-like ground gradient */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
+              background: 'linear-gradient(to top, rgba(94,158,110,0.12), transparent)',
+            }} />
+            {/* Mountain silhouette across bottom */}
+            <svg viewBox="0 0 400 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', opacity: 0.15 }} preserveAspectRatio="none">
+              <polygon points="0,60 30,35 60,50 100,20 140,40 180,15 220,35 260,25 300,40 340,18 380,30 400,45 400,60" fill="#7C9EBA" />
+            </svg>
+            {/* Region icons positioned on the "map" */}
+            <div style={{ position: 'absolute', top: '15%', left: '12%' }}>
+              <PixelMountain size={48} />
+              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-mountains)' }}>runs</span>
             </div>
-            <span className="mono-label" style={{ color: 'var(--text-muted)' }}>mountains · forest · city · coast</span>
+            <div style={{ position: 'absolute', top: '25%', right: '15%' }}>
+              <PixelCity size={48} />
+              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-city)' }}>project</span>
+            </div>
+            <div style={{ position: 'absolute', bottom: '25%', left: '35%' }}>
+              <PixelTree size={48} />
+              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-forest)' }}>reading</span>
+            </div>
+            <div style={{ position: 'absolute', bottom: '15%', right: '25%' }}>
+              <PixelWave size={48} />
+              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-coast)' }}>savings</span>
+            </div>
+            {/* Connecting dotted lines between regions */}
+            <svg viewBox="0 0 400 300" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+            </svg>
           </div>
         </div>
 

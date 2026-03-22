@@ -54,33 +54,34 @@ export default function Login() {
     <div style={{
       minHeight: '100vh',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: 'var(--space-6)',
       background: 'var(--bg-base)',
     }}>
+      {/* Logo — outside form container so it isn't clipped */}
+      <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(40px, 10vw, 56px)',
+            letterSpacing: '0.04em',
+            background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            filter: 'drop-shadow(0 0 30px rgba(212,168,83,0.15))',
+          }}>
+            TERRAIN
+          </h1>
+        </Link>
+      </div>
+
       <div style={{
         width: '100%',
         maxWidth: '400px',
       }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <h1 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(40px, 10vw, 56px)',
-              letterSpacing: '0.02em',
-              background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              filter: 'drop-shadow(0 0 30px rgba(212,168,83,0.15))',
-            }}>
-              TERRAIN
-            </h1>
-          </Link>
-        </div>
-
         <div className="glass-panel-heavy" style={{ padding: 'var(--space-8)' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)',

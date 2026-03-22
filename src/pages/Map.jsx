@@ -7,12 +7,16 @@ import AddRegionModal from '../components/AddRegionModal.jsx'
 import CheckinModal from '../components/CheckinModal.jsx'
 import FieldReport from '../components/FieldReport.jsx'
 import ThemePanel from '../components/ThemePanel.jsx'
+import ExportModal from '../components/ExportModal.jsx'
 import { useRegions } from '../hooks/useRegions.js'
 import { useCheckins } from '../hooks/useCheckins.js'
 import { useTheme } from '../hooks/useTheme.js'
+import { useAuth } from '../hooks/useAuth.js'
+import { supabase } from '../lib/supabase.js'
 
 export default function Map() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { regions, createRegion } = useRegions()
   const { checkins, fetchCheckins, createCheckin } = useCheckins()
   const { theme, updateTheme } = useTheme()
@@ -22,11 +26,40 @@ export default function Map() {
   const [reportRegion, setReportRegion] = useState(null)
   const [reportOpen, setReportOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exportData, setExportData] = useState({ milestones: [], fieldReports: [] })
 
   // Fetch all checkins on mount
   useEffect(() => {
     fetchCheckins()
   }, [fetchCheckins])
+
+  // Fetch milestones + field reports when export modal opens
+  useEffect(() => {
+    if (!exportOpen || !user) return
+
+    async function loadExportData() {
+      const [milestonesRes, reportsRes] = await Promise.all([
+        supabase
+          .from('milestones')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('field_reports')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+      ])
+
+      setExportData({
+        milestones: milestonesRes.data || [],
+        fieldReports: reportsRes.data || [],
+      })
+    }
+
+    loadExportData()
+  }, [exportOpen, user])
 
   // Get last checkin date for each region
   const getLastCheckinDate = useCallback((regionId) => {
@@ -95,6 +128,25 @@ export default function Map() {
           gap: 'var(--space-3)',
           zIndex: 10,
         }}>
+          {/* Export FAB */}
+          <button
+            onClick={() => setExportOpen(true)}
+            className="btn-retro btn-retro--secondary"
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              padding: 0,
+              fontSize: 'var(--text-lg)',
+              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+            }}
+            title="Export journey"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+              <path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
           {/* Explore FAB */}
           <button
             onClick={() => navigate('/explore')}
@@ -194,6 +246,17 @@ export default function Map() {
         theme={theme}
         onUpdate={updateTheme}
       />
+
+      {exportOpen && (
+        <ExportModal
+          regions={regions}
+          checkins={checkins}
+          milestones={exportData.milestones}
+          fieldReports={exportData.fieldReports}
+          username={user?.user_metadata?.username || user?.email?.split('@')[0] || 'Explorer'}
+          onClose={() => setExportOpen(false)}
+        />
+      )}
     </div>
   )
 }

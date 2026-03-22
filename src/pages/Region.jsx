@@ -6,6 +6,7 @@ import { useCheckins } from '../hooks/useCheckins.js'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
 import CheckinModal from '../components/CheckinModal.jsx'
 import FieldReport from '../components/FieldReport.jsx'
+import ExportModal from '../components/ExportModal.jsx'
 import Navbar from '../components/Navbar.jsx'
 
 const MOOD_EMOJI = ['', String.fromCodePoint(0x1F629), String.fromCodePoint(0x1F615), String.fromCodePoint(0x1F610), String.fromCodePoint(0x1F642), String.fromCodePoint(0x1F525)]
@@ -22,6 +23,8 @@ export default function Region() {
   const [checkinOpen, setCheckinOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   const [newMilestone, setNewMilestone] = useState('')
+  const [exportOpen, setExportOpen] = useState(false)
+  const [fieldReports, setFieldReports] = useState([])
 
   // Load region data
   useEffect(() => {
@@ -56,6 +59,24 @@ export default function Region() {
     load()
     fetchCheckins(id)
   }, [user, id, navigate, fetchCheckins])
+
+  // Fetch field reports when export opens
+  useEffect(() => {
+    if (!exportOpen || !user || !id) return
+
+    async function loadFieldReports() {
+      const { data } = await supabase
+        .from('field_reports')
+        .select('*')
+        .eq('region_id', id)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      setFieldReports(data || [])
+    }
+
+    loadFieldReports()
+  }, [exportOpen, user, id])
 
   const handleCheckinSubmit = async (data) => {
     await createCheckin(data)
@@ -184,7 +205,7 @@ export default function Region() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
             <button
               className="btn-retro"
               onClick={() => setCheckinOpen(true)}
@@ -196,6 +217,12 @@ export default function Region() {
               onClick={() => setReportOpen(true)}
             >
               Field Report
+            </button>
+            <button
+              className="btn-retro btn-retro--secondary"
+              onClick={() => setExportOpen(true)}
+            >
+              Export Region
             </button>
           </div>
         </div>
@@ -438,6 +465,17 @@ export default function Region() {
         open={reportOpen}
         onClose={() => setReportOpen(false)}
       />
+
+      {exportOpen && (
+        <ExportModal
+          regions={[region]}
+          checkins={checkins}
+          milestones={milestones}
+          fieldReports={fieldReports}
+          singleRegion={region}
+          onClose={() => setExportOpen(false)}
+        />
+      )}
     </div>
   )
 }

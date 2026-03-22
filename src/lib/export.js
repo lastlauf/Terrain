@@ -9,15 +9,15 @@ export async function getBestQuote(userId, regionId) {
   // Try field reports first
   const { data: reports } = await supabase
     .from('field_reports')
-    .select('content')
+    .select('report_text')
     .eq('user_id', userId)
     .eq('region_id', regionId)
-    .order('created_at', { ascending: false })
+    .order('generated_at', { ascending: false })
     .limit(3)
 
   if (reports?.length) {
     const sentences = reports
-      .flatMap(r => r.content.split(/[.!?]/))
+      .flatMap(r => r.report_text.split(/[.!?]/))
       .map(s => s.trim())
       .filter(s => s.length > 20 && s.length < 80)
     if (sentences.length) return sentences[0]

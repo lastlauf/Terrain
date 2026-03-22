@@ -141,7 +141,7 @@ export default function Map() {
           .from('field_reports')
           .select('*')
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
+          .order('generated_at', { ascending: false }),
       ])
 
       setExportData({

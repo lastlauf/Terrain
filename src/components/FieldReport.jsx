@@ -19,7 +19,7 @@ export default function FieldReport({ region, checkins, open, onClose }) {
         .select('*')
         .eq('region_id', region.id)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('generated_at', { ascending: false })
         .limit(3)
 
       setPastReports(data || [])
@@ -47,7 +47,7 @@ export default function FieldReport({ region, checkins, open, onClose }) {
       await supabase.from('field_reports').insert({
         user_id: user.id,
         region_id: region.id,
-        content: reportText,
+        report_text: reportText,
       })
 
       // Refresh past reports
@@ -56,7 +56,7 @@ export default function FieldReport({ region, checkins, open, onClose }) {
         .select('*')
         .eq('region_id', region.id)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('generated_at', { ascending: false })
         .limit(3)
 
       setPastReports(data || [])

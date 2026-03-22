@@ -76,7 +76,7 @@ export default function Region() {
         .select('*')
         .eq('region_id', id)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('generated_at', { ascending: false })
 
       setFieldReports(data || [])
     }

@@ -68,9 +68,13 @@ export default function Login() {
           <Link to="/" style={{ textDecoration: 'none' }}>
             <h1 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'var(--text-4xl)',
-              color: 'var(--accent-gold)',
-              textShadow: '0 0 30px rgba(212, 168, 83, 0.2)',
+              fontSize: 'clamp(40px, 10vw, 56px)',
+              letterSpacing: '0.02em',
+              background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: 'drop-shadow(0 0 30px rgba(212,168,83,0.15))',
             }}>
               TERRAIN
             </h1>

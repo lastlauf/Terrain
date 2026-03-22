@@ -260,7 +260,7 @@ export default function Landing() {
           {/* TERRAIN on ONE line — gradient text */}
           <h1 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(64px, 12vw, 160px)',
+            fontSize: 'clamp(48px, 9vw, 120px)',
             lineHeight: 1.0,
             letterSpacing: '0.04em',
             background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',

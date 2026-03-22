@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
-import RegionCard from '../components/RegionCard.jsx'
 import AddRegionModal from '../components/AddRegionModal.jsx'
 import CheckinModal from '../components/CheckinModal.jsx'
 import FieldReport from '../components/FieldReport.jsx'
@@ -61,15 +60,6 @@ export default function Map() {
     loadExportData()
   }, [exportOpen, user])
 
-  // Get last checkin date for each region
-  const getLastCheckinDate = useCallback((regionId) => {
-    const regionCheckins = checkins.filter(c => c.region_id === regionId)
-    if (regionCheckins.length === 0) return null
-    return regionCheckins.reduce((latest, c) =>
-      new Date(c.created_at) > new Date(latest.created_at) ? c : latest
-    ).created_at
-  }, [checkins])
-
   const handleRegionClick = (region) => {
     setCheckinRegion(region)
   }
@@ -104,7 +94,7 @@ export default function Map() {
     }}>
       <Navbar onThemeToggle={() => setThemeOpen(true)} />
 
-      {/* Main canvas */}
+      {/* Main canvas — fills full viewport below navbar */}
       <div style={{
         flex: 1,
         marginTop: '56px',
@@ -121,7 +111,7 @@ export default function Map() {
         {/* FABs */}
         <div style={{
           position: 'absolute',
-          bottom: '120px',
+          bottom: 'var(--space-6)',
           right: 'var(--space-6)',
           display: 'flex',
           flexDirection: 'column',
@@ -135,7 +125,6 @@ export default function Map() {
             style={{
               width: '56px',
               height: '56px',
-              borderRadius: '50%',
               padding: 0,
               fontSize: 'var(--text-lg)',
               boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
@@ -154,14 +143,15 @@ export default function Map() {
             style={{
               width: '56px',
               height: '56px',
-              borderRadius: '50%',
               padding: 0,
-              fontSize: 'var(--text-xl)',
-              boxShadow: '0 3px 0 #008A82, 0 0 20px rgba(0, 212, 200, 0.3)',
+              fontSize: 'var(--text-lg)',
+              boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)',
             }}
             title="Explore mode"
           >
-            {String.fromCodePoint(0x1F3AE)}
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+              <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+            </svg>
           </button>
 
           {/* Add FAB */}
@@ -171,7 +161,6 @@ export default function Map() {
             style={{
               width: '56px',
               height: '56px',
-              borderRadius: '50%',
               padding: 0,
               fontSize: 'var(--text-xl)',
             }}
@@ -180,41 +169,6 @@ export default function Map() {
             +
           </button>
         </div>
-      </div>
-
-      {/* Bottom bar — Region cards */}
-      <div style={{
-        height: '100px',
-        background: 'rgba(13, 10, 6, 0.9)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderTop: '2px solid var(--border-retro)',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 var(--space-4)',
-        gap: 'var(--space-3)',
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        flexShrink: 0,
-      }}>
-        {regions.length === 0 ? (
-          <div style={{
-            flex: 1,
-            textAlign: 'center',
-            color: 'var(--text-dim)',
-            fontSize: 'var(--text-sm)',
-          }}>
-            No regions yet. Click + to create your first.
-          </div>
-        ) : (
-          regions.map((region) => (
-            <RegionCard
-              key={region.id}
-              region={region}
-              lastCheckinDate={getLastCheckinDate(region.id)}
-            />
-          ))
-        )}
       </div>
 
       {/* Modals & Panels */}

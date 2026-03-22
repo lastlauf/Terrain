@@ -1,5 +1,12 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
-import { drawTerrainRegion, generateMapLayout, getWeatherStatus, simplex2d } from '../lib/terrain.js'
+import { generateMapLayout, getWeatherStatus, simplex2d } from '../lib/terrain.js'
+import { drawPixelGrid } from '../lib/pixels.js'
+import {
+  drawSprite, drawPixelPath,
+  SPRITES, PALETTES, REGION_COLORS,
+  WEATHER_SPRITES, WEATHER_PALETTES,
+  STAR_SPRITE, STAR_PALETTE,
+} from '../lib/sprites.js'
 
 export default function TerrainCanvas({
   regions,
@@ -36,34 +43,32 @@ export default function TerrainCanvas({
         region: singleRegion,
         x: 40,
         y: 40,
-        w: 320,
-        h: 240,
+        w: 48,
+        h: 48,
       }]
     } else {
       layoutRef.current = generateMapLayout(regions)
     }
   }, [regions, singleRegion])
 
-  // Initialize particles
+  // Initialize square particles
   useEffect(() => {
-    const fx = theme.particle_fx || 'fireflies'
     const particles = []
-    if (fx !== 'none') {
-      const count = mini ? 12 : 40
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * 1200,
-          y: Math.random() * 800,
-          vx: (Math.random() - 0.5) * (fx === 'rain' ? 0.5 : 0.3),
-          vy: fx === 'rain' ? 2 + Math.random() * 3 : fx === 'snowflakes' ? 0.3 + Math.random() * 0.5 : (Math.random() - 0.5) * 0.3,
-          size: fx === 'rain' ? 1 : 1.5 + Math.random() * 2,
-          alpha: 0.3 + Math.random() * 0.5,
-          phase: Math.random() * Math.PI * 2,
-        })
-      }
+    const count = mini ? 8 : 24
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * 1200,
+        y: Math.random() * 800,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: -0.1 - Math.random() * 0.2,
+        size: 2,
+        alpha: 0.15 + Math.random() * 0.25,
+        phase: Math.random() * Math.PI * 2,
+        colorIdx: Math.floor(Math.random() * 3),
+      })
     }
     stateRef.current.particles = particles
-  }, [theme.particle_fx, mini])
+  }, [mini])
 
   // Get last checkin date for a region
   const getLastCheckin = useCallback((regionId) => {
@@ -82,7 +87,13 @@ export default function TerrainCanvas({
 
     for (let i = layoutRef.current.length - 1; i >= 0; i--) {
       const l = layoutRef.current[i]
-      if (worldX >= l.x && worldX <= l.x + l.w && worldY >= l.y && worldY <= l.y + l.h) {
+      // Generous hit area around the sprite
+      const hitRadius = 28
+      const cx = l.x + l.w / 2
+      const cy = l.y + l.h / 2
+      const dx = worldX - cx
+      const dy = worldY - cy
+      if (dx * dx + dy * dy < hitRadius * hitRadius) {
         return l.region
       }
     }
@@ -96,6 +107,13 @@ export default function TerrainCanvas({
 
     const ctx = canvas.getContext('2d')
     let running = true
+
+    // Particle colors
+    const particleColors = [
+      [74, 144, 217],   // blue
+      [255, 107, 157],  // pink
+      [212, 168, 83],   // gold
+    ]
 
     function render() {
       if (!running) return
@@ -117,135 +135,140 @@ export default function TerrainCanvas({
       canvas.style.height = rect.height + 'px'
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-      // Clear
-      ctx.fillStyle = '#0D0A06'
-      ctx.fillRect(0, 0, rect.width, rect.height)
+      const W = rect.width
+      const H = rect.height
 
-      // Draw subtle grid
+      // 1. Fill background
+      ctx.fillStyle = '#0D0A06'
+      ctx.fillRect(0, 0, W, H)
+
+      // 2. Draw pixel grid (subtle animated background)
+      drawPixelGrid(ctx, W, H, s.time)
+
+      // Transform for world-space
       ctx.save()
       ctx.translate(s.offset.x, s.offset.y)
       ctx.scale(s.scale, s.scale)
 
-      // Grid dots
-      if (!mini) {
-        ctx.fillStyle = 'rgba(61, 46, 26, 0.3)'
-        const gridSize = 48
-        const startX = Math.floor(-s.offset.x / s.scale / gridSize) * gridSize - gridSize
-        const startY = Math.floor(-s.offset.y / s.scale / gridSize) * gridSize - gridSize
-        const endX = startX + (rect.width / s.scale) + gridSize * 2
-        const endY = startY + (rect.height / s.scale) + gridSize * 2
+      const layout = layoutRef.current
 
-        for (let gx = startX; gx < endX; gx += gridSize) {
-          for (let gy = startY; gy < endY; gy += gridSize) {
-            ctx.fillRect(gx, gy, 1, 1)
-          }
+      // 3. Draw paths between connected regions
+      if (layout.length > 1) {
+        for (let i = 0; i < layout.length - 1; i++) {
+          const a = layout[i]
+          const b = layout[i + 1]
+          const ax = a.x + a.w / 2
+          const ay = a.y + a.h / 2
+          const bx = b.x + b.w / 2
+          const by = b.y + b.h / 2
+          drawPixelPath(ctx, ax, ay, bx, by, '#3D2E1A', 4, 8)
         }
       }
 
-      // Draw regions
-      const layout = layoutRef.current
+      // 4. Draw each region
       for (const l of layout) {
+        const type = l.region.type || 'mountains'
+        const sprite = SPRITES[type] || SPRITES.mountains
+        const palette = PALETTES[type] || PALETTES.mountains
+        const regionColor = REGION_COLORS[type] || '#D4A853'
+
+        // Hover glow (draw behind sprite)
+        if (interactive && s.hoverRegion && s.hoverRegion.id === l.region.id) {
+          ctx.fillStyle = regionColor.replace(')', ',0.2)').replace('rgb', 'rgba').replace('#', '')
+          // Use a hex-to-rgba approach
+          const r = parseInt(regionColor.slice(1, 3), 16)
+          const g = parseInt(regionColor.slice(3, 5), 16)
+          const b = parseInt(regionColor.slice(5, 7), 16)
+          ctx.fillStyle = `rgba(${r},${g},${b},0.2)`
+          ctx.fillRect(l.x - 4, l.y - 4, l.w + 8, l.h + 8)
+        }
+
+        // Draw the region sprite at scale=4 (12*4=48)
+        drawSprite(ctx, sprite, palette, l.x, l.y, 4)
+
+        // Progress bar below (48px wide, 4px tall)
+        const progress = l.region.progress || 0
+        const barY = l.y + l.h + 4
+        const barW = 48
+        const barH = 4
+
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'
+        ctx.fillRect(l.x, barY, barW, barH)
+
+        if (progress > 0) {
+          ctx.fillStyle = regionColor
+          ctx.fillRect(l.x, barY, barW * (progress / 100), barH)
+        }
+
+        // Weather sprite (8x8 at scale=2 = 16px) upper-right
         const lastDate = getLastCheckin(l.region.id)
         const weather = getWeatherStatus(lastDate)
-        drawTerrainRegion(ctx, l.region, l.x, l.y, l.w, l.h, weather)
-
-        // Hover highlight
-        if (interactive && s.hoverRegion && s.hoverRegion.id === l.region.id) {
-          ctx.strokeStyle = 'rgba(212, 168, 83, 0.5)'
-          ctx.lineWidth = 3
-          ctx.beginPath()
-          ctx.roundRect(l.x - 2, l.y - 2, l.w + 4, l.h + 4, 10)
-          ctx.stroke()
+        const weatherSprite = WEATHER_SPRITES[weather]
+        const weatherPalette = WEATHER_PALETTES[weather]
+        if (weatherSprite) {
+          drawSprite(ctx, weatherSprite, weatherPalette, l.x + l.w - 4, l.y - 12, 2)
         }
+
+        // Region name below
+        ctx.fillStyle = '#F5E6C8'
+        ctx.font = "11px 'Inter', sans-serif"
+        ctx.textAlign = 'center'
+        ctx.shadowColor = 'rgba(0,0,0,0.8)'
+        ctx.shadowBlur = 3
+        ctx.fillText(l.region.name, l.x + l.w / 2, barY + barH + 14, 80)
+        ctx.shadowBlur = 0
       }
 
-      // Add region placeholder
-      if (interactive && !mini && !singleRegion) {
-        const addX = layout.length > 0 ? Math.max(...layout.map(l => l.x + l.w)) + 24 : 24
-        const addY = 24
+      // Add region placeholder (dashed square)
+      if (interactive && !mini && !singleRegion && layout.length > 0) {
+        const last = layout[layout.length - 1]
+        const addX = last.x + 100
+        const addY = last.y
         ctx.strokeStyle = 'rgba(212, 168, 83, 0.2)'
         ctx.lineWidth = 2
-        ctx.setLineDash([6, 4])
-        ctx.beginPath()
-        ctx.roundRect(addX, addY, 200, 160, 8)
-        ctx.stroke()
+        ctx.setLineDash([4, 4])
+        ctx.strokeRect(addX, addY, 48, 48)
         ctx.setLineDash([])
 
         ctx.fillStyle = 'rgba(212, 168, 83, 0.3)'
-        ctx.font = `bold 32px 'Inter', sans-serif`
+        ctx.font = "bold 24px 'Inter', sans-serif"
         ctx.textAlign = 'center'
-        ctx.fillText('+', addX + 100, addY + 88)
+        ctx.fillText('+', addX + 24, addY + 32)
       }
 
       ctx.restore()
 
-      // Particles (screen space)
-      const fx = theme.particle_fx || 'fireflies'
-      if (fx !== 'none') {
-        for (const p of s.particles) {
-          p.x += p.vx
-          p.y += p.vy
+      // 5. Square particles (screen space)
+      for (const p of s.particles) {
+        p.x += p.vx + Math.sin(s.time * 1.5 + p.phase) * 0.1
+        p.y += p.vy
 
-          if (fx === 'fireflies') {
-            p.x += Math.sin(s.time * 2 + p.phase) * 0.3
-            p.y += Math.cos(s.time * 1.5 + p.phase) * 0.2
-          }
+        // Wrap around
+        if (p.x < 0) p.x = W
+        if (p.x > W) p.x = 0
+        if (p.y < 0) p.y = H
+        if (p.y > H) p.y = 0
 
-          // Wrap around
-          if (p.x < 0) p.x = rect.width
-          if (p.x > rect.width) p.x = 0
-          if (p.y < 0) p.y = rect.height
-          if (p.y > rect.height) p.y = 0
-
-          const alpha = fx === 'fireflies'
-            ? p.alpha * (0.5 + Math.sin(s.time * 3 + p.phase) * 0.5)
-            : p.alpha
-
-          if (fx === 'rain') {
-            ctx.strokeStyle = `rgba(150, 180, 220, ${alpha})`
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(p.x, p.y)
-            ctx.lineTo(p.x + p.vx * 2, p.y + p.vy * 2)
-            ctx.stroke()
-          } else {
-            const color = fx === 'fireflies' ? `rgba(212, 168, 83, ${alpha})`
-              : fx === 'snowflakes' ? `rgba(220, 220, 240, ${alpha})`
-              : `rgba(200, 200, 200, ${alpha})`
-
-            ctx.fillStyle = color
-            ctx.beginPath()
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-            ctx.fill()
-
-            if (fx === 'fireflies') {
-              ctx.fillStyle = `rgba(212, 168, 83, ${alpha * 0.2})`
-              ctx.beginPath()
-              ctx.arc(p.x, p.y, p.size * 4, 0, Math.PI * 2)
-              ctx.fill()
-            }
-          }
-        }
+        const alpha = p.alpha * (0.5 + Math.sin(s.time * 2 + p.phase) * 0.5)
+        const [pr, pg, pb] = particleColors[p.colorIdx]
+        ctx.fillStyle = `rgba(${pr},${pg},${pb},${alpha})`
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size)
       }
 
       // Hover tooltip
       if (interactive && s.hoverRegion && !s.dragging) {
         const name = s.hoverRegion.name
-        ctx.font = `bold 13px 'Inter', sans-serif`
+        ctx.font = "bold 13px 'Inter', sans-serif"
         const tw = ctx.measureText(name).width
         const tx = s.mousePos.x - tw / 2 - 8
         const ty = s.mousePos.y - 36
 
         ctx.fillStyle = 'rgba(13, 10, 6, 0.9)'
-        ctx.beginPath()
-        ctx.roundRect(tx, ty, tw + 16, 24, 4)
-        ctx.fill()
+        ctx.fillRect(tx, ty, tw + 16, 24)
 
-        ctx.strokeStyle = 'var(--border-retro)'
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.roundRect(tx, ty, tw + 16, 24, 4)
-        ctx.stroke()
+        ctx.strokeStyle = '#3D2E1A'
+        ctx.lineWidth = 2
+        ctx.strokeRect(tx, ty, tw + 16, 24)
 
         ctx.fillStyle = '#F5E6C8'
         ctx.textAlign = 'left'
@@ -309,11 +332,15 @@ export default function TerrainCanvas({
       } else if (!region && onAddClick) {
         // Check if clicked on the add button area
         const layout = layoutRef.current
-        const addX = layout.length > 0 ? Math.max(...layout.map(l => l.x + l.w)) + 24 : 24
-        const worldX = (screenX - s.offset.x) / s.scale
-        const worldY = (screenY - s.offset.y) / s.scale
-        if (worldX >= addX && worldX <= addX + 200 && worldY >= 24 && worldY <= 184) {
-          onAddClick()
+        if (layout.length > 0) {
+          const last = layout[layout.length - 1]
+          const addX = last.x + 100
+          const addY = last.y
+          const worldX = (screenX - s.offset.x) / s.scale
+          const worldY = (screenY - s.offset.y) / s.scale
+          if (worldX >= addX && worldX <= addX + 48 && worldY >= addY && worldY <= addY + 48) {
+            onAddClick()
+          }
         }
       }
     }

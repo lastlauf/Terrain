@@ -1,12 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
-import { simplex2d } from '../lib/terrain.js'
+import { drawPixelGrid } from '../lib/pixels.js'
+import TerrainCanvas from '../components/TerrainCanvas.jsx'
 
-// ── Pixel art inline SVG components ──
+// ── Pixel art inline SVG components (updated colors) ──
 
 function PixelMountain({ size = 48 }) {
-  // 8x8 pixel mountain
   const pixels = [
     [0,0,0,0,1,0,0,0],
     [0,0,0,1,2,1,0,0],
@@ -17,7 +17,7 @@ function PixelMountain({ size = 48 }) {
     [3,3,3,3,3,3,3,3],
     [3,3,3,3,3,3,3,3],
   ]
-  const colors = ['transparent', '#F5E6C8', '#7C9EBA', '#5A6B7A']
+  const colors = ['transparent', '#F5E6C8', '#4A90D9', '#3A72B0']
   const s = size / 8
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
@@ -39,7 +39,7 @@ function PixelTree({ size = 48 }) {
     [0,0,0,2,0,0,0,0],
     [0,0,0,2,0,0,0,0],
   ]
-  const colors = ['transparent', '#5E9E6E', '#6B4226']
+  const colors = ['transparent', '#5E9E6E', '#8B6B3E']
   const s = size / 8
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
@@ -61,7 +61,7 @@ function PixelCity({ size = 48 }) {
     [1,2,1,2,1,1,1,1],
     [1,1,1,1,1,1,1,1],
   ]
-  const colors = ['transparent', '#8A7560', '#D4A853']
+  const colors = ['transparent', '#D4A853', '#FF6B9D']
   const s = size / 8
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
@@ -83,7 +83,7 @@ function PixelWave({ size = 48 }) {
     [0,0,3,3,3,3,0,0],
     [0,0,0,3,3,0,0,0],
   ]
-  const colors = ['transparent', '#F5E6C8', '#00D4C8', '#D4A853']
+  const colors = ['transparent', '#F5E6C8', '#FF6B9D', '#D4A853']
   const s = size / 8
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
@@ -105,7 +105,7 @@ function PixelSatellite({ size = 48 }) {
     [0,1,0,0,1,0,0,0],
     [1,0,0,0,0,0,0,0],
   ]
-  const colors = ['transparent', '#00D4C8', '#8A7560']
+  const colors = ['transparent', '#4A90D9', '#8A7560']
   const s = size / 8
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
@@ -138,6 +138,156 @@ function PixelGamepad({ size = 48 }) {
   )
 }
 
+// ── Demo Data ──
+
+const DEMO_REGIONS = [
+  { id: 'demo-1', name: 'Morning Runs', type: 'mountains', category: 'physical', description: 'Building a daily running habit', color: '#4A90D9', progress: 65 },
+  { id: 'demo-2', name: 'Side Project', type: 'city', category: 'creative', description: 'Shipping my app by summer', color: '#D4A853', progress: 40 },
+  { id: 'demo-3', name: 'Reading List', type: 'forest', category: 'learning', description: '24 books this year', color: '#5E9E6E', progress: 30 },
+  { id: 'demo-4', name: 'Savings Goal', type: 'coast', category: 'financial', description: 'Emergency fund by December', color: '#FF6B9D', progress: 55 },
+]
+
+const DEMO_CHECKINS = [
+  { id: 'c1', region_id: 'demo-1', duration_minutes: 45, notes: 'Great 5K today, felt strong.', mood: 4, created_at: new Date(Date.now() - 1000*60*60*24).toISOString() },
+  { id: 'c2', region_id: 'demo-2', duration_minutes: 120, notes: 'Shipped the auth flow.', mood: 5, created_at: new Date(Date.now() - 1000*60*60*24*2).toISOString() },
+  { id: 'c3', region_id: 'demo-3', duration_minutes: 60, notes: 'Finished chapter 8.', mood: 4, created_at: new Date(Date.now() - 1000*60*60*24*5).toISOString() },
+  { id: 'c4', region_id: 'demo-4', duration_minutes: 15, notes: 'Moved $500 into savings.', mood: 4, created_at: new Date(Date.now() - 1000*60*60*24*7).toISOString() },
+]
+
+// ── Demo Info Popup ──
+
+function DemoPopup({ region, onClose }) {
+  const checkins = DEMO_CHECKINS.filter(c => c.region_id === region.id)
+  const latest = checkins[0]
+
+  return (
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-content glass-panel-heavy">
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-2xl)',
+          color: region.color || 'var(--accent-gold)',
+          marginBottom: 'var(--space-1)',
+        }}>
+          {region.name}
+        </h2>
+        <p style={{
+          fontFamily: 'var(--font-heading)',
+          fontSize: 'var(--text-sm)',
+          color: 'var(--text-muted)',
+          marginBottom: 'var(--space-2)',
+          textTransform: 'capitalize',
+        }}>
+          {region.type} &middot; {region.category}
+        </p>
+        <p style={{
+          fontSize: 'var(--text-sm)',
+          color: 'var(--text-muted)',
+          marginBottom: 'var(--space-6)',
+          lineHeight: 1.6,
+        }}>
+          {region.description}
+        </p>
+
+        {/* Progress */}
+        <div style={{ marginBottom: 'var(--space-6)' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: 'var(--space-2)',
+          }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', fontWeight: 600 }}>
+              Progress
+            </span>
+            <span style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 'var(--text-sm)',
+              color: region.color || 'var(--accent-gold)',
+            }}>
+              {region.progress}%
+            </span>
+          </div>
+          <div style={{
+            height: '8px',
+            background: 'var(--bg-surface)',
+            border: '2px solid var(--border-retro)',
+          }}>
+            <div style={{
+              height: '100%',
+              width: `${region.progress}%`,
+              background: region.color || 'var(--accent-gold)',
+              transition: 'width var(--duration-slow) var(--ease-out)',
+            }} />
+          </div>
+        </div>
+
+        {/* Sample checkin */}
+        {latest && (
+          <div style={{
+            padding: 'var(--space-3)',
+            background: 'var(--bg-glass)',
+            border: '2px solid var(--border-retro)',
+            marginBottom: 'var(--space-6)',
+            borderLeft: `3px solid ${region.color || 'var(--accent-gold)'}`,
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--space-2)',
+            }}>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                {latest.duration_minutes} min
+              </span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-dim)' }}>
+                {new Date(latest.created_at).toLocaleDateString()}
+              </span>
+            </div>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              {latest.notes}
+            </p>
+          </div>
+        )}
+
+        {/* Demo notice */}
+        <div style={{
+          padding: 'var(--space-3)',
+          background: 'rgba(212, 168, 83, 0.08)',
+          border: '2px solid rgba(212, 168, 83, 0.2)',
+          marginBottom: 'var(--space-4)',
+          textAlign: 'center',
+        }}>
+          <p style={{
+            fontSize: 'var(--text-xs)',
+            color: 'var(--accent-gold)',
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+          }}>
+            Demo Mode &mdash; Read Only
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+          <Link
+            to="/signup"
+            className="btn-retro"
+            style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}
+          >
+            Sign Up
+          </Link>
+          <button
+            type="button"
+            className="btn-retro btn-retro--secondary"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main Landing ──
 
 export default function Landing() {
@@ -145,11 +295,13 @@ export default function Landing() {
   const { user } = useAuth()
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
+  const [demoRegion, setDemoRegion] = useState(null)
 
   useEffect(() => {
     if (user) navigate('/map', { replace: true })
   }, [user, navigate])
 
+  // Pixel grid hero background
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -175,53 +327,15 @@ export default function Landing() {
       ctx.fillStyle = '#0D0A06'
       ctx.fillRect(0, 0, W, H)
 
-      for (let i = 0; i < 80; i++) {
-        const sx = (simplex2d(i * 0.3, 0.1) * W * 1.5 + W * 0.2 + time * 8 * ((i % 3) + 0.5)) % W
-        const sy = simplex2d(0.1, i * 0.3) * H * 0.55
-        const br = Math.sin(time * 1.8 + i) * 0.3 + 0.45
-        ctx.fillStyle = `rgba(245, 230, 200, ${br * 0.35})`
-        ctx.fillRect(sx, sy, i % 4 === 0 ? 2 : 1.5, i % 4 === 0 ? 2 : 1.5)
-      }
+      // Draw pixel grid
+      drawPixelGrid(ctx, W, H, time)
 
-      ctx.fillStyle = 'rgba(124, 158, 186, 0.13)'
-      ctx.beginPath(); ctx.moveTo(0, H)
-      for (let x = 0; x <= W; x += 3) {
-        const n = simplex2d(x * 0.003 + time * 0.15, 1.0)
-        ctx.lineTo(x, H * 0.52 - n * H * 0.22)
-      }
-      ctx.lineTo(W, H); ctx.closePath(); ctx.fill()
-
-      ctx.fillStyle = 'rgba(94, 158, 110, 0.18)'
-      ctx.beginPath(); ctx.moveTo(0, H)
-      for (let x = 0; x <= W; x += 3) {
-        const n = simplex2d(x * 0.005 + time * 0.25, 5.0)
-        ctx.lineTo(x, H * 0.62 - n * H * 0.14)
-      }
-      ctx.lineTo(W, H); ctx.closePath(); ctx.fill()
-
-      ctx.fillStyle = 'rgba(212, 168, 83, 0.10)'
-      ctx.beginPath(); ctx.moveTo(0, H)
-      for (let x = 0; x <= W; x += 3) {
-        const n = simplex2d(x * 0.008 + time * 0.4, 10.0)
-        ctx.lineTo(x, H * 0.72 - n * H * 0.10)
-      }
-      ctx.lineTo(W, H); ctx.closePath(); ctx.fill()
-
-      const g = ctx.createLinearGradient(0, H * 0.78, 0, H)
-      g.addColorStop(0, 'rgba(26, 21, 16, 0.6)')
+      // Fade gradient at bottom
+      const g = ctx.createLinearGradient(0, H * 0.75, 0, H)
+      g.addColorStop(0, 'rgba(13, 10, 6, 0)')
       g.addColorStop(1, '#0D0A06')
       ctx.fillStyle = g
-      ctx.fillRect(0, H * 0.78, W, H * 0.22)
-
-      for (let i = 0; i < 22; i++) {
-        const px = (simplex2d(i * 0.7, time * 0.4) * W + W) % W
-        const py = simplex2d(time * 0.25, i * 0.7) * H * 0.45 + H * 0.32
-        const alpha = Math.sin(time * 2.2 + i * 0.6) * 0.28 + 0.28
-        ctx.fillStyle = `rgba(212, 168, 83, ${alpha})`
-        ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2); ctx.fill()
-        ctx.fillStyle = `rgba(212, 168, 83, ${alpha * 0.18})`
-        ctx.beginPath(); ctx.arc(px, py, 9, 0, Math.PI * 2); ctx.fill()
-      }
+      ctx.fillRect(0, H * 0.75, W, H * 0.25)
 
       requestAnimationFrame(render)
     }
@@ -287,14 +401,14 @@ export default function Landing() {
             </p>
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link to="/demo" className="btn-retro" style={{
+              <a href="#demo" className="btn-retro" style={{
                 textDecoration: 'none',
                 fontSize: '15px',
                 padding: '14px 32px',
                 borderRadius: '50px',
               }}>
                 Start Exploring
-              </Link>
+              </a>
               <Link to="/login" className="btn-retro btn-retro--secondary" style={{
                 textDecoration: 'none',
                 fontSize: '15px',
@@ -321,7 +435,11 @@ export default function Landing() {
           display: 'flex', alignItems: 'center', gap: '8px',
         }}>
           <span className="mono-label" style={{ color: 'var(--text-dim)' }}>scroll</span>
-          <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>↓</span>
+          <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
         </div>
       </section>
 
@@ -374,15 +492,6 @@ export default function Landing() {
               backgroundImage: 'radial-gradient(circle, rgba(245,230,200,0.06) 1px, transparent 1px)',
               backgroundSize: '20px 20px',
             }} />
-            {/* Terrain-like ground gradient */}
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
-              background: 'linear-gradient(to top, rgba(94,158,110,0.12), transparent)',
-            }} />
-            {/* Mountain silhouette across bottom */}
-            <svg viewBox="0 0 400 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', opacity: 0.15 }} preserveAspectRatio="none">
-              <polygon points="0,60 30,35 60,50 100,20 140,40 180,15 220,35 260,25 300,40 340,18 380,30 400,45 400,60" fill="#7C9EBA" />
-            </svg>
             {/* Region icons positioned on the "map" */}
             <div style={{ position: 'absolute', top: '15%', left: '12%' }}>
               <PixelMountain size={48} />
@@ -402,9 +511,9 @@ export default function Landing() {
             </div>
             {/* Connecting dotted lines between regions */}
             <svg viewBox="0 0 400 300" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
-              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
-              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-retro)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
             </svg>
           </div>
         </div>
@@ -419,7 +528,7 @@ export default function Landing() {
           marginTop: '80px',
         }}>
           <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-teal)' }}>02</span>
+            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-blue)' }}>02</span>
             <div style={{ marginBottom: '16px' }}>
               <PixelSatellite size={40} />
             </div>
@@ -438,7 +547,7 @@ export default function Landing() {
             </p>
           </div>
           <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-orange)' }}>03</span>
+            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-pink)' }}>03</span>
             <div style={{ marginBottom: '16px' }}>
               <PixelGamepad size={40} />
             </div>
@@ -456,6 +565,63 @@ export default function Landing() {
               Walk through your goals as a platformer. Each region becomes a biome zone. Collect past reflections as orbs. Traverse your progress — literally.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ── DEMO SECTION ── */}
+      <section id="demo" style={{
+        padding: '80px 6vw 120px',
+        maxWidth: '1100px',
+        margin: '0 auto',
+      }}>
+        <hr className="dotted-divider" style={{ marginBottom: '80px' }} />
+
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>Interactive</span>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(32px, 5vw, 64px)',
+            letterSpacing: '0.1em',
+            color: 'var(--text-primary)',
+            marginBottom: '16px',
+          }}>
+            Try the Demo
+          </h2>
+          <p style={{ fontSize: '16px', color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6 }}>
+            Click any region node to see its details. Drag to pan around the map. This is what your terrain looks like.
+          </p>
+        </div>
+
+        {/* Demo Canvas */}
+        <div style={{
+          width: '100%',
+          maxWidth: '640px',
+          height: '400px',
+          margin: '0 auto 48px',
+          border: '3px solid var(--border-retro)',
+          background: 'var(--bg-base)',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <TerrainCanvas
+            regions={DEMO_REGIONS}
+            checkins={DEMO_CHECKINS}
+            onRegionClick={(region) => setDemoRegion(region)}
+            interactive={true}
+            mini={false}
+            theme={{}}
+          />
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <Link to="/signup" className="btn-retro btn-retro--orange" style={{
+            textDecoration: 'none',
+            fontSize: '16px',
+            padding: '16px 40px',
+            borderRadius: '50px',
+          }}>
+            Sign Up to Build Yours
+          </Link>
         </div>
       </section>
 
@@ -503,6 +669,14 @@ export default function Landing() {
         <span className="mono-label">TERRAIN — Goal Operating System</span>
         <span className="mono-label" style={{ color: 'var(--text-dim)' }}>Built with care</span>
       </footer>
+
+      {/* Demo popup */}
+      {demoRegion && (
+        <DemoPopup
+          region={demoRegion}
+          onClose={() => setDemoRegion(null)}
+        />
+      )}
     </div>
   )
 }

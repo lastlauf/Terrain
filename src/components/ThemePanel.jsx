@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const SKY_PRESETS = [
   { value: 'dawn', label: 'Dawn', colors: ['#2A1A1A', '#4A2A2A', '#D4A853'] },
-  { value: 'day', label: 'Day', colors: ['#1A2A3A', '#3A5A7A', '#7C9EBA'] },
+  { value: 'day', label: 'Day', colors: ['#1A2A3A', '#3A5A7A', '#4A90D9'] },
   { value: 'dusk', label: 'Dusk', colors: ['#2A1A2A', '#4A2A4A', '#E8632A'] },
   { value: 'night', label: 'Night', colors: ['#0A0A1A', '#1A1A2A', '#2A2A4A'] },
   { value: 'storm', label: 'Storm', colors: ['#0A0A0A', '#1A1A1A', '#2A2A2A'] },
@@ -10,7 +10,7 @@ const SKY_PRESETS = [
 
 const GROUND_STYLES = ['natural', 'pixelated', 'wireframe']
 const PARTICLE_OPTIONS = ['fireflies', 'snowflakes', 'rain', 'none']
-const CHARACTER_COLORS = ['#D4A853', '#00D4C8', '#FF6B9D', '#E8632A', '#7C9EBA', '#5E9E6E']
+const CHARACTER_COLORS = ['#D4A853', '#4A90D9', '#FF6B9D', '#5E9E6E', '#3A72B0', '#D4568A']
 
 export default function ThemePanel({ open, onClose, theme, onUpdate }) {
   const [localTheme, setLocalTheme] = useState(theme)

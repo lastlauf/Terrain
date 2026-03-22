@@ -17,8 +17,8 @@ const CATEGORIES = [
 ]
 
 const COLOR_PRESETS = [
-  '#7C9EBA', '#5E9E6E', '#D4A853', '#00D4C8',
-  '#FF6B9D', '#E8632A', '#9B6BFF', '#6BCF7F',
+  '#4A90D9', '#5E9E6E', '#D4A853', '#FF6B9D',
+  '#3A72B0', '#8B6B3E', '#9B6BFF', '#6BCF7F',
 ]
 
 export default function AddRegionModal({ onClose, onSubmit, inline = false }) {

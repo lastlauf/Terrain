@@ -9,10 +9,10 @@ export const FRICTION = 0.82
 export const SPRINT_MULTIPLIER = 1.8
 
 const REGION_BG_COLORS = {
-  mountains: { sky: '#1A2A3A', ground: '#2A3A4A', accent: '#7C9EBA' },
+  mountains: { sky: '#1A2A3A', ground: '#2A3A4A', accent: '#4A90D9' },
   forest: { sky: '#0A1A0A', ground: '#1A2A1A', accent: '#5E9E6E' },
   city: { sky: '#1A1510', ground: '#2A2015', accent: '#D4A853' },
-  coast: { sky: '#0A1A2A', ground: '#1A2A3A', accent: '#00D4C8' },
+  coast: { sky: '#0A1A2A', ground: '#1A2A3A', accent: '#FF6B9D' },
 }
 
 export function generateZone(region, index) {

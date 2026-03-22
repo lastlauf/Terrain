@@ -1,5 +1,6 @@
 /* ============================================
    TERRAIN — Global Styles
+   Pixel-art Mario World aesthetic
    ============================================ */
 
 @font-face {
@@ -11,7 +12,7 @@
 }
 
 :root {
-  /* Color Palette */
+  /* Color Palette — blue/pink/gold family */
   --bg-base: #0D0A06;
   --bg-surface: #1A1510;
   --bg-glass: rgba(255, 200, 100, 0.06);
@@ -19,16 +20,15 @@
   --border-retro: #3D2E1A;
   --border-retro-light: #5A4530;
   --accent-gold: #D4A853;
-  --accent-orange: #E8632A;
-  --accent-teal: #00D4C8;
   --accent-pink: #FF6B9D;
+  --accent-blue: #4A90D9;
   --text-primary: #F5E6C8;
   --text-muted: #8A7560;
   --text-dim: #5A4A38;
-  --region-mountains: #7C9EBA;
+  --region-mountains: #4A90D9;
   --region-forest: #5E9E6E;
   --region-city: #D4A853;
-  --region-coast: #00D4C8;
+  --region-coast: #FF6B9D;
   --danger: #E8432A;
 
   /* Spacing Scale (4px base) */
@@ -78,7 +78,7 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
   --shadow-glow-gold: 0 0 20px rgba(212, 168, 83, 0.3);
-  --shadow-glow-teal: 0 0 20px rgba(0, 212, 200, 0.3);
+  --shadow-glow-blue: 0 0 20px rgba(74, 144, 217, 0.3);
 }
 
 /* ============================================
@@ -120,7 +120,7 @@ a {
 }
 
 a:hover {
-  color: var(--accent-orange);
+  color: var(--accent-pink);
 }
 
 img {
@@ -172,25 +172,30 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   Glass Panel
+   Glass Panel — Pixel Border Style
    ============================================ */
 
 .glass-panel {
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: var(--border-width) solid var(--border-retro);
-  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: var(--border-width-heavy) solid var(--border-retro);
+  border-radius: 0;
   box-shadow: var(--shadow-md);
 }
 
 .glass-panel-heavy {
-  background: var(--bg-glass-heavy);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--bg-surface);
   border: var(--border-width-heavy) solid var(--border-retro);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   Pixel Border Utility
+   ============================================ */
+
+.pixel-border {
+  border: 3px solid var(--border-retro);
+  border-radius: 0;
 }
 
 /* ============================================
@@ -209,7 +214,7 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, #4A90D9 0%, #FF6B9D 50%, #D4A853 100%);
   background-size: 200% 200%;
   border: var(--border-width-heavy) solid rgba(255,255,255,0.15);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   box-shadow: 0 3px 0 rgba(0,0,0,0.3), var(--shadow-sm);
   transition: all var(--duration-fast) var(--ease-out);
   text-transform: uppercase;
@@ -274,14 +279,14 @@ a.btn-retro--secondary:hover {
 }
 
 .btn-retro--teal {
-  background: var(--accent-teal);
-  border-color: var(--accent-teal);
-  box-shadow: 0 3px 0 #008A82, var(--shadow-sm);
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  box-shadow: 0 3px 0 #2A5486, var(--shadow-sm);
 }
 
 .btn-retro--teal:hover {
-  background: #1AE0D5;
-  box-shadow: 0 4px 0 #008A82, var(--shadow-md);
+  background: #5A9EE6;
+  box-shadow: 0 4px 0 #2A5486, var(--shadow-md);
 }
 
 .btn-retro--pink {
@@ -313,7 +318,7 @@ a.btn-retro--secondary:hover {
   color: var(--text-primary);
   background: var(--bg-surface);
   border: var(--border-width) solid var(--border-retro);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   outline: none;
   transition: border-color var(--duration-fast) var(--ease-out),
               box-shadow var(--duration-fast) var(--ease-out);
@@ -414,7 +419,7 @@ textarea.input-retro {
   font-family: var(--font-heading);
 }
 
-/* Monospace label — small editorial metadata text, à la has.works */
+/* Monospace label */
 .mono-label {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -423,7 +428,7 @@ textarea.input-retro {
   color: var(--text-muted);
 }
 
-/* Dotted divider — editorial section break */
+/* Dotted divider */
 .dotted-divider {
   border: none;
   border-top: 1px dashed var(--border-retro);
@@ -431,9 +436,8 @@ textarea.input-retro {
 }
 
 .text-gold { color: var(--accent-gold); }
-.text-orange { color: var(--accent-orange); }
-.text-teal { color: var(--accent-teal); }
 .text-pink { color: var(--accent-pink); }
+.text-blue { color: var(--accent-blue); }
 .text-muted { color: var(--text-muted); }
 
 /* ============================================
@@ -451,7 +455,7 @@ textarea.input-retro {
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-retro);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -498,7 +502,7 @@ textarea.input-retro {
   display: inline-block;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 0;
   background: var(--accent-gold);
   margin: 0 3px;
   animation: dot-pulse 1.4s ease-in-out infinite;

@@ -517,7 +517,7 @@ export default function Landing() {
             <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>01</span>
             <h2 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(40px, 6vw, 80px)',
+              fontSize: 'clamp(24px, 3.5vw, 44px)',
               lineHeight: 1.1,
               letterSpacing: '0.1em',
               color: 'var(--text-primary)',
@@ -525,7 +525,7 @@ export default function Landing() {
             }}>
               Map<br />View
             </h2>
-            <p style={{ fontSize: '16px', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '340px' }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '18px', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '380px' }}>
               Each goal becomes a region on your terrain — mountains, forests, cities, coasts. The map breathes: weather shifts with your check-in recency.
             </p>
           </div>
@@ -585,7 +585,7 @@ export default function Landing() {
             </div>
             <h3 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 4vw, 52px)',
+              fontSize: 'clamp(22px, 3vw, 36px)',
               lineHeight: 1.1,
               letterSpacing: '0.1em',
               color: 'var(--text-primary)',
@@ -593,7 +593,7 @@ export default function Landing() {
             }}>
               Field<br />Reports
             </h3>
-            <p style={{ fontSize: '15px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '18px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
               AI-powered dispatches from your terrain. A wise cartographer notices patterns, names what it sees, and asks one good question. Under 80 words — always.
             </p>
           </div>
@@ -604,7 +604,7 @@ export default function Landing() {
             </div>
             <h3 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(28px, 4vw, 52px)',
+              fontSize: 'clamp(22px, 3vw, 36px)',
               lineHeight: 1.1,
               letterSpacing: '0.1em',
               color: 'var(--text-primary)',
@@ -612,7 +612,7 @@ export default function Landing() {
             }}>
               Explore<br />Mode
             </h3>
-            <p style={{ fontSize: '15px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '18px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
               Walk through your goals as a platformer. Each region becomes a biome zone. Collect past reflections as orbs. Traverse your progress — literally.
             </p>
           </div>

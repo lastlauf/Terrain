@@ -56,7 +56,7 @@
   /* Fonts */
   --font-display: 'Daydream', 'Boogaloo', cursive;
   --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Open Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Courier New', 'Courier', monospace;
 
   /* Borders */

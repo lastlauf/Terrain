@@ -15,18 +15,20 @@ import { useRegions } from '../hooks/useRegions.js'
 import { useCheckins } from '../hooks/useCheckins.js'
 import { useTheme } from '../hooks/useTheme.js'
 import { useAuth } from '../hooks/useAuth.js'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 import { supabase } from '../lib/supabase.js'
 import { buildDispatchContext, generateDispatch } from '../lib/claude.js'
 
 // FAB with hover label
-function Fab({ onClick, className, style, title, children, 'data-tour': dataTour }) {
+function Fab({ onClick, className, style, title, children, 'data-tour': dataTour, small }) {
   const [hovered, setHovered] = useState(false)
+  const size = small ? '40px' : '48px'
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
       {hovered && (
         <span style={{
           position: 'absolute',
-          right: '64px',
+          right: small ? '52px' : '64px',
           whiteSpace: 'nowrap',
           fontFamily: 'var(--font-mono)',
           fontSize: '11px',
@@ -49,10 +51,10 @@ function Fab({ onClick, className, style, title, children, 'data-tour': dataTour
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         style={{
-          width: '48px',
-          height: '48px',
+          width: size,
+          height: size,
           padding: 0,
-          fontSize: 'var(--text-lg)',
+          fontSize: small ? 'var(--text-base)' : 'var(--text-lg)',
           ...style,
         }}
         title={title}
@@ -313,12 +315,7 @@ export default function Map() {
   }, [])
 
   // Detect mobile
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
+  const isMobile = useIsMobile()
 
   return (
     <div style={{
@@ -357,35 +354,35 @@ export default function Map() {
           {/* FABs with hover labels */}
           <div style={{
             position: 'absolute',
-            bottom: 'var(--space-6)',
-            right: 'var(--space-6)',
+            bottom: isMobile ? 'var(--space-4)' : 'var(--space-6)',
+            right: isMobile ? 'var(--space-4)' : 'var(--space-6)',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--space-2)',
             zIndex: 10,
           }}>
-            <Fab onClick={() => setDashboardOpen(!dashboardOpen)} className={dashboardOpen ? 'btn-retro' : 'btn-retro btn-retro--secondary'} data-tour="fab-dashboard" title={dashboardOpen ? 'Close List' : 'List View'}>
+            <Fab small={isMobile} onClick={() => setDashboardOpen(!dashboardOpen)} className={dashboardOpen ? 'btn-retro' : 'btn-retro btn-retro--secondary'} data-tour="fab-dashboard" title={dashboardOpen ? 'Close List' : 'List View'}>
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M3 4h14M3 8h14M3 12h10M3 16h6" stroke="currentColor" strokeWidth="2" strokeLinecap="square" /></svg>
             </Fab>
 
-            <Fab onClick={() => setShowDispatch(true)} className="btn-retro btn-retro--secondary" data-tour="fab-dispatch" title="Letters">
+            <Fab small={isMobile} onClick={() => setShowDispatch(true)} className="btn-retro btn-retro--secondary" data-tour="fab-dispatch" title="Letters">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/></svg>
             </Fab>
 
-            <Fab onClick={() => setExportOpen(true)} className="btn-retro btn-retro--secondary" data-tour="fab-export" title="Export">
+            <Fab small={isMobile} onClick={() => setExportOpen(true)} className="btn-retro btn-retro--secondary" data-tour="fab-export" title="Export">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </Fab>
 
-            <Fab onClick={() => navigate('/explore')} className="btn-retro btn-retro--teal" data-tour="fab-explore" title="Explore" style={{ boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)' }}>
+            <Fab small={isMobile} onClick={() => navigate('/explore')} className="btn-retro btn-retro--teal" data-tour="fab-explore" title="Explore" style={{ boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)' }}>
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/></svg>
             </Fab>
 
-            <Fab onClick={() => setTemplatesOpen(true)} className="btn-retro btn-retro--secondary" title="Templates">
+            <Fab small={isMobile} onClick={() => setTemplatesOpen(true)} className="btn-retro btn-retro--secondary" title="Templates">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/></svg>
             </Fab>
 
-            <Fab onClick={() => setAddModalOpen(true)} className="btn-retro" title="Add Region">
-              <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
+            <Fab small={isMobile} onClick={() => setAddModalOpen(true)} className="btn-retro" title="Add Region">
+              <span style={{ fontSize: isMobile ? '18px' : '20px', lineHeight: 1 }}>+</span>
             </Fab>
           </div>
         </div>

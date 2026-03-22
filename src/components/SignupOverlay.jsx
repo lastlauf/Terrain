@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 
 export default function SignupOverlay({ onClose }) {
   const navigate = useNavigate()
   const { signUp } = useAuth()
+  const isMobile = useIsMobile()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
@@ -52,10 +54,10 @@ export default function SignupOverlay({ onClose }) {
         className="glass-panel-heavy"
         style={{
           width: '100%',
-          maxWidth: '440px',
+          maxWidth: isMobile ? 'calc(100vw - 24px)' : '440px',
           maxHeight: '90vh',
           overflowY: 'auto',
-          padding: 'var(--space-8)',
+          padding: isMobile ? 'var(--space-6)' : 'var(--space-8)',
           position: 'relative',
           animation: 'slide-up var(--duration-slow) var(--ease-out)',
         }}

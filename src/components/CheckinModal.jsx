@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 
 const MOODS = [
   { value: 1, emoji: String.fromCodePoint(0x1F629), label: 'Struggling' },
@@ -9,6 +10,7 @@ const MOODS = [
 ]
 
 export default function CheckinModal({ region, onClose, onSubmit }) {
+  const isMobile = useIsMobile()
   const [duration, setDuration] = useState(30)
   const [mood, setMood] = useState(3)
   const [notes, setNotes] = useState('')
@@ -88,6 +90,7 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
                 accentColor: 'var(--accent-gold)',
                 height: '6px',
                 cursor: 'pointer',
+                touchAction: 'none',
               }}
             />
             <div style={{
@@ -115,6 +118,7 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
             </label>
             <div style={{
               display: 'flex',
+              flexWrap: 'wrap',
               gap: 'var(--space-2)',
               justifyContent: 'center',
             }}>
@@ -124,7 +128,8 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
                   type="button"
                   onClick={() => setMood(m.value)}
                   style={{
-                    flex: 1,
+                    flex: isMobile ? '0 0 auto' : 1,
+                    minWidth: isMobile ? '56px' : 'auto',
                     padding: 'var(--space-2) var(--space-1)',
                     fontSize: 'var(--text-xl)',
                     background: mood === m.value ? 'var(--bg-glass-heavy)' : 'transparent',

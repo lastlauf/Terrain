@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 import { PixelPaletteIcon } from './PixelIcons.jsx'
 
 export default function Navbar({ onThemeToggle, onReplayTour }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const isMobile = useIsMobile()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
@@ -48,7 +50,7 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--space-6)',
+        gap: isMobile ? 'var(--space-3)' : 'var(--space-6)',
       }}>
         <Link to="/map" style={{
           fontFamily: 'var(--font-heading)',
@@ -100,7 +102,7 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
               display: 'flex',
               alignItems: 'center',
               gap: 'var(--space-2)',
-              padding: 'var(--space-1) var(--space-3)',
+              padding: isMobile ? 'var(--space-1)' : 'var(--space-1) var(--space-3)',
               fontSize: 'var(--text-sm)',
               color: 'var(--text-primary)',
               border: '1px solid var(--border-retro)',
@@ -123,7 +125,7 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
             }}>
               {username[0].toUpperCase()}
             </span>
-            {username}
+            {!isMobile && username}
           </button>
 
           {menuOpen && (

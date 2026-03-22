@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 import { getRegionIcon } from './PixelIcons.jsx'
 
 const REGION_TYPES = [
@@ -23,6 +24,7 @@ const COLOR_PRESETS = [
 ]
 
 export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
+  const isMobile = useIsMobile()
   const [name, setName] = useState('')
   const [type, setType] = useState('mountains')
   const [category, setCategory] = useState('other')
@@ -114,7 +116,7 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
         </label>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
           gap: 'var(--space-2)',
         }}>
           {REGION_TYPES.map((t) => (
@@ -216,7 +218,7 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
         }}>
           Color
         </label>
-        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
           {COLOR_PRESETS.map((c) => (
             <button
               key={c}

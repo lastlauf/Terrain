@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 import { PixelSparkleIcon } from '../components/PixelIcons.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
   const { signIn, sendMagicLink } = useAuth()
+  const isMobile = useIsMobile()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -83,7 +85,7 @@ export default function Login() {
         width: '100%',
         maxWidth: '400px',
       }}>
-        <div className="glass-panel-heavy" style={{ padding: 'var(--space-8)' }}>
+        <div className="glass-panel-heavy" style={{ padding: isMobile ? 'var(--space-6)' : 'var(--space-8)' }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 'var(--text-xl)',
@@ -193,7 +195,7 @@ export default function Login() {
                 disabled={loading}
                 style={{ width: '100%' }}
               >
-                Send Magic Link
+                {isMobile ? 'Magic Link' : 'Send Magic Link'}
               </button>
             </form>
           )}
@@ -217,7 +219,7 @@ export default function Login() {
         bottom: 0,
         left: 0,
         right: 0,
-        padding: '16px 6vw',
+        padding: isMobile ? '12px 6vw' : '16px 6vw',
         borderTop: '1px solid var(--border-retro)',
         display: 'flex',
         alignItems: 'center',
@@ -225,7 +227,7 @@ export default function Login() {
         background: 'var(--bg-base)',
       }}>
         <span className="mono-label">TERRAIN</span>
-        <span className="mono-label" style={{ color: 'var(--text-dim)' }}>enterterrain.com</span>
+        {!isMobile && <span className="mono-label" style={{ color: 'var(--text-dim)' }}>enterterrain.com</span>}
       </footer>
     </div>
   )

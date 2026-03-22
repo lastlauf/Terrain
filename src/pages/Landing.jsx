@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { useIsMobile } from '../hooks/useIsMobile.js'
 import { drawPixelGrid } from '../lib/pixels.js'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
 import SignupOverlay from '../components/SignupOverlay.jsx'
@@ -336,6 +337,7 @@ export default function Landing() {
   const containerRef = useRef(null)
   const [demoRegion, setDemoRegion] = useState(null)
   const [signupOpen, setSignupOpen] = useState(() => searchParams.get('signup') === '1')
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (user) navigate('/map', { replace: true })
@@ -417,9 +419,9 @@ export default function Landing() {
           {/* TERRAIN on ONE line — gradient text */}
           <h1 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(48px, 9vw, 120px)',
+            fontSize: isMobile ? 'clamp(32px, 11vw, 48px)' : 'clamp(48px, 9vw, 120px)',
             lineHeight: 1.0,
-            letterSpacing: '0.04em',
+            letterSpacing: isMobile ? '0.02em' : '0.04em',
             background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -431,7 +433,13 @@ export default function Landing() {
             TERRAIN
           </h1>
 
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '48px', flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'flex-end',
+            gap: isMobile ? '24px' : '48px',
+            flexWrap: 'wrap',
+          }}>
             <p style={{
               fontFamily: 'var(--font-body)',
               fontSize: 'clamp(16px, 2.2vw, 22px)',
@@ -443,20 +451,29 @@ export default function Landing() {
               every region is a life area you're building.
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: '12px',
+              flexWrap: 'wrap',
+              alignItems: isMobile ? 'stretch' : 'center',
+              width: isMobile ? '100%' : 'auto',
+            }}>
               <a href="#demo" className="btn-retro" style={{
                 textDecoration: 'none',
-                fontSize: '15px',
-                padding: '14px 32px',
+                fontSize: isMobile ? '14px' : '15px',
+                padding: isMobile ? '12px 24px' : '14px 32px',
                 borderRadius: '50px',
+                textAlign: 'center',
               }}>
                 Start Exploring
               </a>
               <Link to="/login" className="btn-retro btn-retro--secondary" style={{
                 textDecoration: 'none',
-                fontSize: '15px',
-                padding: '14px 32px',
+                fontSize: isMobile ? '14px' : '15px',
+                padding: isMobile ? '12px 24px' : '14px 32px',
                 borderRadius: '50px',
+                textAlign: 'center',
               }}>
                 Log In
               </Link>
@@ -470,8 +487,9 @@ export default function Landing() {
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: 0,
+                  padding: isMobile ? '8px 0' : 0,
                   fontFamily: 'inherit',
+                  textAlign: isMobile ? 'center' : 'left',
                 }}
               >
                 or Sign Up
@@ -481,7 +499,7 @@ export default function Landing() {
         </div>
 
         <div style={{
-          position: 'absolute', bottom: '32px', left: '6vw', zIndex: 2,
+          position: 'absolute', bottom: isMobile ? '16px' : '32px', left: '6vw', zIndex: 2,
           animation: 'float 2s ease-in-out infinite',
           display: 'flex', alignItems: 'center', gap: '8px',
         }}>
@@ -496,11 +514,11 @@ export default function Landing() {
 
       {/* ── FEATURES ── */}
       <section style={{
-        padding: '120px 6vw',
+        padding: isMobile ? '64px 6vw' : '120px 6vw',
         maxWidth: '1100px',
         margin: '0 auto',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '80px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '48px' : '80px' }}>
           <span className="mono-label">How it works</span>
           <hr className="dotted-divider" style={{ flex: 1, margin: 0 }} />
         </div>
@@ -508,10 +526,10 @@ export default function Landing() {
         {/* Feature 01 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '64px',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: isMobile ? '32px' : '64px',
           alignItems: 'center',
-          marginBottom: '80px',
+          marginBottom: isMobile ? '48px' : '80px',
         }}>
           <div>
             <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>01</span>
@@ -574,9 +592,9 @@ export default function Landing() {
         {/* Features 02 + 03 */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '48px',
-          marginTop: '80px',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: isMobile ? '32px' : '48px',
+          marginTop: isMobile ? '48px' : '80px',
         }}>
           <div>
             <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-blue)' }}>02</span>
@@ -621,11 +639,11 @@ export default function Landing() {
 
       {/* ── DEMO SECTION ── */}
       <section id="demo" style={{
-        padding: '80px 6vw 120px',
+        padding: isMobile ? '48px 6vw 64px' : '80px 6vw 120px',
         maxWidth: '1100px',
         margin: '0 auto',
       }}>
-        <hr className="dotted-divider" style={{ marginBottom: '80px' }} />
+        <hr className="dotted-divider" style={{ marginBottom: isMobile ? '48px' : '80px' }} />
 
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>Interactive</span>
@@ -647,8 +665,8 @@ export default function Landing() {
         <div style={{
           width: '100%',
           maxWidth: '900px',
-          height: '500px',
-          margin: '0 auto 48px',
+          height: isMobile ? '300px' : '500px',
+          margin: isMobile ? '0 auto 32px' : '0 auto 48px',
           border: '3px solid var(--border-retro)',
           background: 'var(--bg-base)',
           position: 'relative',
@@ -678,9 +696,10 @@ export default function Landing() {
             onClick={openSignup}
             className="btn-retro btn-retro--orange"
             style={{
-              fontSize: '16px',
-              padding: '16px 40px',
+              fontSize: isMobile ? '14px' : '16px',
+              padding: isMobile ? '12px 24px' : '16px 40px',
               borderRadius: '50px',
+              width: isMobile ? '100%' : 'auto',
             }}
           >
             Sign Up to Build Yours
@@ -691,12 +710,13 @@ export default function Landing() {
       {/* ── CTA FOOTER STRIP ── */}
       <section style={{
         borderTop: '2px solid var(--border-retro)',
-        padding: '80px 6vw',
+        padding: isMobile ? '48px 6vw' : '80px 6vw',
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '32px',
+        gap: isMobile ? '24px' : '32px',
       }}>
         <div>
           <p className="mono-label" style={{ marginBottom: '8px' }}>Ready to map your terrain?</p>
@@ -714,10 +734,11 @@ export default function Landing() {
           onClick={openSignup}
           className="btn-retro btn-retro--orange"
           style={{
-            fontSize: '16px',
-            padding: '16px 40px',
+            fontSize: isMobile ? '14px' : '16px',
+            padding: isMobile ? '12px 24px' : '16px 40px',
             borderRadius: '50px',
             flexShrink: 0,
+            width: isMobile ? '100%' : 'auto',
           }}
         >
           Create Your Map
@@ -726,11 +747,13 @@ export default function Landing() {
 
       {/* ── FOOTER ── */}
       <footer style={{
-        padding: '24px 6vw',
+        padding: isMobile ? '16px 6vw' : '24px 6vw',
         borderTop: '1px solid var(--border-retro)',
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: 'space-between',
+        gap: isMobile ? '4px' : '0',
       }}>
         <span className="mono-label">TERRAIN — Goal Operating System</span>
         <span className="mono-label" style={{ color: 'var(--text-dim)' }}>Built with care</span>

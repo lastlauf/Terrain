@@ -38,7 +38,7 @@ export default function TerrainCanvas({
 
   const layoutRef = useRef([])
 
-  // Compute layout whenever regions change
+  // Compute layout whenever regions change + auto-center
   useEffect(() => {
     if (singleRegion) {
       layoutRef.current = [{
@@ -49,7 +49,26 @@ export default function TerrainCanvas({
         h: 48,
       }]
     } else {
-      layoutRef.current = generateMapLayout(regions)
+      const newLayout = generateMapLayout(regions)
+      layoutRef.current = newLayout
+
+      // Auto-center the map on all regions
+      if (newLayout.length > 0 && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect()
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+        newLayout.forEach(l => {
+          minX = Math.min(minX, l.x)
+          maxX = Math.max(maxX, l.x + l.w)
+          minY = Math.min(minY, l.y)
+          maxY = Math.max(maxY, l.y + l.h)
+        })
+        const contentW = maxX - minX
+        const contentH = maxY - minY
+        const centerX = minX + contentW / 2
+        const centerY = minY + contentH / 2
+        stateRef.current.offset.x = rect.width / 2 - centerX
+        stateRef.current.offset.y = rect.height / 2 - centerY
+      }
     }
   }, [regions, singleRegion])
 

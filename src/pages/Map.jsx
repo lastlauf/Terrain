@@ -247,14 +247,24 @@ export default function Map() {
 
   const handleAddRegion = async (data) => {
     try {
-      const cols = Math.ceil(Math.sqrt(regions.length + 1))
-      const col = regions.length % cols
-      const row = Math.floor(regions.length / cols)
-      await createRegion({
+      // Use winding path positions matching generateMapLayout
+      const pathPattern = [
+        { dx: 1, dy: 0 }, { dx: 1, dy: 1 }, { dx: 1, dy: 0 },
+        { dx: 1, dy: -1 }, { dx: 1, dy: 0 }, { dx: 0, dy: 1 },
+      ]
+      const CELL = 100
+      let px = 80, py = 200
+      for (let j = 0; j < regions.length; j++) {
+        const step = pathPattern[j % pathPattern.length]
+        px += step.dx * CELL
+        py += step.dy * CELL
+      }
+      const result = await createRegion({
         ...data,
-        position_x: col * 224 + 24,
-        position_y: row * 184 + 24,
+        position_x: px,
+        position_y: py,
       })
+      console.log('Region created:', result)
     } catch (err) {
       console.error('Failed to create region:', err)
       alert('Failed to create region: ' + (err.message || 'Unknown error'))

@@ -37,6 +37,12 @@ export default function TerrainCanvas({
   })
 
   const layoutRef = useRef([])
+  const themeRef = useRef(theme)
+
+  // Keep themeRef in sync
+  useEffect(() => {
+    themeRef.current = theme
+  }, [theme])
 
   // Compute layout whenever regions change + auto-center
   useEffect(() => {
@@ -158,9 +164,20 @@ export default function TerrainCanvas({
 
       const W = rect.width
       const H = rect.height
+      const t = themeRef.current || {}
 
-      // 1. Fill background
-      ctx.fillStyle = '#0D0A06'
+      // Sky color mapping
+      const skyColors = {
+        dawn: '#1A0F0A',
+        day: '#0A1420',
+        dusk: '#1A0A14',
+        night: '#0D0A06',
+        storm: '#0A0A0F',
+      }
+      const bgColor = skyColors[t.sky_color] || '#0D0A06'
+
+      // 1. Fill background with theme sky color
+      ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, W, H)
 
       // 2. Draw pixel grid (subtle animated background)
@@ -292,10 +309,14 @@ export default function TerrainCanvas({
 
       ctx.restore()
 
-      // 5. Square particles (screen space)
+      // 5. Square particles (screen space) — skip if theme says 'none'
+      const pFx = t.particle_fx || 'fireflies'
+      if (pFx === 'none') { /* skip */ } else
       for (const p of s.particles) {
-        p.x += p.vx + Math.sin(s.time * 1.5 + p.phase) * 0.1
-        p.y += p.vy
+        // Adjust velocity based on particle type
+        const vyBase = pFx === 'rain' ? 2 : pFx === 'snowflakes' ? 0.3 : p.vy
+        p.x += p.vx + (pFx === 'fireflies' ? Math.sin(s.time * 1.5 + p.phase) * 0.1 : 0)
+        p.y += vyBase
 
         // Wrap around
         if (p.x < 0) p.x = W
@@ -304,7 +325,16 @@ export default function TerrainCanvas({
         if (p.y > H) p.y = 0
 
         const alpha = p.alpha * (0.5 + Math.sin(s.time * 2 + p.phase) * 0.5)
-        const [pr, pg, pb] = particleColors[p.colorIdx]
+        // Use character color from theme if set, otherwise default palette
+        let pr, pg, pb
+        if (t.character_color) {
+          const hex = t.character_color
+          pr = parseInt(hex.slice(1, 3), 16)
+          pg = parseInt(hex.slice(3, 5), 16)
+          pb = parseInt(hex.slice(5, 7), 16)
+        } else {
+          [pr, pg, pb] = particleColors[p.colorIdx]
+        }
         ctx.fillStyle = `rgba(${pr},${pg},${pb},${alpha})`
         ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size)
       }

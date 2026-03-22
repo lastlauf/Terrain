@@ -222,6 +222,20 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 0 rgba(0,0,0,0.3), var(--shadow-md);
   background-position: 100% 100%;
   filter: brightness(1.1);
+  color: var(--bg-base);
+}
+
+a.btn-retro {
+  color: var(--bg-base);
+}
+
+a.btn-retro:hover {
+  color: var(--bg-base);
+}
+
+a.btn-retro--secondary,
+a.btn-retro--secondary:hover {
+  color: var(--text-primary);
 }
 
 .btn-retro:active {

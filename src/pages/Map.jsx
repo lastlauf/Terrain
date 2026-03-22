@@ -18,6 +18,51 @@ import { useAuth } from '../hooks/useAuth.js'
 import { supabase } from '../lib/supabase.js'
 import { buildDispatchContext, generateDispatch } from '../lib/claude.js'
 
+// FAB with hover label
+function Fab({ onClick, className, style, title, children, 'data-tour': dataTour }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+      {hovered && (
+        <span style={{
+          position: 'absolute',
+          right: '64px',
+          whiteSpace: 'nowrap',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '11px',
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: 'var(--text-muted)',
+          background: 'var(--bg-surface)',
+          border: '2px solid var(--border-retro)',
+          padding: '4px 8px',
+          pointerEvents: 'none',
+          animation: 'fade-in 100ms ease-out',
+        }}>
+          {title}
+        </span>
+      )}
+      <button
+        onClick={onClick}
+        className={className}
+        data-tour={dataTour}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          width: '48px',
+          height: '48px',
+          padding: 0,
+          fontSize: 'var(--text-lg)',
+          ...style,
+        }}
+        title={title}
+      >
+        {children}
+      </button>
+    </div>
+  )
+}
+
 export default function Map() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -201,15 +246,19 @@ export default function Map() {
   }
 
   const handleAddRegion = async (data) => {
-    // Calculate position
-    const cols = Math.ceil(Math.sqrt(regions.length + 1))
-    const col = regions.length % cols
-    const row = Math.floor(regions.length / cols)
-    await createRegion({
-      ...data,
-      position_x: col * 224 + 24,
-      position_y: row * 184 + 24,
-    })
+    try {
+      const cols = Math.ceil(Math.sqrt(regions.length + 1))
+      const col = regions.length % cols
+      const row = Math.floor(regions.length / cols)
+      await createRegion({
+        ...data,
+        position_x: col * 224 + 24,
+        position_y: row * 184 + 24,
+      })
+    } catch (err) {
+      console.error('Failed to create region:', err)
+      alert('Failed to create region: ' + (err.message || 'Unknown error'))
+    }
   }
 
   // Live theme preview callback
@@ -295,129 +344,39 @@ export default function Map() {
             theme={activeTheme}
           />
 
-          {/* FABs */}
+          {/* FABs with hover labels */}
           <div style={{
             position: 'absolute',
             bottom: 'var(--space-6)',
             right: 'var(--space-6)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--space-3)',
+            gap: 'var(--space-2)',
             zIndex: 10,
           }}>
-            {/* Dashboard toggle FAB */}
-            <button
-              onClick={() => setDashboardOpen(!dashboardOpen)}
-              className={dashboardOpen ? 'btn-retro' : 'btn-retro btn-retro--secondary'}
-              data-tour="fab-dashboard"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-lg)',
-                boxShadow: dashboardOpen
-                  ? '0 3px 0 rgba(0,0,0,0.3), 0 0 20px rgba(212, 168, 83, 0.3)'
-                  : '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-              }}
-              title={dashboardOpen ? 'Close dashboard' : 'Open dashboard'}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-                <path d="M3 4h14M3 8h14M3 12h10M3 16h6" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
-              </svg>
-            </button>
+            <Fab onClick={() => setDashboardOpen(!dashboardOpen)} className={dashboardOpen ? 'btn-retro' : 'btn-retro btn-retro--secondary'} data-tour="fab-dashboard" title={dashboardOpen ? 'Close List' : 'List View'}>
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M3 4h14M3 8h14M3 12h10M3 16h6" stroke="currentColor" strokeWidth="2" strokeLinecap="square" /></svg>
+            </Fab>
 
-            {/* Letters FAB */}
-            <button
-              onClick={() => setShowDispatch(true)}
-              className="btn-retro btn-retro--secondary"
-              data-tour="fab-dispatch"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-lg)',
-                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-              }}
-              title="Morning dispatches"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-                <path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
-              </svg>
-            </button>
+            <Fab onClick={() => setShowDispatch(true)} className="btn-retro btn-retro--secondary" data-tour="fab-dispatch" title="Letters">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/></svg>
+            </Fab>
 
-            {/* Export FAB */}
-            <button
-              onClick={() => setExportOpen(true)}
-              className="btn-retro btn-retro--secondary"
-              data-tour="fab-export"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-lg)',
-                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-              }}
-              title="Export journey"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-                <path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+            <Fab onClick={() => setExportOpen(true)} className="btn-retro btn-retro--secondary" data-tour="fab-export" title="Export">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Fab>
 
-            {/* Explore FAB */}
-            <button
-              onClick={() => navigate('/explore')}
-              className="btn-retro btn-retro--teal"
-              data-tour="fab-explore"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-lg)',
-                boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)',
-              }}
-              title="Explore mode"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-                <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
-              </svg>
-            </button>
+            <Fab onClick={() => navigate('/explore')} className="btn-retro btn-retro--teal" data-tour="fab-explore" title="Explore" style={{ boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)' }}>
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/></svg>
+            </Fab>
 
-            {/* Templates FAB */}
-            <button
-              onClick={() => setTemplatesOpen(true)}
-              className="btn-retro btn-retro--secondary"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-lg)',
-                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-              }}
-              title="Map templates"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-                <rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                <rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-              </svg>
-            </button>
+            <Fab onClick={() => setTemplatesOpen(true)} className="btn-retro btn-retro--secondary" title="Templates">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}><rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/><rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/></svg>
+            </Fab>
 
-            {/* Add FAB */}
-            <button
-              onClick={() => setAddModalOpen(true)}
-              className="btn-retro"
-              style={{
-                width: '56px',
-                height: '56px',
-                padding: 0,
-                fontSize: 'var(--text-xl)',
-              }}
-              title="Add region"
-            >
-              +
-            </button>
+            <Fab onClick={() => setAddModalOpen(true)} className="btn-retro" title="Add Region">
+              <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
+            </Fab>
           </div>
         </div>
 

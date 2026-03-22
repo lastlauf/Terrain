@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
-import Signup from './pages/Signup.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Map from './pages/Map.jsx'
 import Explore from './pages/Explore.jsx'
@@ -13,7 +12,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route path="/signup" element={<Navigate to="/?signup=1" replace />} />
       <Route path="/onboarding" element={<AuthGuard><Onboarding /></AuthGuard>} />
       <Route path="/map" element={<AuthGuard><Map /></AuthGuard>} />
       <Route path="/explore" element={<AuthGuard><Explore /></AuthGuard>} />

@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { drawPixelGrid } from '../lib/pixels.js'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
+import SignupOverlay from '../components/SignupOverlay.jsx'
+import {
+  SPRITES, PALETTES, REGION_COLORS,
+} from '../lib/sprites.js'
 
 // ── Pixel art inline SVG components (updated colors) ──
 
@@ -138,6 +142,21 @@ function PixelGamepad({ size = 48 }) {
   )
 }
 
+// ── SVG sprite renderer for demo card (uses sprite data from lib/sprites) ──
+
+function SpriteRenderer({ type, scale = 8 }) {
+  const sprite = SPRITES[type] || SPRITES.mountains
+  const palette = PALETTES[type] || PALETTES.mountains
+  const size = sprite.length * scale
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated', display: 'block' }}>
+      {sprite.map((row, y) => row.map((c, x) => c ? (
+        <rect key={`${x}-${y}`} x={x * scale} y={y * scale} width={scale} height={scale} fill={palette[c]} />
+      ) : null))}
+    </svg>
+  )
+}
+
 // ── Demo Data ──
 
 const DEMO_REGIONS = [
@@ -154,134 +173,153 @@ const DEMO_CHECKINS = [
   { id: 'c4', region_id: 'demo-4', duration_minutes: 15, notes: 'Moved $500 into savings.', mood: 4, created_at: new Date(Date.now() - 1000*60*60*24*7).toISOString() },
 ]
 
-// ── Demo Info Popup ──
+const MOOD_EMOJI = {
+  1: String.fromCodePoint(0x1F629),
+  2: String.fromCodePoint(0x1F615),
+  3: String.fromCodePoint(0x1F610),
+  4: String.fromCodePoint(0x1F642),
+  5: String.fromCodePoint(0x1F525),
+}
 
-function DemoPopup({ region, onClose }) {
+// ── Rich Demo Card (slides up from bottom of canvas) ──
+
+function DemoCard({ region, onClose, onSignup }) {
   const checkins = DEMO_CHECKINS.filter(c => c.region_id === region.id)
   const latest = checkins[0]
+  const regionColor = region.color || 'var(--accent-gold)'
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-content glass-panel-heavy">
-        <h2 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-2xl)',
-          color: region.color || 'var(--accent-gold)',
-          marginBottom: 'var(--space-1)',
-        }}>
-          {region.name}
-        </h2>
-        <p style={{
-          fontFamily: 'var(--font-heading)',
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-muted)',
-          marginBottom: 'var(--space-2)',
-          textTransform: 'capitalize',
-        }}>
-          {region.type} &middot; {region.category}
-        </p>
-        <p style={{
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-muted)',
-          marginBottom: 'var(--space-6)',
-          lineHeight: 1.6,
-        }}>
-          {region.description}
-        </p>
+    <div
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'var(--bg-surface)',
+        border: '3px solid var(--border-retro)',
+        borderBottom: 'none',
+        padding: 'var(--space-6)',
+        zIndex: 10,
+        animation: 'slide-up var(--duration-slow) var(--ease-out)',
+      }}
+    >
+      <div style={{ display: 'flex', gap: 'var(--space-6)', alignItems: 'flex-start' }}>
+        {/* Large pixel sprite */}
+        <div style={{ flexShrink: 0 }}>
+          <SpriteRenderer type={region.type} scale={8} />
+        </div>
 
-        {/* Progress */}
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Name */}
+          <h3 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-2xl)',
+            color: regionColor,
             marginBottom: 'var(--space-2)',
+            letterSpacing: '0.04em',
           }}>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', fontWeight: 600 }}>
-              Progress
+            {region.name}
+          </h3>
+
+          {/* Type + Category pills */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+            <span style={{
+              display: 'inline-block',
+              padding: '2px var(--space-2)',
+              fontSize: 'var(--text-xs)',
+              fontFamily: 'var(--font-mono)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: regionColor,
+              border: `2px solid ${regionColor}`,
+              background: 'transparent',
+            }}>
+              {region.type}
             </span>
             <span style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: 'var(--text-sm)',
-              color: region.color || 'var(--accent-gold)',
+              display: 'inline-block',
+              padding: '2px var(--space-2)',
+              fontSize: 'var(--text-xs)',
+              fontFamily: 'var(--font-mono)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--text-muted)',
+              border: '2px solid var(--border-retro)',
+              background: 'transparent',
             }}>
-              {region.progress}%
+              {region.category}
             </span>
           </div>
-          <div style={{
-            height: '8px',
-            background: 'var(--bg-surface)',
-            border: '2px solid var(--border-retro)',
-          }}>
-            <div style={{
-              height: '100%',
-              width: `${region.progress}%`,
-              background: region.color || 'var(--accent-gold)',
-              transition: 'width var(--duration-slow) var(--ease-out)',
-            }} />
-          </div>
-        </div>
 
-        {/* Sample checkin */}
-        {latest && (
-          <div style={{
-            padding: 'var(--space-3)',
-            background: 'var(--bg-glass)',
-            border: '2px solid var(--border-retro)',
-            marginBottom: 'var(--space-6)',
-            borderLeft: `3px solid ${region.color || 'var(--accent-gold)'}`,
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: 'var(--space-2)',
-            }}>
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
-                {latest.duration_minutes} min
-              </span>
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-dim)' }}>
-                {new Date(latest.created_at).toLocaleDateString()}
-              </span>
-            </div>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              {latest.notes}
-            </p>
-          </div>
-        )}
-
-        {/* Demo notice */}
-        <div style={{
-          padding: 'var(--space-3)',
-          background: 'rgba(212, 168, 83, 0.08)',
-          border: '2px solid rgba(212, 168, 83, 0.2)',
-          marginBottom: 'var(--space-4)',
-          textAlign: 'center',
-        }}>
+          {/* Description */}
           <p style={{
-            fontSize: 'var(--text-xs)',
-            color: 'var(--accent-gold)',
-            fontFamily: 'var(--font-mono)',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            fontSize: 'var(--text-sm)',
+            color: 'var(--text-muted)',
+            lineHeight: 1.5,
+            marginBottom: 'var(--space-4)',
           }}>
-            Demo Mode &mdash; Read Only
+            {region.description}
           </p>
-        </div>
 
-        <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-          <Link
-            to="/signup"
-            className="btn-retro"
-            style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}
-          >
-            Sign Up
-          </Link>
-          <button
-            type="button"
-            className="btn-retro btn-retro--secondary"
-            onClick={onClose}
-          >
-            Close
-          </button>
+          {/* Progress bar */}
+          <div style={{ marginBottom: 'var(--space-4)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 600 }}>Progress</span>
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xs)', color: regionColor }}>{region.progress}%</span>
+            </div>
+            <div style={{ height: '6px', background: 'rgba(0,0,0,0.4)', border: '2px solid var(--border-retro)' }}>
+              <div style={{
+                height: '100%',
+                width: `${region.progress}%`,
+                background: regionColor,
+                transition: 'width var(--duration-slow) var(--ease-out)',
+              }} />
+            </div>
+          </div>
+
+          {/* Latest checkin note */}
+          {latest && (
+            <div style={{
+              padding: 'var(--space-2) var(--space-3)',
+              background: 'var(--bg-glass)',
+              border: '2px solid var(--border-retro)',
+              borderLeft: `3px solid ${regionColor}`,
+              marginBottom: 'var(--space-4)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-primary)' }}>
+                  {latest.duration_minutes} min {MOOD_EMOJI[latest.mood] || ''}
+                </span>
+                <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+                  {new Date(latest.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                {latest.notes}
+              </p>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+            <button
+              type="button"
+              className="btn-retro"
+              onClick={onSignup}
+              style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) var(--space-6)' }}
+            >
+              Sign Up
+            </button>
+            <button
+              type="button"
+              className="btn-retro btn-retro--secondary"
+              onClick={onClose}
+              style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) var(--space-4)' }}
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -292,10 +330,12 @@ function DemoPopup({ region, onClose }) {
 
 export default function Landing() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { user } = useAuth()
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
   const [demoRegion, setDemoRegion] = useState(null)
+  const [signupOpen, setSignupOpen] = useState(() => searchParams.get('signup') === '1')
 
   useEffect(() => {
     if (user) navigate('/map', { replace: true })
@@ -342,6 +382,9 @@ export default function Landing() {
     render()
     return () => { running = false }
   }, [])
+
+  const openSignup = useCallback(() => setSignupOpen(true), [])
+  const closeSignup = useCallback(() => setSignupOpen(false), [])
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
@@ -417,14 +460,22 @@ export default function Landing() {
               }}>
                 Log In
               </Link>
-              <Link to="/signup" style={{
-                fontSize: '14px',
-                color: 'var(--text-muted)',
-                textDecoration: 'underline',
-                textUnderlineOffset: '3px',
-              }}>
+              <button
+                onClick={openSignup}
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--text-muted)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '3px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontFamily: 'inherit',
+                }}
+              >
                 or Sign Up
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -580,7 +631,7 @@ export default function Landing() {
           <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>Interactive</span>
           <h2 style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(32px, 5vw, 64px)',
+            fontSize: 'clamp(40px, 6vw, 80px)',
             letterSpacing: '0.1em',
             color: 'var(--text-primary)',
             marginBottom: '16px',
@@ -588,15 +639,15 @@ export default function Landing() {
             Try the Demo
           </h2>
           <p style={{ fontSize: '16px', color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto', lineHeight: 1.6 }}>
-            Click any region node to see its details. Drag to pan around the map. This is what your terrain looks like.
+            Click a region to explore it.
           </p>
         </div>
 
-        {/* Demo Canvas */}
+        {/* Demo Canvas — full width, taller */}
         <div style={{
           width: '100%',
-          maxWidth: '640px',
-          height: '400px',
+          maxWidth: '900px',
+          height: '500px',
           margin: '0 auto 48px',
           border: '3px solid var(--border-retro)',
           background: 'var(--bg-base)',
@@ -611,17 +662,29 @@ export default function Landing() {
             mini={false}
             theme={{}}
           />
+
+          {/* Rich inline card that slides up from bottom */}
+          {demoRegion && (
+            <DemoCard
+              region={demoRegion}
+              onClose={() => setDemoRegion(null)}
+              onSignup={() => { setDemoRegion(null); openSignup() }}
+            />
+          )}
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <Link to="/signup" className="btn-retro btn-retro--orange" style={{
-            textDecoration: 'none',
-            fontSize: '16px',
-            padding: '16px 40px',
-            borderRadius: '50px',
-          }}>
+          <button
+            onClick={openSignup}
+            className="btn-retro btn-retro--orange"
+            style={{
+              fontSize: '16px',
+              padding: '16px 40px',
+              borderRadius: '50px',
+            }}
+          >
             Sign Up to Build Yours
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -647,15 +710,18 @@ export default function Landing() {
             Start building.
           </h2>
         </div>
-        <Link to="/signup" className="btn-retro btn-retro--orange" style={{
-          textDecoration: 'none',
-          fontSize: '16px',
-          padding: '16px 40px',
-          borderRadius: '50px',
-          flexShrink: 0,
-        }}>
+        <button
+          onClick={openSignup}
+          className="btn-retro btn-retro--orange"
+          style={{
+            fontSize: '16px',
+            padding: '16px 40px',
+            borderRadius: '50px',
+            flexShrink: 0,
+          }}
+        >
           Create Your Map
-        </Link>
+        </button>
       </section>
 
       {/* ── FOOTER ── */}
@@ -670,12 +736,9 @@ export default function Landing() {
         <span className="mono-label" style={{ color: 'var(--text-dim)' }}>Built with care</span>
       </footer>
 
-      {/* Demo popup */}
-      {demoRegion && (
-        <DemoPopup
-          region={demoRegion}
-          onClose={() => setDemoRegion(null)}
-        />
+      {/* Signup overlay */}
+      {signupOpen && (
+        <SignupOverlay onClose={closeSignup} />
       )}
     </div>
   )

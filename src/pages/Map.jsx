@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
@@ -9,6 +9,7 @@ import ThemePanel from '../components/ThemePanel.jsx'
 import ExportModal from '../components/ExportModal.jsx'
 import DispatchOverlay from '../components/DispatchOverlay.jsx'
 import TemplatesModal from '../components/TemplatesModal.jsx'
+import DashboardView from '../components/DashboardView.jsx'
 import OnboardingTour, { useOnboarding } from '../components/OnboardingTour.jsx'
 import { useRegions } from '../hooks/useRegions.js'
 import { useCheckins } from '../hooks/useCheckins.js'
@@ -20,7 +21,7 @@ import { buildDispatchContext, generateDispatch } from '../lib/claude.js'
 export default function Map() {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { regions, createRegion } = useRegions()
+  const { regions, createRegion, updateRegion } = useRegions()
   const { checkins, fetchCheckins, createCheckin } = useCheckins()
   const { theme, updateTheme } = useTheme()
 
@@ -36,6 +37,30 @@ export default function Map() {
   const [pastDispatches, setPastDispatches] = useState([])
   const [mapBlurred, setMapBlurred] = useState(false)
   const [templatesOpen, setTemplatesOpen] = useState(false)
+
+  // Dashboard panel state
+  const [dashboardOpen, setDashboardOpen] = useState(false)
+  const [hiddenRegions, setHiddenRegions] = useState(new Set())
+  const [regionOrder, setRegionOrder] = useState([])
+
+  // Initialize region order when regions change
+  useEffect(() => {
+    setRegionOrder(prev => {
+      // Keep existing order, append new regions
+      const existing = new Set(prev)
+      const newIds = regions.map(r => r.id).filter(id => !existing.has(id))
+      if (newIds.length === 0 && prev.length === regions.length) return prev
+      // Remove ids no longer in regions
+      const regionIds = new Set(regions.map(r => r.id))
+      const cleaned = prev.filter(id => regionIds.has(id))
+      return [...cleaned, ...newIds]
+    })
+  }, [regions])
+
+  // Filtered regions for the map (respects visibility)
+  const visibleRegions = useMemo(() => {
+    return regions.filter(r => !hiddenRegions.has(r.id))
+  }, [regions, hiddenRegions])
 
   // Live theme preview state — overrides saved theme while ThemePanel is open
   const [previewTheme, setPreviewTheme] = useState(null)
@@ -204,6 +229,38 @@ export default function Map() {
     updateTheme(newTheme)
   }, [updateTheme])
 
+  // Dashboard: progress change handler
+  const handleDashboardProgressChange = useCallback(async (regionId, newProgress) => {
+    try {
+      await updateRegion(regionId, { progress: newProgress })
+    } catch (err) {
+      console.error('Failed to update progress:', err)
+    }
+  }, [updateRegion])
+
+  // Dashboard: toggle visibility
+  const handleToggleVisibility = useCallback((regionId) => {
+    setHiddenRegions(prev => {
+      const next = new Set(prev)
+      if (next.has(regionId)) next.delete(regionId)
+      else next.add(regionId)
+      return next
+    })
+  }, [])
+
+  // Dashboard: checkin from dashboard
+  const handleDashboardCheckin = useCallback((region) => {
+    setCheckinRegion(region)
+  }, [])
+
+  // Detect mobile
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   return (
     <div style={{
       height: '100vh',
@@ -214,125 +271,200 @@ export default function Map() {
     }}>
       <Navbar onThemeToggle={() => setThemeOpen(true)} onReplayTour={replayTour} />
 
-      {/* Main canvas — fills full viewport below navbar */}
+      {/* Main area below navbar */}
       <div style={{
         flex: 1,
         marginTop: '56px',
+        display: 'flex',
         position: 'relative',
-        filter: mapBlurred ? 'blur(6px)' : 'none',
-        transition: 'filter 300ms var(--ease-out)',
+        overflow: 'hidden',
       }}>
-        <TerrainCanvas
-          regions={regions}
-          checkins={checkins}
-          onRegionClick={handleRegionClick}
-          onAddClick={() => setAddModalOpen(true)}
-          theme={activeTheme}
-        />
-
-        {/* FABs */}
+        {/* Map canvas — shrinks when dashboard is open on desktop */}
         <div style={{
-          position: 'absolute',
-          bottom: 'var(--space-6)',
-          right: 'var(--space-6)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--space-3)',
-          zIndex: 10,
+          flex: dashboardOpen && !isMobile ? '0 0 60%' : '1 1 100%',
+          position: 'relative',
+          filter: mapBlurred ? 'blur(6px)' : 'none',
+          transition: 'flex var(--duration-slow) var(--ease-out), filter 300ms var(--ease-out)',
+          overflow: 'hidden',
         }}>
-          {/* Letters FAB */}
-          <button
-            onClick={() => setShowDispatch(true)}
-            className="btn-retro btn-retro--secondary"
-            data-tour="fab-dispatch"
-            style={{
-              width: '56px',
-              height: '56px',
-              padding: 0,
-              fontSize: 'var(--text-lg)',
-              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-            }}
-            title="Morning dispatches"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-              <path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
-            </svg>
-          </button>
+          <TerrainCanvas
+            regions={visibleRegions}
+            checkins={checkins}
+            onRegionClick={handleRegionClick}
+            onAddClick={() => setAddModalOpen(true)}
+            theme={activeTheme}
+          />
 
-          {/* Export FAB */}
-          <button
-            onClick={() => setExportOpen(true)}
-            className="btn-retro btn-retro--secondary"
-            data-tour="fab-export"
-            style={{
-              width: '56px',
-              height: '56px',
-              padding: 0,
-              fontSize: 'var(--text-lg)',
-              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-            }}
-            title="Export journey"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-              <path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          {/* FABs */}
+          <div style={{
+            position: 'absolute',
+            bottom: 'var(--space-6)',
+            right: 'var(--space-6)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--space-3)',
+            zIndex: 10,
+          }}>
+            {/* Dashboard toggle FAB */}
+            <button
+              onClick={() => setDashboardOpen(!dashboardOpen)}
+              className={dashboardOpen ? 'btn-retro' : 'btn-retro btn-retro--secondary'}
+              data-tour="fab-dashboard"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-lg)',
+                boxShadow: dashboardOpen
+                  ? '0 3px 0 rgba(0,0,0,0.3), 0 0 20px rgba(212, 168, 83, 0.3)'
+                  : '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+              }}
+              title={dashboardOpen ? 'Close dashboard' : 'Open dashboard'}
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+                <path d="M3 4h14M3 8h14M3 12h10M3 16h6" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
+              </svg>
+            </button>
 
-          {/* Explore FAB */}
-          <button
-            onClick={() => navigate('/explore')}
-            className="btn-retro btn-retro--teal"
-            data-tour="fab-explore"
-            style={{
-              width: '56px',
-              height: '56px',
-              padding: 0,
-              fontSize: 'var(--text-lg)',
-              boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)',
-            }}
-            title="Explore mode"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-              <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
-            </svg>
-          </button>
+            {/* Letters FAB */}
+            <button
+              onClick={() => setShowDispatch(true)}
+              className="btn-retro btn-retro--secondary"
+              data-tour="fab-dispatch"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-lg)',
+                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+              }}
+              title="Morning dispatches"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+                <path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+              </svg>
+            </button>
 
-          {/* Templates FAB */}
-          <button
-            onClick={() => setTemplatesOpen(true)}
-            className="btn-retro btn-retro--secondary"
-            style={{
-              width: '56px',
-              height: '56px',
-              padding: 0,
-              fontSize: 'var(--text-lg)',
-              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
-            }}
-            title="Map templates"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
-              <rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-              <rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-              <rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-              <rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-            </svg>
-          </button>
+            {/* Export FAB */}
+            <button
+              onClick={() => setExportOpen(true)}
+              className="btn-retro btn-retro--secondary"
+              data-tour="fab-export"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-lg)',
+                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+              }}
+              title="Export journey"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+                <path d="M10 3v10M10 13l-3.5-3.5M10 13l3.5-3.5M4 17h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
 
-          {/* Add FAB */}
-          <button
-            onClick={() => setAddModalOpen(true)}
-            className="btn-retro"
-            style={{
-              width: '56px',
-              height: '56px',
-              padding: 0,
-              fontSize: 'var(--text-xl)',
-            }}
-            title="Add region"
-          >
-            +
-          </button>
+            {/* Explore FAB */}
+            <button
+              onClick={() => navigate('/explore')}
+              className="btn-retro btn-retro--teal"
+              data-tour="fab-explore"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-lg)',
+                boxShadow: '0 3px 0 #2A5486, 0 0 20px rgba(74, 144, 217, 0.3)',
+              }}
+              title="Explore mode"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+                <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            {/* Templates FAB */}
+            <button
+              onClick={() => setTemplatesOpen(true)}
+              className="btn-retro btn-retro--secondary"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-lg)',
+                boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+              }}
+              title="Map templates"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+                <rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                <rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+              </svg>
+            </button>
+
+            {/* Add FAB */}
+            <button
+              onClick={() => setAddModalOpen(true)}
+              className="btn-retro"
+              style={{
+                width: '56px',
+                height: '56px',
+                padding: 0,
+                fontSize: 'var(--text-xl)',
+              }}
+              title="Add region"
+            >
+              +
+            </button>
+          </div>
         </div>
+
+        {/* Dashboard panel */}
+        {dashboardOpen && (
+          isMobile ? (
+            // Mobile: full-screen overlay
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 30,
+              animation: 'slide-in-right var(--duration-slow) var(--ease-out)',
+            }}>
+              <DashboardView
+                regions={regions}
+                checkins={checkins}
+                onCheckin={handleDashboardCheckin}
+                onProgressChange={handleDashboardProgressChange}
+                hiddenRegions={hiddenRegions}
+                onToggleVisibility={handleToggleVisibility}
+                regionOrder={regionOrder}
+                onReorder={setRegionOrder}
+                onClose={() => setDashboardOpen(false)}
+              />
+            </div>
+          ) : (
+            // Desktop: side panel 40%
+            <div style={{
+              flex: '0 0 40%',
+              height: '100%',
+              animation: 'slide-in-right var(--duration-slow) var(--ease-out)',
+              overflow: 'hidden',
+            }}>
+              <DashboardView
+                regions={regions}
+                checkins={checkins}
+                onCheckin={handleDashboardCheckin}
+                onProgressChange={handleDashboardProgressChange}
+                hiddenRegions={hiddenRegions}
+                onToggleVisibility={handleToggleVisibility}
+                regionOrder={regionOrder}
+                onReorder={setRegionOrder}
+                onClose={() => setDashboardOpen(false)}
+              />
+            </div>
+          )
+        )}
       </div>
 
       {/* Modals & Panels */}

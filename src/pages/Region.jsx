@@ -10,6 +10,7 @@ import ExportModal from '../components/ExportModal.jsx'
 import LandmarkNaming from '../components/LandmarkNaming.jsx'
 import ShareCard from '../components/ShareCard.jsx'
 import Navbar from '../components/Navbar.jsx'
+import { PixelCheckIcon } from '../components/PixelIcons.jsx'
 import { getBestQuote } from '../lib/export.js'
 
 const MOOD_EMOJI = ['', String.fromCodePoint(0x1F629), String.fromCodePoint(0x1F615), String.fromCodePoint(0x1F610), String.fromCodePoint(0x1F642), String.fromCodePoint(0x1F525)]
@@ -466,7 +467,7 @@ export default function Region() {
                     fontSize: '12px',
                     color: 'var(--bg-base)',
                   }}>
-                    {m.completed && String.fromCodePoint(0x2713)}
+                    {m.completed && <PixelCheckIcon size={12} />}
                   </div>
                   <span style={{
                     fontSize: 'var(--text-sm)',

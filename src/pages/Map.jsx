@@ -8,6 +8,8 @@ import FieldReport from '../components/FieldReport.jsx'
 import ThemePanel from '../components/ThemePanel.jsx'
 import ExportModal from '../components/ExportModal.jsx'
 import DispatchOverlay from '../components/DispatchOverlay.jsx'
+import TemplatesModal from '../components/TemplatesModal.jsx'
+import OnboardingTour, { useOnboarding } from '../components/OnboardingTour.jsx'
 import { useRegions } from '../hooks/useRegions.js'
 import { useCheckins } from '../hooks/useCheckins.js'
 import { useTheme } from '../hooks/useTheme.js'
@@ -33,6 +35,14 @@ export default function Map() {
   const [showDispatch, setShowDispatch] = useState(false)
   const [pastDispatches, setPastDispatches] = useState([])
   const [mapBlurred, setMapBlurred] = useState(false)
+  const [templatesOpen, setTemplatesOpen] = useState(false)
+
+  // Live theme preview state — overrides saved theme while ThemePanel is open
+  const [previewTheme, setPreviewTheme] = useState(null)
+  const activeTheme = previewTheme || theme
+
+  // Onboarding tour
+  const { showTour, completeTour, replayTour } = useOnboarding()
 
   // Fetch all checkins on mount
   useEffect(() => {
@@ -177,6 +187,23 @@ export default function Map() {
     })
   }
 
+  // Live theme preview callback
+  const handleThemePreview = useCallback((previewData) => {
+    setPreviewTheme(previewData)
+  }, [])
+
+  // When ThemePanel closes, clear preview
+  const handleThemeClose = useCallback(() => {
+    setPreviewTheme(null)
+    setThemeOpen(false)
+  }, [])
+
+  // When ThemePanel saves, persist to DB and clear preview
+  const handleThemeSave = useCallback((newTheme) => {
+    setPreviewTheme(null)
+    updateTheme(newTheme)
+  }, [updateTheme])
+
   return (
     <div style={{
       height: '100vh',
@@ -185,7 +212,7 @@ export default function Map() {
       background: 'var(--bg-base)',
       overflow: 'hidden',
     }}>
-      <Navbar onThemeToggle={() => setThemeOpen(true)} />
+      <Navbar onThemeToggle={() => setThemeOpen(true)} onReplayTour={replayTour} />
 
       {/* Main canvas — fills full viewport below navbar */}
       <div style={{
@@ -200,7 +227,7 @@ export default function Map() {
           checkins={checkins}
           onRegionClick={handleRegionClick}
           onAddClick={() => setAddModalOpen(true)}
-          theme={theme}
+          theme={activeTheme}
         />
 
         {/* FABs */}
@@ -217,6 +244,7 @@ export default function Map() {
           <button
             onClick={() => setShowDispatch(true)}
             className="btn-retro btn-retro--secondary"
+            data-tour="fab-dispatch"
             style={{
               width: '56px',
               height: '56px',
@@ -235,6 +263,7 @@ export default function Map() {
           <button
             onClick={() => setExportOpen(true)}
             className="btn-retro btn-retro--secondary"
+            data-tour="fab-export"
             style={{
               width: '56px',
               height: '56px',
@@ -253,6 +282,7 @@ export default function Map() {
           <button
             onClick={() => navigate('/explore')}
             className="btn-retro btn-retro--teal"
+            data-tour="fab-explore"
             style={{
               width: '56px',
               height: '56px',
@@ -264,6 +294,27 @@ export default function Map() {
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
               <path d="M10 2l2.5 5.5L18 8.5l-4 4 1 5.5L10 15l-5 3 1-5.5-4-4 5.5-1z" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {/* Templates FAB */}
+          <button
+            onClick={() => setTemplatesOpen(true)}
+            className="btn-retro btn-retro--secondary"
+            style={{
+              width: '56px',
+              height: '56px',
+              padding: 0,
+              fontSize: 'var(--text-lg)',
+              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+            }}
+            title="Map templates"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+              <rect x="3" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+              <rect x="11" y="3" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+              <rect x="3" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+              <rect x="11" y="11" width="6" height="6" stroke="currentColor" strokeWidth="2" fill="none"/>
             </svg>
           </button>
 
@@ -309,9 +360,10 @@ export default function Map() {
 
       <ThemePanel
         open={themeOpen}
-        onClose={() => setThemeOpen(false)}
+        onClose={handleThemeClose}
         theme={theme}
-        onUpdate={updateTheme}
+        onUpdate={handleThemeSave}
+        onPreview={handleThemePreview}
       />
 
       {exportOpen && (
@@ -332,6 +384,18 @@ export default function Map() {
           onDismiss={handleDismissDispatch}
           onBlurMap={setMapBlurred}
         />
+      )}
+
+      {templatesOpen && (
+        <TemplatesModal
+          onClose={() => setTemplatesOpen(false)}
+          onCreateRegions={handleAddRegion}
+        />
+      )}
+
+      {/* Onboarding Tour */}
+      {showTour && (
+        <OnboardingTour onComplete={completeTour} />
       )}
     </div>
   )

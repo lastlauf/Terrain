@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { PixelPaletteIcon } from './PixelIcons.jsx'
 
-export default function Navbar({ onThemeToggle }) {
+export default function Navbar({ onThemeToggle, onReplayTour }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -77,14 +78,17 @@ export default function Navbar({ onThemeToggle }) {
           <button
             onClick={onThemeToggle}
             style={{
-              fontSize: 'var(--text-base)',
-              color: 'var(--text-muted)',
               padding: 'var(--space-1)',
-              transition: 'color var(--duration-fast) var(--ease-out)',
+              transition: 'opacity var(--duration-fast) var(--ease-out)',
+              opacity: 0.7,
+              display: 'flex',
+              alignItems: 'center',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
             title="Theme settings"
           >
-            &#9881;
+            <PixelPaletteIcon size={24} />
           </button>
         )}
 
@@ -136,6 +140,24 @@ export default function Navbar({ onThemeToggle }) {
               zIndex: 60,
               animation: 'slide-up var(--duration-fast) var(--ease-out)',
             }}>
+              {onReplayTour && (
+                <button
+                  onClick={() => { onReplayTour(); setMenuOpen(false) }}
+                  style={{
+                    width: '100%',
+                    padding: 'var(--space-2) var(--space-3)',
+                    fontSize: 'var(--text-sm)',
+                    color: 'var(--text-primary)',
+                    textAlign: 'left',
+                    borderRadius: 'var(--radius-sm)',
+                    transition: 'background var(--duration-fast)',
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = 'var(--bg-glass)'}
+                  onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                >
+                  Replay Tour
+                </button>
+              )}
               <button
                 onClick={handleSignOut}
                 style={{

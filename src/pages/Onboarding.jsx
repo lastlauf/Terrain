@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useRegions } from '../hooks/useRegions.js'
 import AddRegionModal from '../components/AddRegionModal.jsx'
+import { getRegionIcon } from '../components/PixelIcons.jsx'
 
 const STEPS = [
   { title: 'Welcome, Explorer', subtitle: 'Let\'s chart your first terrain.' },
@@ -177,11 +178,8 @@ export default function Onboarding() {
                     animation: `slide-up ${300 + i * 150}ms var(--ease-out)`,
                   }}
                 >
-                  <div style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-1)' }}>
-                    {r.type === 'mountains' ? String.fromCodePoint(0x26F0, 0xFE0F)
-                      : r.type === 'forest' ? String.fromCodePoint(0x1F332)
-                      : r.type === 'city' ? String.fromCodePoint(0x1F3D9, 0xFE0F)
-                      : String.fromCodePoint(0x1F30A)}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-1)' }}>
+                    {getRegionIcon(r.type, 28)}
                   </div>
                   <div style={{
                     fontFamily: 'var(--font-heading)',

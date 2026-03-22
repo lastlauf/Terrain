@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { getRegionIcon } from './PixelIcons.jsx'
 
 const REGION_TYPES = [
-  { value: 'mountains', label: 'Mountains', icon: String.fromCodePoint(0x26F0, 0xFE0F), color: 'var(--region-mountains)' },
-  { value: 'forest', label: 'Forest', icon: String.fromCodePoint(0x1F332), color: 'var(--region-forest)' },
-  { value: 'city', label: 'City', icon: String.fromCodePoint(0x1F3D9, 0xFE0F), color: 'var(--region-city)' },
-  { value: 'coast', label: 'Coast', icon: String.fromCodePoint(0x1F30A), color: 'var(--region-coast)' },
+  { value: 'mountains', label: 'Mountains', color: 'var(--region-mountains)' },
+  { value: 'forest', label: 'Forest', color: 'var(--region-forest)' },
+  { value: 'city', label: 'City', color: 'var(--region-city)' },
+  { value: 'coast', label: 'Coast', color: 'var(--region-coast)' },
 ]
 
 const CATEGORIES = [
@@ -136,7 +137,7 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
                 transition: 'all var(--duration-fast) var(--ease-out)',
               }}
             >
-              <div style={{ fontSize: 'var(--text-xl)', marginBottom: '2px' }}>{t.icon}</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2px' }}>{getRegionIcon(t.value, 24)}</div>
               <div style={{
                 fontSize: 'var(--text-xs)',
                 color: type === t.value ? 'var(--text-primary)' : 'var(--text-muted)',

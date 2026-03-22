@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const SKY_PRESETS = [
   { value: 'dawn', label: 'Dawn', colors: ['#2A1A1A', '#4A2A2A', '#D4A853'] },
@@ -12,18 +12,38 @@ const GROUND_STYLES = ['natural', 'pixelated', 'wireframe']
 const PARTICLE_OPTIONS = ['fireflies', 'snowflakes', 'rain', 'none']
 const CHARACTER_COLORS = ['#D4A853', '#4A90D9', '#FF6B9D', '#5E9E6E', '#3A72B0', '#D4568A']
 
-export default function ThemePanel({ open, onClose, theme, onUpdate }) {
+export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }) {
   const [localTheme, setLocalTheme] = useState(theme)
+  const [savedTheme] = useState(theme)
+
+  // Sync local theme when panel opens with new theme
+  useEffect(() => {
+    if (open) {
+      setLocalTheme(theme)
+    }
+  }, [open, theme])
 
   if (!open) return null
 
   const handleChange = (key, value) => {
-    setLocalTheme((prev) => ({ ...prev, [key]: value }))
+    const next = { ...localTheme, [key]: value }
+    setLocalTheme(next)
+    // Live preview: push changes to the map immediately
+    if (onPreview) {
+      onPreview(next)
+    }
   }
 
   const handleSave = () => {
     onUpdate(localTheme)
     onClose()
+  }
+
+  const handleReset = () => {
+    setLocalTheme(savedTheme)
+    if (onPreview) {
+      onPreview(savedTheme)
+    }
   }
 
   return (
@@ -102,7 +122,6 @@ export default function ThemePanel({ open, onClose, theme, onUpdate }) {
                 style={{
                   width: '48px',
                   height: '48px',
-                  borderRadius: 'var(--radius-md)',
                   background: `linear-gradient(180deg, ${sky.colors[0]}, ${sky.colors[1]}, ${sky.colors[2]})`,
                   border: `2px solid ${localTheme.sky_color === sky.value ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
                   cursor: 'pointer',
@@ -140,7 +159,6 @@ export default function ThemePanel({ open, onClose, theme, onUpdate }) {
                   background: localTheme.ground_style === style ? 'var(--accent-gold)' : 'var(--bg-surface)',
                   color: localTheme.ground_style === style ? 'var(--bg-base)' : 'var(--text-muted)',
                   border: `2px solid ${localTheme.ground_style === style ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
-                  borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -177,7 +195,6 @@ export default function ThemePanel({ open, onClose, theme, onUpdate }) {
                   background: localTheme.particle_fx === fx ? 'var(--accent-gold)' : 'var(--bg-surface)',
                   color: localTheme.particle_fx === fx ? 'var(--bg-base)' : 'var(--text-muted)',
                   border: `2px solid ${localTheme.particle_fx === fx ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
-                  borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -211,7 +228,6 @@ export default function ThemePanel({ open, onClose, theme, onUpdate }) {
                 style={{
                   width: '36px',
                   height: '36px',
-                  borderRadius: '50%',
                   background: c,
                   border: `3px solid ${localTheme.character_color === c ? 'var(--text-primary)' : 'transparent'}`,
                   cursor: 'pointer',
@@ -223,15 +239,24 @@ export default function ThemePanel({ open, onClose, theme, onUpdate }) {
         </div>
       </div>
 
-      {/* Save */}
+      {/* Footer: Reset + Save */}
       <div style={{
         padding: 'var(--space-4) var(--space-6)',
         borderTop: '2px solid var(--border-retro)',
+        display: 'flex',
+        gap: 'var(--space-3)',
       }}>
+        <button
+          onClick={handleReset}
+          className="btn-retro btn-retro--secondary"
+          style={{ flex: 1 }}
+        >
+          Reset
+        </button>
         <button
           onClick={handleSave}
           className="btn-retro"
-          style={{ width: '100%' }}
+          style={{ flex: 2 }}
         >
           Save Theme
         </button>

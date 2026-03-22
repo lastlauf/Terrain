@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
+import { PixelSparkleIcon } from '../components/PixelIcons.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -116,7 +117,7 @@ export default function Login() {
                 fontSize: 'var(--text-3xl)',
                 marginBottom: 'var(--space-4)',
               }}>
-                {String.fromCodePoint(0x2728)}
+                <PixelSparkleIcon size={48} />
               </div>
               <p style={{
                 fontFamily: 'var(--font-heading)',

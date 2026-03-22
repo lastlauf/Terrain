@@ -7,7 +7,10 @@ import TerrainCanvas from '../components/TerrainCanvas.jsx'
 import CheckinModal from '../components/CheckinModal.jsx'
 import FieldReport from '../components/FieldReport.jsx'
 import ExportModal from '../components/ExportModal.jsx'
+import LandmarkNaming from '../components/LandmarkNaming.jsx'
+import ShareCard from '../components/ShareCard.jsx'
 import Navbar from '../components/Navbar.jsx'
+import { getBestQuote } from '../lib/export.js'
 
 const MOOD_EMOJI = ['', String.fromCodePoint(0x1F629), String.fromCodePoint(0x1F615), String.fromCodePoint(0x1F610), String.fromCodePoint(0x1F642), String.fromCodePoint(0x1F525)]
 
@@ -25,6 +28,9 @@ export default function Region() {
   const [newMilestone, setNewMilestone] = useState('')
   const [exportOpen, setExportOpen] = useState(false)
   const [fieldReports, setFieldReports] = useState([])
+  const [landmarkMilestone, setLandmarkMilestone] = useState(null)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareQuote, setShareQuote] = useState(null)
 
   // Load region data
   useEffect(() => {
@@ -93,11 +99,52 @@ export default function Region() {
       })
       .eq('id', milestone.id)
 
+    const updated = { ...milestone, completed, completed_at: completed ? new Date().toISOString() : null }
+
+    setMilestones((prev) =>
+      prev.map((m) => m.id === milestone.id ? updated : m)
+    )
+
+    // If just completed, open landmark naming modal
+    if (completed && !milestone.landmark_name) {
+      setLandmarkMilestone(updated)
+    }
+  }
+
+  function getLandmarkPosition(milestoneIndex) {
+    const angle = (milestoneIndex / 5) * Math.PI * 0.8 - Math.PI * 0.4
+    const radius = 0.3 + (milestoneIndex % 3) * 0.1
+    return { x: 0.5 + Math.cos(angle) * radius, y: 0.5 + Math.sin(angle) * radius * 0.6 }
+  }
+
+  const handleLandmarkName = async (name) => {
+    if (!landmarkMilestone) return
+
+    const milestoneIndex = milestones.findIndex(m => m.id === landmarkMilestone.id)
+    const { x, y } = getLandmarkPosition(milestoneIndex >= 0 ? milestoneIndex : 0)
+
+    await supabase
+      .from('milestones')
+      .update({
+        landmark_name: name,
+        landmark_x: x,
+        landmark_y: y,
+      })
+      .eq('id', landmarkMilestone.id)
+
     setMilestones((prev) =>
       prev.map((m) =>
-        m.id === milestone.id ? { ...m, completed, completed_at: completed ? new Date().toISOString() : null } : m
+        m.id === landmarkMilestone.id ? { ...m, landmark_name: name, landmark_x: x, landmark_y: y } : m
       )
     )
+    setLandmarkMilestone(null)
+  }
+
+  const handleShare = async () => {
+    if (!user || !region) return
+    const quote = await getBestQuote(user.id, region.id)
+    setShareQuote(quote)
+    setShareOpen(true)
   }
 
   const handleAddMilestone = async (e) => {
@@ -224,6 +271,12 @@ export default function Region() {
             >
               Export Region
             </button>
+            <button
+              className="btn-retro btn-retro--secondary"
+              onClick={handleShare}
+            >
+              Share
+            </button>
           </div>
         </div>
 
@@ -270,6 +323,7 @@ export default function Region() {
           <TerrainCanvas
             regions={[]}
             checkins={checkins}
+            milestones={milestones}
             singleRegion={region}
             interactive={false}
           />
@@ -474,6 +528,25 @@ export default function Region() {
           fieldReports={fieldReports}
           singleRegion={region}
           onClose={() => setExportOpen(false)}
+        />
+      )}
+
+      {landmarkMilestone && (
+        <LandmarkNaming
+          regionName={region.name}
+          milestoneTitle={landmarkMilestone.title}
+          onSubmit={handleLandmarkName}
+          onClose={() => setLandmarkMilestone(null)}
+        />
+      )}
+
+      {shareOpen && (
+        <ShareCard
+          region={region}
+          checkins={checkins}
+          milestones={milestones}
+          quote={shareQuote}
+          onClose={() => setShareOpen(false)}
         />
       )}
     </div>

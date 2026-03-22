@@ -1,4 +1,40 @@
+import { supabase } from './supabase.js'
+
 const MOOD_EMOJI = ['', '\u{1F629}', '\u{1F615}', '\u{1F610}', '\u{1F642}', '\u{1F525}']
+
+/**
+ * Get the best quote for a region from field reports or checkin notes.
+ */
+export async function getBestQuote(userId, regionId) {
+  // Try field reports first
+  const { data: reports } = await supabase
+    .from('field_reports')
+    .select('content')
+    .eq('user_id', userId)
+    .eq('region_id', regionId)
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  if (reports?.length) {
+    const sentences = reports
+      .flatMap(r => r.content.split(/[.!?]/))
+      .map(s => s.trim())
+      .filter(s => s.length > 20 && s.length < 80)
+    if (sentences.length) return sentences[0]
+  }
+
+  // Fall back to most recent checkin note
+  const { data: checkin } = await supabase
+    .from('checkins')
+    .select('notes')
+    .eq('region_id', regionId)
+    .not('notes', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  return checkin?.notes || null
+}
 
 /**
  * Generate a Markdown export of a user's terrain journey.

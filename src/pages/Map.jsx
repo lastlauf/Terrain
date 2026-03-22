@@ -7,11 +7,13 @@ import CheckinModal from '../components/CheckinModal.jsx'
 import FieldReport from '../components/FieldReport.jsx'
 import ThemePanel from '../components/ThemePanel.jsx'
 import ExportModal from '../components/ExportModal.jsx'
+import DispatchOverlay from '../components/DispatchOverlay.jsx'
 import { useRegions } from '../hooks/useRegions.js'
 import { useCheckins } from '../hooks/useCheckins.js'
 import { useTheme } from '../hooks/useTheme.js'
 import { useAuth } from '../hooks/useAuth.js'
 import { supabase } from '../lib/supabase.js'
+import { buildDispatchContext, generateDispatch } from '../lib/claude.js'
 
 export default function Map() {
   const navigate = useNavigate()
@@ -27,11 +29,102 @@ export default function Map() {
   const [themeOpen, setThemeOpen] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
   const [exportData, setExportData] = useState({ milestones: [], fieldReports: [] })
+  const [dispatch, setDispatch] = useState(null)
+  const [showDispatch, setShowDispatch] = useState(false)
+  const [pastDispatches, setPastDispatches] = useState([])
+  const [mapBlurred, setMapBlurred] = useState(false)
 
   // Fetch all checkins on mount
   useEffect(() => {
     fetchCheckins()
   }, [fetchCheckins])
+
+  // Check morning dispatch after auth resolves
+  useEffect(() => {
+    if (!user) return
+
+    async function checkMorningDispatch() {
+      const today = new Date().toISOString().split('T')[0]
+
+      // 1. Check if today's dispatch exists
+      const { data: existing } = await supabase
+        .from('morning_dispatches')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('dispatched_date', today)
+        .single()
+
+      if (existing) {
+        // Already read today? Don't show
+        if (existing.read_at) {
+          setDispatch(existing)
+          return
+        }
+        // Show unread dispatch
+        setDispatch(existing)
+        setShowDispatch(true)
+        return
+      }
+
+      // 2. No dispatch today — generate one
+      try {
+        const context = await buildDispatchContext(user.id)
+        if (!context) return // No regions yet
+
+        const content = await generateDispatch(context)
+
+        const { data: newDispatch } = await supabase
+          .from('morning_dispatches')
+          .insert({
+            user_id: user.id,
+            dispatched_date: today,
+            content,
+          })
+          .select()
+          .single()
+
+        if (newDispatch) {
+          setDispatch(newDispatch)
+          setShowDispatch(true)
+        }
+      } catch (err) {
+        console.error('Morning dispatch error:', err)
+      }
+    }
+
+    checkMorningDispatch()
+  }, [user])
+
+  // Fetch past dispatches for archive
+  useEffect(() => {
+    if (!user) return
+
+    async function loadPastDispatches() {
+      const { data } = await supabase
+        .from('morning_dispatches')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('dispatched_date', { ascending: false })
+        .limit(30)
+
+      setPastDispatches(data || [])
+    }
+
+    loadPastDispatches()
+  }, [user, dispatch])
+
+  // Dismiss dispatch handler
+  const handleDismissDispatch = useCallback(async () => {
+    setShowDispatch(false)
+    if (dispatch && !dispatch.read_at) {
+      const now = new Date().toISOString()
+      await supabase
+        .from('morning_dispatches')
+        .update({ read_at: now })
+        .eq('id', dispatch.id)
+      setDispatch(prev => ({ ...prev, read_at: now }))
+    }
+  }, [dispatch])
 
   // Fetch milestones + field reports when export modal opens
   useEffect(() => {
@@ -99,6 +192,8 @@ export default function Map() {
         flex: 1,
         marginTop: '56px',
         position: 'relative',
+        filter: mapBlurred ? 'blur(6px)' : 'none',
+        transition: 'filter 300ms var(--ease-out)',
       }}>
         <TerrainCanvas
           regions={regions}
@@ -118,6 +213,24 @@ export default function Map() {
           gap: 'var(--space-3)',
           zIndex: 10,
         }}>
+          {/* Letters FAB */}
+          <button
+            onClick={() => setShowDispatch(true)}
+            className="btn-retro btn-retro--secondary"
+            style={{
+              width: '56px',
+              height: '56px',
+              padding: 0,
+              fontSize: 'var(--text-lg)',
+              boxShadow: '0 3px 0 rgba(0,0,0,0.2), 0 0 20px rgba(212, 168, 83, 0.15)',
+            }}
+            title="Morning dispatches"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ display: 'block', margin: '0 auto' }}>
+              <path d="M2 5l8 5 8-5M2 5v10h16V5H2z" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter" fill="none"/>
+            </svg>
+          </button>
+
           {/* Export FAB */}
           <button
             onClick={() => setExportOpen(true)}
@@ -209,6 +322,15 @@ export default function Map() {
           fieldReports={exportData.fieldReports}
           username={user?.user_metadata?.username || user?.email?.split('@')[0] || 'Explorer'}
           onClose={() => setExportOpen(false)}
+        />
+      )}
+
+      {showDispatch && (
+        <DispatchOverlay
+          dispatch={dispatch}
+          pastDispatches={pastDispatches}
+          onDismiss={handleDismissDispatch}
+          onBlurMap={setMapBlurred}
         />
       )}
     </div>

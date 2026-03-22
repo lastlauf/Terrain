@@ -5,12 +5,14 @@ import {
   drawSprite, drawPixelPath,
   SPRITES, PALETTES, REGION_COLORS,
   WEATHER_SPRITES, WEATHER_PALETTES,
+  LANDMARK_SPRITES,
   STAR_SPRITE, STAR_PALETTE,
 } from '../lib/sprites.js'
 
 export default function TerrainCanvas({
   regions,
   checkins = [],
+  milestones = [],
   onRegionClick,
   onAddClick,
   interactive = true,
@@ -219,6 +221,39 @@ export default function TerrainCanvas({
         ctx.shadowBlur = 0
       }
 
+      // 4b. Draw landmarks for completed milestones
+      for (const l of layout) {
+        const regionMilestones = milestones.filter(
+          m => m.region_id === l.region.id && m.completed && m.landmark_name && m.landmark_x != null && m.landmark_y != null
+        )
+
+        const type = l.region.type || 'mountains'
+        const palette = PALETTES[type] || PALETTES.mountains
+        const landmarkSprite = LANDMARK_SPRITES[type]
+
+        for (const m of regionMilestones) {
+          if (!landmarkSprite) continue
+
+          // Position offset from region center using landmark_x/landmark_y (0-1)
+          const lmScale = 2  // 8x8 at scale=2 = 16px
+          const offsetX = (m.landmark_x - 0.5) * 60
+          const offsetY = (m.landmark_y - 0.5) * 40
+          const lmX = l.x + l.w / 2 + offsetX - (8 * lmScale) / 2
+          const lmY = l.y + l.h / 2 + offsetY - (8 * lmScale) / 2
+
+          drawSprite(ctx, landmarkSprite, palette, lmX, lmY, lmScale)
+
+          // Name label
+          ctx.fillStyle = 'rgba(245, 230, 200, 0.6)'
+          ctx.font = "9px 'Inter', sans-serif"
+          ctx.textAlign = 'center'
+          ctx.shadowColor = 'rgba(0,0,0,0.8)'
+          ctx.shadowBlur = 2
+          ctx.fillText(m.landmark_name, lmX + (8 * lmScale) / 2, lmY + 8 * lmScale + 10, 60)
+          ctx.shadowBlur = 0
+        }
+      }
+
       // Add region placeholder (dashed square)
       if (interactive && !mini && !singleRegion && layout.length > 0) {
         const last = layout[layout.length - 1]
@@ -283,7 +318,7 @@ export default function TerrainCanvas({
       running = false
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [regions, checkins, interactive, mini, singleRegion, theme, getLastCheckin, hitTest])
+  }, [regions, checkins, milestones, interactive, mini, singleRegion, theme, getLastCheckin, hitTest])
 
   // Mouse/touch handlers
   const handleMouseDown = (e) => {

@@ -211,6 +211,22 @@ export default function Login() {
           </Link>
         </p>
       </div>
+
+      <footer style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: '16px 6vw',
+        borderTop: '1px solid var(--border-retro)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: 'var(--bg-base)',
+      }}>
+        <span className="mono-label">TERRAIN</span>
+        <span className="mono-label" style={{ color: 'var(--text-dim)' }}>enterterrain.com</span>
+      </footer>
     </div>
   )
 }

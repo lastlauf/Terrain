@@ -55,7 +55,7 @@
 
   /* Fonts */
   --font-display: 'Daydream', 'Boogaloo', cursive;
-  --font-heading: 'Fredoka One', cursive;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'Courier New', 'Courier', monospace;
 
@@ -206,10 +206,11 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-size: var(--text-base);
   color: var(--bg-base);
-  background: var(--accent-gold);
-  border: var(--border-width-heavy) solid var(--accent-gold);
+  background: linear-gradient(135deg, #4A90D9 0%, #FF6B9D 50%, #D4A853 100%);
+  background-size: 200% 200%;
+  border: var(--border-width-heavy) solid rgba(255,255,255,0.15);
   border-radius: var(--radius-md);
-  box-shadow: 0 3px 0 #8A6B2A, var(--shadow-sm);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), var(--shadow-sm);
   transition: all var(--duration-fast) var(--ease-out);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -218,39 +219,44 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-retro:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 0 #8A6B2A, var(--shadow-md);
-  background: #E0B865;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), var(--shadow-md);
+  background-position: 100% 100%;
+  filter: brightness(1.1);
 }
 
 .btn-retro:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 #8A6B2A;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.3);
 }
 
 .btn-retro--secondary {
   background: transparent;
-  color: var(--accent-gold);
-  box-shadow: 0 3px 0 var(--border-retro), var(--shadow-sm);
+  color: var(--text-primary);
+  border: var(--border-width-heavy) solid var(--text-muted);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.2), var(--shadow-sm);
 }
 
 .btn-retro--secondary:hover {
   background: var(--bg-glass);
-  box-shadow: 0 4px 0 var(--border-retro), var(--shadow-md);
+  border-color: var(--text-primary);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), var(--shadow-md);
+  filter: none;
 }
 
 .btn-retro--secondary:active {
-  box-shadow: 0 1px 0 var(--border-retro);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.2);
 }
 
 .btn-retro--orange {
-  background: var(--accent-orange);
-  border-color: var(--accent-orange);
-  box-shadow: 0 3px 0 #9A3A10, var(--shadow-sm);
+  background: linear-gradient(135deg, #FF6B9D 0%, #D4A853 50%, #4A90D9 100%);
+  background-size: 200% 200%;
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), var(--shadow-sm);
 }
 
 .btn-retro--orange:hover {
-  background: #F0753E;
-  box-shadow: 0 4px 0 #9A3A10, var(--shadow-md);
+  background-position: 100% 100%;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), var(--shadow-md);
 }
 
 .btn-retro--teal {

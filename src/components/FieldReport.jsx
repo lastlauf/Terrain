@@ -85,10 +85,9 @@ export default function FieldReport({ region, checkins, open, onClose }) {
       bottom: 0,
       width: '380px',
       maxWidth: '100vw',
-      background: 'rgba(26, 21, 16, 0.95)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      borderLeft: '3px solid var(--border-retro)',
+      background: 'var(--bg-surface-raised)',
+      borderLeft: '1px solid var(--border-light)',
+      boxShadow: 'var(--shadow-lg)',
       zIndex: 60,
       display: 'flex',
       flexDirection: 'column',
@@ -98,16 +97,17 @@ export default function FieldReport({ region, checkins, open, onClose }) {
       {/* Header */}
       <div style={{
         padding: 'var(--space-6)',
-        borderBottom: '2px solid var(--border-retro)',
+        borderBottom: '1px solid var(--border-light)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
         <div>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-xl)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             marginBottom: 'var(--space-1)',
           }}>
             FIELD REPORT
@@ -167,8 +167,8 @@ export default function FieldReport({ region, checkins, open, onClose }) {
         ) : report ? (
           <div style={{
             padding: 'var(--space-4)',
-            background: 'var(--bg-glass)',
-            border: '1px solid var(--border-retro)',
+            background: 'var(--bg-muted)',
+            border: '1px solid var(--border-light)',
             borderRadius: 'var(--radius-md)',
             marginBottom: 'var(--space-6)',
           }}>
@@ -199,10 +199,11 @@ export default function FieldReport({ region, checkins, open, onClose }) {
             <h3 style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'var(--text-sm)',
-              color: 'var(--text-muted)',
+              color: 'var(--text-secondary)',
               marginBottom: 'var(--space-3)',
               textTransform: 'uppercase',
               letterSpacing: '1px',
+              fontWeight: 600,
             }}>
               Past Reports
             </h3>
@@ -213,7 +214,7 @@ export default function FieldReport({ region, checkins, open, onClose }) {
                   padding: 'var(--space-3)',
                   marginBottom: 'var(--space-3)',
                   background: 'var(--bg-surface)',
-                  border: '1px solid var(--border-retro)',
+                  border: '1px solid var(--border-light)',
                   borderRadius: 'var(--radius-md)',
                 }}
               >

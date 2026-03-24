@@ -7,10 +7,10 @@ const TEMPLATES = [
     name: 'The Athlete',
     description: 'Track your physical training, nutrition, and recovery.',
     regions: [
-      { name: 'Morning Runs', type: 'mountains', category: 'physical', color: '#4A90D9' },
-      { name: 'Gym Sessions', type: 'city', category: 'physical', color: '#D4A853' },
-      { name: 'Nutrition', type: 'forest', category: 'physical', color: '#5E9E6E' },
-      { name: 'Recovery', type: 'coast', category: 'physical', color: '#FF6B9D' },
+      { name: 'Morning Runs', type: 'mountains', category: 'physical', color: '#4A6FA5' },
+      { name: 'Gym Sessions', type: 'city', category: 'physical', color: '#C45A1A' },
+      { name: 'Nutrition', type: 'forest', category: 'physical', color: '#4A8C5C' },
+      { name: 'Recovery', type: 'coast', category: 'physical', color: '#3A7D9E' },
     ],
   },
   {
@@ -18,10 +18,10 @@ const TEMPLATES = [
     name: 'The Creator',
     description: 'Organize your creative projects and output.',
     regions: [
-      { name: 'Writing', type: 'forest', category: 'creative', color: '#5E9E6E' },
-      { name: 'Design', type: 'city', category: 'creative', color: '#D4A853' },
-      { name: 'Side Project', type: 'mountains', category: 'creative', color: '#4A90D9' },
-      { name: 'Social Media', type: 'coast', category: 'creative', color: '#FF6B9D' },
+      { name: 'Writing', type: 'forest', category: 'creative', color: '#4A8C5C' },
+      { name: 'Design', type: 'city', category: 'creative', color: '#C45A1A' },
+      { name: 'Side Project', type: 'mountains', category: 'creative', color: '#4A6FA5' },
+      { name: 'Social Media', type: 'coast', category: 'creative', color: '#3A7D9E' },
     ],
   },
   {
@@ -29,10 +29,10 @@ const TEMPLATES = [
     name: 'The Student',
     description: 'Stay on top of study sessions and exam prep.',
     regions: [
-      { name: 'Study Sessions', type: 'mountains', category: 'learning', color: '#4A90D9' },
-      { name: 'Reading', type: 'forest', category: 'learning', color: '#5E9E6E' },
-      { name: 'Exam Prep', type: 'city', category: 'learning', color: '#D4A853' },
-      { name: 'Language Learning', type: 'coast', category: 'learning', color: '#FF6B9D' },
+      { name: 'Study Sessions', type: 'mountains', category: 'learning', color: '#4A6FA5' },
+      { name: 'Reading', type: 'forest', category: 'learning', color: '#4A8C5C' },
+      { name: 'Exam Prep', type: 'city', category: 'learning', color: '#C45A1A' },
+      { name: 'Language Learning', type: 'coast', category: 'learning', color: '#3A7D9E' },
     ],
   },
   {
@@ -40,10 +40,10 @@ const TEMPLATES = [
     name: 'Life Balance',
     description: 'Map the key pillars of a balanced life.',
     regions: [
-      { name: 'Health', type: 'mountains', category: 'physical', color: '#4A90D9' },
-      { name: 'Career', type: 'city', category: 'financial', color: '#D4A853' },
-      { name: 'Relationships', type: 'forest', category: 'relationships', color: '#5E9E6E' },
-      { name: 'Finance', type: 'coast', category: 'financial', color: '#FF6B9D' },
+      { name: 'Health', type: 'mountains', category: 'physical', color: '#4A6FA5' },
+      { name: 'Career', type: 'city', category: 'financial', color: '#C45A1A' },
+      { name: 'Relationships', type: 'forest', category: 'relationships', color: '#4A8C5C' },
+      { name: 'Finance', type: 'coast', category: 'financial', color: '#3A7D9E' },
     ],
   },
   {
@@ -51,10 +51,10 @@ const TEMPLATES = [
     name: 'The Builder',
     description: 'For developers building skills and shipping code.',
     regions: [
-      { name: 'Coding', type: 'city', category: 'creative', color: '#D4A853' },
-      { name: 'Open Source', type: 'mountains', category: 'creative', color: '#4A90D9' },
-      { name: 'Networking', type: 'coast', category: 'relationships', color: '#FF6B9D' },
-      { name: 'Learning', type: 'forest', category: 'learning', color: '#5E9E6E' },
+      { name: 'Coding', type: 'city', category: 'creative', color: '#C45A1A' },
+      { name: 'Open Source', type: 'mountains', category: 'creative', color: '#4A6FA5' },
+      { name: 'Networking', type: 'coast', category: 'relationships', color: '#3A7D9E' },
+      { name: 'Learning', type: 'forest', category: 'learning', color: '#4A8C5C' },
     ],
   },
 ]
@@ -93,9 +93,10 @@ export default function TemplatesModal({ onClose, onCreateRegions }) {
         overflow: 'auto',
       }}>
         <h2 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-2xl)',
-          color: 'var(--accent-gold)',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 700,
+          fontSize: 'var(--text-xl)',
+          color: 'var(--text-primary)',
           marginBottom: 'var(--space-2)',
         }}>
           TEMPLATES
@@ -119,11 +120,12 @@ export default function TemplatesModal({ onClose, onCreateRegions }) {
               style={{
                 padding: 'var(--space-4)',
                 background: 'var(--bg-surface)',
-                border: '2px solid var(--border-retro)',
+                border: '1px solid var(--border-light)',
+                borderRadius: 'var(--radius-md)',
                 transition: 'border-color var(--duration-fast) var(--ease-out)',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-gold)'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-retro)'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-orange)'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-light)'}
             >
               <div style={{
                 display: 'flex',
@@ -132,7 +134,8 @@ export default function TemplatesModal({ onClose, onCreateRegions }) {
                 marginBottom: 'var(--space-2)',
               }}>
                 <h3 style={{
-                  fontFamily: 'var(--font-display)',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 700,
                   fontSize: 'var(--text-lg)',
                   color: 'var(--text-primary)',
                 }}>
@@ -171,10 +174,11 @@ export default function TemplatesModal({ onClose, onCreateRegions }) {
                     className="mono-label"
                     style={{
                       padding: '2px var(--space-2)',
-                      background: 'var(--bg-glass)',
-                      border: '1px solid var(--border-retro)',
+                      background: 'var(--bg-muted)',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: 'var(--radius-sm)',
                       fontSize: '11px',
-                      color: 'var(--text-dim)',
+                      color: 'var(--text-secondary)',
                     }}
                   >
                     {r.name}

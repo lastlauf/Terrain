@@ -87,9 +87,10 @@ export default function ExportModal({
 
         {/* Title */}
         <h2 style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'var(--text-2xl)',
-          color: 'var(--accent-gold)',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 700,
+          fontSize: 'var(--text-xl)',
+          color: 'var(--text-primary)',
           marginBottom: 'var(--space-6)',
           letterSpacing: '0.04em',
         }}>
@@ -137,7 +138,7 @@ export default function ExportModal({
                 <span style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: 'var(--text-xs)',
-                  color: 'var(--accent-gold)',
+                  color: 'var(--accent-orange)',
                   marginTop: '2px',
                   flexShrink: 0,
                 }}>
@@ -163,7 +164,7 @@ export default function ExportModal({
             overflowY: 'auto',
             padding: 'var(--space-4)',
             background: 'var(--bg-surface)',
-            border: 'var(--border-width) solid var(--border-retro)',
+            border: '1px solid var(--border-light)',
             borderRadius: 'var(--radius-md)',
             fontSize: 'var(--text-xs)',
             fontFamily: 'var(--font-mono)',

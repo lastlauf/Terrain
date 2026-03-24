@@ -40,9 +40,10 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
       <div className="modal-content glass-panel-heavy">
         <form onSubmit={handleSubmit}>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--text-2xl)',
-            color: 'var(--accent-gold)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
+            fontSize: 'var(--text-xl)',
+            color: 'var(--text-primary)',
             marginBottom: 'var(--space-1)',
           }}>
             Log Session
@@ -73,7 +74,7 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
               <span style={{
                 fontFamily: 'var(--font-heading)',
                 fontSize: 'var(--text-sm)',
-                color: 'var(--accent-gold)',
+                color: 'var(--accent-orange)',
               }}>
                 {duration} min
               </span>
@@ -87,7 +88,7 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
               onChange={(e) => setDuration(Number(e.target.value))}
               style={{
                 width: '100%',
-                accentColor: 'var(--accent-gold)',
+                accentColor: 'var(--accent-orange)',
                 height: '6px',
                 cursor: 'pointer',
                 touchAction: 'none',
@@ -132,8 +133,8 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
                     minWidth: isMobile ? '56px' : 'auto',
                     padding: 'var(--space-2) var(--space-1)',
                     fontSize: 'var(--text-xl)',
-                    background: mood === m.value ? 'var(--bg-glass-heavy)' : 'transparent',
-                    border: `2px solid ${mood === m.value ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
+                    background: mood === m.value ? 'var(--accent-orange-bg)' : 'transparent',
+                    border: `2px solid ${mood === m.value ? 'var(--accent-orange)' : 'var(--border-mid)'}`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
                     textAlign: 'center',

@@ -108,7 +108,7 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(22, 20, 16, 0.95)',
+          background: 'rgba(26, 23, 20, 0.40)',
           animation: 'fade-in 300ms var(--ease-out)',
           padding: 'var(--space-6)',
         }}
@@ -118,8 +118,10 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
             width: '100%',
             maxWidth: '540px',
             maxHeight: '80vh',
-            border: '3px solid var(--border-retro)',
-            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)',
+            background: 'var(--bg-surface-raised)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-lg)',
             padding: 'var(--space-8)',
             display: 'flex',
             flexDirection: 'column',
@@ -133,9 +135,10 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
             alignItems: 'center',
           }}>
             <h2 style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 700,
               fontSize: 'var(--text-lg)',
-              color: 'var(--accent-gold)',
+              color: 'var(--text-primary)',
               letterSpacing: '2px',
             }}>
               PAST LETTERS
@@ -189,16 +192,16 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
                       flexDirection: 'column',
                       gap: 'var(--space-1)',
                       padding: 'var(--space-3) var(--space-4)',
-                      background: 'var(--bg-glass)',
-                      border: '1px solid var(--border-retro)',
-                      borderRadius: 0,
+                      background: 'var(--bg-muted)',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: 'var(--radius-md)',
                       textAlign: 'left',
                       cursor: 'pointer',
                       transition: 'background var(--duration-fast)',
                       width: '100%',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-glass-heavy)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-glass)'}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--accent-orange-bg)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-muted)'}
                   >
                     <span style={{
                       fontFamily: 'var(--font-mono)',
@@ -236,7 +239,7 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(22, 20, 16, 0.95)',
+        background: 'rgba(26, 23, 20, 0.40)',
         animation: 'fade-in 300ms var(--ease-out)',
         padding: 'var(--space-6)',
       }}
@@ -245,8 +248,10 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
         style={{
           width: '100%',
           maxWidth: '560px',
-          border: '3px solid var(--border-retro)',
-          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--bg-surface-raised)',
+          boxShadow: 'var(--shadow-lg)',
           padding: 'var(--space-8)',
           display: 'flex',
           flexDirection: 'column',
@@ -257,9 +262,10 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
         {/* Header */}
         <div>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-xl)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             letterSpacing: '2px',
             marginBottom: 'var(--space-2)',
           }}>
@@ -302,9 +308,9 @@ export default function DispatchOverlay({ dispatch, pastDispatches = [], onDismi
               display: 'inline-block',
               width: '8px',
               height: '18px',
-              background: 'var(--accent-gold)',
+              background: 'var(--accent-orange)',
               marginLeft: '2px',
-              animation: 'pulse-glow 1s ease-in-out infinite',
+              animation: 'pulse-subtle 1s ease-in-out infinite',
             }} />
           )}
         </div>

@@ -10,12 +10,12 @@ import { getWeatherStatus } from '../lib/terrain.js'
 const CATEGORIES = ['All', 'Physical', 'Creative', 'Financial', 'Relationships', 'Learning']
 
 const CATEGORY_COLORS = {
-  physical: '#4A90D9',
-  creative: '#D4A853',
-  financial: '#FF6B9D',
-  relationships: '#5E9E6E',
-  learning: '#9B6BD4',
-  other: '#8A7560',
+  physical: '#4A6FA5',
+  creative: '#C45A1A',
+  financial: '#4A8C5C',
+  relationships: '#3A7D9E',
+  learning: '#7A5AB5',
+  other: '#7A7268',
 }
 
 const WEATHER_ICONS = {
@@ -79,8 +79,8 @@ function RegionRow({
   isLast,
 }) {
   const navigate = useNavigate()
-  const regionColor = REGION_COLORS[region.type] || '#D4A853'
-  const catColor = CATEGORY_COLORS[region.category] || '#8A7560'
+  const regionColor = REGION_COLORS[region.type] || '#C45A1A'
+  const catColor = CATEGORY_COLORS[region.category] || '#7A7268'
   const regionCheckins = checkins.filter(c => c.region_id === region.id)
   const lastCheckin = regionCheckins[0] || null
   const weather = getWeatherStatus(lastCheckin?.created_at || null)
@@ -102,7 +102,7 @@ function RegionRow({
 
   return (
     <div style={{
-      borderBottom: '2px solid var(--border-retro)',
+      borderBottom: '1px solid var(--border-light)',
       opacity: hidden ? 0.4 : 1,
       transition: 'opacity var(--duration-fast) var(--ease-out)',
     }}>
@@ -161,7 +161,7 @@ function RegionRow({
           </div>
 
           {/* Progress bar */}
-          <div style={{ height: '4px', background: 'rgba(0,0,0,0.4)', border: '1px solid var(--border-retro)', marginTop: '4px' }}>
+          <div style={{ height: '4px', background: 'var(--bg-muted)', border: 'none', marginTop: '4px' }}>
             <div style={{
               height: '100%',
               width: `${region.progress || 0}%`,
@@ -236,7 +236,7 @@ function RegionRow({
               style={{
                 padding: '4px',
                 color: hidden ? 'var(--text-dim)' : 'var(--text-muted)',
-                border: '1px solid var(--border-retro)',
+                border: '1px solid var(--border-light)',
                 background: 'transparent',
                 cursor: 'pointer',
                 display: 'flex',
@@ -267,7 +267,7 @@ function RegionRow({
               style={{
                 padding: '4px',
                 color: isFirst ? 'var(--text-dim)' : 'var(--text-muted)',
-                border: '1px solid var(--border-retro)',
+                border: '1px solid var(--border-light)',
                 background: 'transparent',
                 cursor: isFirst ? 'not-allowed' : 'pointer',
                 display: 'flex',
@@ -286,7 +286,7 @@ function RegionRow({
               style={{
                 padding: '4px',
                 color: isLast ? 'var(--text-dim)' : 'var(--text-muted)',
-                border: '1px solid var(--border-retro)',
+                border: '1px solid var(--border-light)',
                 background: 'transparent',
                 cursor: isLast ? 'not-allowed' : 'pointer',
                 display: 'flex',
@@ -335,7 +335,7 @@ function RegionRow({
                   padding: '4px var(--space-2)',
                   borderLeft: `2px solid ${regionColor}`,
                   marginBottom: '4px',
-                  background: 'var(--bg-glass)',
+                  background: 'var(--bg-muted)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '11px', color: 'var(--text-primary)' }}>
@@ -449,20 +449,21 @@ export default function DashboardView({
       display: 'flex',
       flexDirection: 'column',
       background: 'var(--bg-surface)',
-      borderLeft: '3px solid var(--border-retro)',
+      borderLeft: '1px solid var(--border-light)',
       overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
         padding: 'var(--space-4)',
-        borderBottom: '2px solid var(--border-retro)',
+        borderBottom: '1px solid var(--border-light)',
         flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)' }}>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-lg)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             letterSpacing: '0.08em',
           }}>
             DASHBOARD
@@ -476,9 +477,10 @@ export default function DashboardView({
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--text-muted)',
-              border: '2px solid var(--border-retro)',
+              border: '1px solid var(--border-light)',
               background: 'transparent',
               cursor: 'pointer',
+              borderRadius: 'var(--radius-sm)',
             }}
             title="Close dashboard"
           >
@@ -492,7 +494,7 @@ export default function DashboardView({
         <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
           {CATEGORIES.map(cat => {
             const active = filter === cat
-            const catColorVal = cat === 'All' ? 'var(--accent-gold)' : (CATEGORY_COLORS[cat.toLowerCase()] || 'var(--text-muted)')
+            const catColorVal = cat === 'All' ? 'var(--accent-orange)' : (CATEGORY_COLORS[cat.toLowerCase()] || 'var(--text-muted)')
             return (
               <button
                 key={cat}
@@ -504,11 +506,12 @@ export default function DashboardView({
                   letterSpacing: '0.06em',
                   padding: '2px 8px',
                   lineHeight: '16px',
-                  color: active ? 'var(--bg-base)' : catColorVal,
+                  color: active ? '#FFFFFF' : catColorVal,
                   background: active ? catColorVal : 'transparent',
-                  border: `1px solid ${active ? catColorVal : 'var(--border-retro)'}`,
+                  border: `1px solid ${active ? catColorVal : 'var(--border-light)'}`,
                   cursor: 'pointer',
                   transition: 'all var(--duration-fast) var(--ease-out)',
+                  borderRadius: 'var(--radius-sm)',
                 }}
               >
                 {cat}
@@ -523,14 +526,14 @@ export default function DashboardView({
         display: 'flex',
         padding: 'var(--space-3) var(--space-4)',
         gap: 'var(--space-4)',
-        borderBottom: '2px solid var(--border-retro)',
+        borderBottom: '1px solid var(--border-light)',
         flexShrink: 0,
         flexWrap: 'wrap',
       }}>
         {[
-          { label: 'Regions', value: stats.totalRegions, color: 'var(--accent-gold)' },
-          { label: 'Check-ins', value: stats.totalCheckins, color: 'var(--accent-blue)' },
-          { label: 'Streaks', value: stats.activeStreaks, color: 'var(--accent-pink)' },
+          { label: 'Regions', value: stats.totalRegions, color: 'var(--accent-orange)' },
+          { label: 'Check-ins', value: stats.totalCheckins, color: 'var(--region-mountains)' },
+          { label: 'Streaks', value: stats.activeStreaks, color: 'var(--region-forest)' },
           { label: 'Avg Progress', value: `${stats.avgProgress}%`, color: 'var(--text-primary)' },
         ].map(s => (
           <div key={s.label} style={{ textAlign: 'center', flex: 1, minWidth: '48px' }}>
@@ -561,8 +564,8 @@ export default function DashboardView({
                   alignItems: 'center',
                   gap: 'var(--space-2)',
                   padding: 'var(--space-2) var(--space-4)',
-                  background: 'var(--bg-glass)',
-                  borderBottom: '1px solid var(--border-retro)',
+                  background: 'var(--bg-muted)',
+                  borderBottom: '1px solid var(--border-light)',
                   cursor: 'pointer',
                   userSelect: 'none',
                 }}

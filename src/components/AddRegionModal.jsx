@@ -19,8 +19,8 @@ const CATEGORIES = [
 ]
 
 const COLOR_PRESETS = [
-  '#4A90D9', '#5E9E6E', '#D4A853', '#FF6B9D',
-  '#3A72B0', '#8B6B3E', '#9B6BFF', '#6BCF7F',
+  '#4A6FA5', '#4A8C5C', '#C45A1A', '#3A7D9E',
+  '#3A5F8A', '#7A5AB5', '#4A8070', '#C47A3A',
 ]
 
 export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
@@ -59,9 +59,10 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
   const content = (
     <form onSubmit={handleSubmit}>
       <h2 style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'var(--text-2xl)',
-        color: 'var(--accent-gold)',
+        fontFamily: 'var(--font-heading)',
+        fontWeight: 700,
+        fontSize: 'var(--text-xl)',
+        color: 'var(--text-primary)',
         marginBottom: 'var(--space-6)',
       }}>
         New Region
@@ -131,8 +132,8 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
               }}
               style={{
                 padding: 'var(--space-3) var(--space-2)',
-                background: type === t.value ? 'var(--bg-glass-heavy)' : 'var(--bg-surface)',
-                border: `2px solid ${type === t.value ? t.color : 'var(--border-retro)'}`,
+                background: type === t.value ? 'var(--accent-orange-bg)' : 'var(--bg-surface)',
+                border: `2px solid ${type === t.value ? t.color : 'var(--border-mid)'}`,
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',
                 textAlign: 'center',
@@ -172,9 +173,9 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
               style={{
                 padding: 'var(--space-1) var(--space-3)',
                 fontSize: 'var(--text-sm)',
-                background: category === c.value ? 'var(--accent-gold)' : 'var(--bg-surface)',
-                color: category === c.value ? 'var(--bg-base)' : 'var(--text-muted)',
-                border: `1px solid ${category === c.value ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
+                background: category === c.value ? 'var(--accent-orange)' : 'var(--bg-surface)',
+                color: category === c.value ? '#FFFFFF' : 'var(--text-muted)',
+                border: `1px solid ${category === c.value ? 'var(--accent-orange)' : 'var(--border-mid)'}`,
                 borderRadius: 'var(--radius-sm)',
                 cursor: 'pointer',
                 fontWeight: 600,

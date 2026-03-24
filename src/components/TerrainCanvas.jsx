@@ -137,9 +137,9 @@ export default function TerrainCanvas({
 
     // Particle colors
     const particleColors = [
-      [74, 144, 217],   // blue
-      [255, 107, 157],  // pink
-      [212, 168, 83],   // gold
+      [200, 194, 181],  // warm gray
+      [232, 113, 43],   // orange accent
+      [168, 158, 142],  // taupe
     ]
 
     function render() {
@@ -166,15 +166,15 @@ export default function TerrainCanvas({
       const H = rect.height
       const t = themeRef.current || {}
 
-      // Sky color mapping
+      // Sky color mapping — warm neutral light palette
       const skyColors = {
-        dawn: '#1A0F0A',
-        day: '#0A1420',
-        dusk: '#1A0A14',
-        night: '#0D0A06',
-        storm: '#0A0A0F',
+        dawn: '#F5F0E8',
+        day: '#F5F2ED',
+        dusk: '#EDE8E0',
+        night: '#E8E4DC',
+        storm: '#DDD8CE',
       }
-      const bgColor = skyColors[t.sky_color] || '#0D0A06'
+      const bgColor = skyColors[t.sky_color] || '#F5F2ED'
 
       // 1. Fill background with theme sky color
       ctx.fillStyle = bgColor
@@ -199,7 +199,7 @@ export default function TerrainCanvas({
           const ay = a.y + a.h / 2
           const bx = b.x + b.w / 2
           const by = b.y + b.h / 2
-          drawPixelPath(ctx, ax, ay, bx, by, '#3D2E1A', 4, 8)
+          drawPixelPath(ctx, ax, ay, bx, by, '#C8C2B5', 4, 8)
         }
       }
 
@@ -230,7 +230,7 @@ export default function TerrainCanvas({
         const barW = 48
         const barH = 4
 
-        ctx.fillStyle = 'rgba(0,0,0,0.5)'
+        ctx.fillStyle = 'rgba(26, 23, 20, 0.1)'
         ctx.fillRect(l.x, barY, barW, barH)
 
         if (progress > 0) {
@@ -248,10 +248,10 @@ export default function TerrainCanvas({
         }
 
         // Region name below
-        ctx.fillStyle = '#F5E6C8'
+        ctx.fillStyle = '#4A4540'
         ctx.font = "11px 'Inter', sans-serif"
         ctx.textAlign = 'center'
-        ctx.shadowColor = 'rgba(0,0,0,0.8)'
+        ctx.shadowColor = 'rgba(245, 242, 237, 0.8)'
         ctx.shadowBlur = 3
         ctx.fillText(l.region.name, l.x + l.w / 2, barY + barH + 14, 80)
         ctx.shadowBlur = 0
@@ -280,10 +280,10 @@ export default function TerrainCanvas({
           drawSprite(ctx, landmarkSprite, palette, lmX, lmY, lmScale)
 
           // Name label
-          ctx.fillStyle = 'rgba(245, 230, 200, 0.6)'
+          ctx.fillStyle = 'rgba(74, 69, 64, 0.6)'
           ctx.font = "9px 'Inter', sans-serif"
           ctx.textAlign = 'center'
-          ctx.shadowColor = 'rgba(0,0,0,0.8)'
+          ctx.shadowColor = 'rgba(245, 242, 237, 0.8)'
           ctx.shadowBlur = 2
           ctx.fillText(m.landmark_name, lmX + (8 * lmScale) / 2, lmY + 8 * lmScale + 10, 60)
           ctx.shadowBlur = 0
@@ -347,14 +347,14 @@ export default function TerrainCanvas({
         const tx = s.mousePos.x - tw / 2 - 8
         const ty = s.mousePos.y - 36
 
-        ctx.fillStyle = 'rgba(13, 10, 6, 0.9)'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
         ctx.fillRect(tx, ty, tw + 16, 24)
 
-        ctx.strokeStyle = '#3D2E1A'
-        ctx.lineWidth = 2
+        ctx.strokeStyle = '#DDD8CE'
+        ctx.lineWidth = 1
         ctx.strokeRect(tx, ty, tw + 16, 24)
 
-        ctx.fillStyle = '#F5E6C8'
+        ctx.fillStyle = '#1A1714'
         ctx.textAlign = 'left'
         ctx.fillText(name, tx + 8, ty + 16)
       }

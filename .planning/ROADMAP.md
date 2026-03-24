@@ -12,7 +12,7 @@ Terrain v2 is a full visual overhaul of an existing goal-tracking app. The dark 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Design System** - Establish the visual language — palette, type, spacing, components
+- [x] **Phase 1: Design System** - Establish the visual language — palette, type, spacing, components (completed 2026-03-24)
 - [ ] **Phase 2: Map & Layout** - Isometric canvas and dual-panel layout replace the old map
 - [ ] **Phase 3: Game & Productivity UX** - Inline platformer and streamlined task workflows
 - [ ] **Phase 4: Landing Page** - Public-facing redesign to match the new direction
@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — CSS design tokens, global styles, HTML font setup (Wave 1)
 - [x] 01-02-PLAN.md — Core components: Navbar, modals, DashboardView (Wave 2)
-- [ ] 01-03-PLAN.md — Pages: Landing, Login, Signup, Region, Explore, Onboarding (Wave 2)
+- [x] 01-03-PLAN.md — Pages: Landing, Login, Signup, Region, Explore, Onboarding (Wave 2)
 
 ### Phase 2: Map & Layout
 **Goal**: The isometric diorama map and dual-panel layout define the core user experience
@@ -78,7 +78,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System | 2/3 | In Progress|  |
+| 1. Design System | 3/3 | Complete   | 2026-03-24 |
 | 2. Map & Layout | 0/TBD | Not started | - |
 | 3. Game & Productivity UX | 0/TBD | Not started | - |
 | 4. Landing Page | 0/TBD | Not started | - |

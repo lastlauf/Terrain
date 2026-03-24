@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useIsMobile } from '../hooks/useIsMobile.js'
@@ -8,141 +8,165 @@ import {
   SPRITES, PALETTES, REGION_COLORS,
 } from '../lib/sprites.js'
 
-// ── Pixel art inline SVG components (updated colors) ──
+// ── Isometric Diorama SVG Components ──
+// Hand-crafted isometric tiles inspired by reference art
 
-function PixelMountain({ size = 48 }) {
-  const pixels = [
-    [0,0,0,0,1,0,0,0],
-    [0,0,0,1,2,1,0,0],
-    [0,0,1,2,2,2,1,0],
-    [0,1,2,2,2,2,2,1],
-    [1,3,3,2,2,2,3,3],
-    [3,3,3,3,2,3,3,3],
-    [3,3,3,3,3,3,3,3],
-    [3,3,3,3,3,3,3,3],
-  ]
-  const colors = ['transparent', '#F5E6C8', '#4A90D9', '#3A72B0']
-  const s = size / 8
+function IsometricForest({ size = 200 }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none">
+      {/* Base block */}
+      <path d="M100 170 L30 130 L30 100 L100 140 Z" fill="#8B8680" />
+      <path d="M100 170 L170 130 L170 100 L100 140 Z" fill="#A09A93" />
+      <path d="M30 100 L100 60 L170 100 L100 140 Z" fill="#5E9E6E" />
+      {/* Grass detail */}
+      <path d="M50 110 L100 85 L150 110 L100 135 Z" fill="#6BAF7B" />
+      {/* Trees */}
+      <g>
+        <polygon points="75,55 65,75 85,75" fill="#3D7A4A" />
+        <polygon points="75,48 67,65 83,65" fill="#4A8C5C" />
+        <polygon points="75,40 69,55 81,55" fill="#5E9E6E" />
+        <rect x="73" y="75" width="4" height="8" fill="#8B6B3E" />
+      </g>
+      <g>
+        <polygon points="95,50 85,70 105,70" fill="#3D7A4A" />
+        <polygon points="95,43 87,60 103,60" fill="#4A8C5C" />
+        <polygon points="95,35 89,50 101,50" fill="#5E9E6E" />
+        <rect x="93" y="70" width="4" height="8" fill="#8B6B3E" />
+      </g>
+      <g>
+        <polygon points="115,58 105,78 125,78" fill="#3D7A4A" />
+        <polygon points="115,51 107,68 123,68" fill="#4A8C5C" />
+        <polygon points="115,43 109,58 121,58" fill="#5E9E6E" />
+        <rect x="113" y="78" width="4" height="8" fill="#8B6B3E" />
+      </g>
+      {/* Small cabin */}
+      <path d="M128 82 L128 95 L142 88 L142 75 Z" fill="#C4A882" />
+      <path d="M128 82 L120 78 L120 91 L128 95 Z" fill="#A89070" />
+      <path d="M120 78 L128 72 L142 78 L134 82 Z" fill="#D4B892" />
+      <path d="M120 78 L128 72 L135 76 L128 82 Z" fill="#BF8C5E" />
+      {/* Campfire */}
+      <circle cx="60" cy="100" r="3" fill="#E8712B" opacity="0.8" />
+      <circle cx="60" cy="99" r="2" fill="#F5C542" opacity="0.6" />
     </svg>
   )
 }
 
-function PixelTree({ size = 48 }) {
-  const pixels = [
-    [0,0,0,1,0,0,0,0],
-    [0,0,1,1,1,0,0,0],
-    [0,1,1,1,1,1,0,0],
-    [1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,0,0],
-    [1,1,1,1,1,1,1,0],
-    [0,0,0,2,0,0,0,0],
-    [0,0,0,2,0,0,0,0],
-  ]
-  const colors = ['transparent', '#5E9E6E', '#8B6B3E']
-  const s = size / 8
+function IsometricCoast({ size = 200 }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none">
+      {/* Base block */}
+      <path d="M100 170 L30 130 L30 100 L100 140 Z" fill="#8B8680" />
+      <path d="M100 170 L170 130 L170 100 L100 140 Z" fill="#A09A93" />
+      {/* Ground with water split */}
+      <path d="M30 100 L100 60 L130 77 L100 97 L60 117 L30 100 Z" fill="#5E9E6E" />
+      <path d="M130 77 L170 100 L100 140 L60 117 L100 97 Z" fill="#5DB8D4" opacity="0.7" />
+      {/* Water surface detail */}
+      <path d="M130 80 L160 96 L100 130 L70 114 L100 100 Z" fill="#4AA8C4" opacity="0.5" />
+      {/* Rocks */}
+      <ellipse cx="90" cy="90" rx="8" ry="5" fill="#9E9890" />
+      <ellipse cx="82" cy="93" rx="6" ry="4" fill="#B5AFA8" />
+      <ellipse cx="110" cy="85" rx="5" ry="3" fill="#A8A29C" />
+      {/* Sandy shore */}
+      <path d="M60 112 L100 92 L110 98 L70 118 Z" fill="#D4C8A0" />
+      {/* Small boat */}
+      <g transform="translate(120, 100) rotate(-15)">
+        <path d="M0 0 L20 0 L18 6 L2 6 Z" fill="#8B6B3E" />
+        <line x1="10" y1="0" x2="10" y2="-12" stroke="#6B5030" strokeWidth="1.5" />
+        <path d="M10 -12 L18 -4 L10 -2 Z" fill="#E8E4DC" opacity="0.8" />
+      </g>
+      {/* Palm tree */}
+      <rect x="48" y="85" width="3" height="15" fill="#8B6B3E" />
+      <path d="M49 85 L40 78 L49 82 Z" fill="#5E9E6E" />
+      <path d="M49 85 L58 78 L49 82 Z" fill="#4A8C5C" />
+      <path d="M49 83 L44 75 L49 80 Z" fill="#6BAF7B" />
     </svg>
   )
 }
 
-function PixelCity({ size = 48 }) {
-  const pixels = [
-    [0,0,0,0,0,1,0,0],
-    [0,0,1,0,0,1,0,0],
-    [0,0,1,0,1,1,1,0],
-    [0,1,1,0,1,2,1,0],
-    [0,1,2,1,1,1,1,0],
-    [1,1,1,1,1,2,1,0],
-    [1,2,1,2,1,1,1,1],
-    [1,1,1,1,1,1,1,1],
-  ]
-  const colors = ['transparent', '#D4A853', '#FF6B9D']
-  const s = size / 8
+function IsometricMountain({ size = 200 }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none">
+      {/* Base block */}
+      <path d="M100 170 L30 130 L30 100 L100 140 Z" fill="#8B8680" />
+      <path d="M100 170 L170 130 L170 100 L100 140 Z" fill="#A09A93" />
+      <path d="M30 100 L100 60 L170 100 L100 140 Z" fill="#6BAF7B" />
+      {/* Mountain */}
+      <polygon points="100,25 60,85 140,85" fill="#4A6FA5" />
+      <polygon points="100,25 80,60 120,60" fill="#5A82B8" />
+      {/* Snow cap */}
+      <polygon points="100,25 90,42 110,42" fill="#F5F2ED" />
+      <polygon points="100,25 93,38 107,38" fill="#FFFFFF" />
+      {/* Smaller peak */}
+      <polygon points="135,50 115,85 155,85" fill="#3D5E8C" />
+      <polygon points="135,50 127,65 143,65" fill="#4A6FA5" />
+      {/* Trail path */}
+      <path d="M65 100 Q80 90 95 95 Q110 100 130 88" stroke="#D4C8A0" strokeWidth="2" fill="none" strokeDasharray="4 3" opacity="0.6" />
+      {/* Small rocks */}
+      <ellipse cx="70" cy="105" rx="5" ry="3" fill="#9E9890" />
+      <ellipse cx="130" cy="100" rx="4" ry="2.5" fill="#B5AFA8" />
     </svg>
   )
 }
 
-function PixelWave({ size = 48 }) {
-  const pixels = [
-    [0,0,0,0,0,0,0,0],
-    [0,0,1,0,0,0,0,0],
-    [0,1,2,1,0,0,1,0],
-    [1,2,2,2,1,1,2,1],
-    [2,2,2,2,2,2,2,2],
-    [0,2,2,2,2,2,2,0],
-    [0,0,3,3,3,3,0,0],
-    [0,0,0,3,3,0,0,0],
-  ]
-  const colors = ['transparent', '#F5E6C8', '#FF6B9D', '#D4A853']
-  const s = size / 8
+function IsometricCity({ size = 200 }) {
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none">
+      {/* Base block */}
+      <path d="M100 170 L30 130 L30 100 L100 140 Z" fill="#8B8680" />
+      <path d="M100 170 L170 130 L170 100 L100 140 Z" fill="#A09A93" />
+      <path d="M30 100 L100 60 L170 100 L100 140 Z" fill="#D4C8A0" />
+      {/* Grid pattern on ground */}
+      <line x1="60" y1="80" x2="100" y2="120" stroke="#C4B890" strokeWidth="0.5" />
+      <line x1="80" y1="70" x2="120" y2="110" stroke="#C4B890" strokeWidth="0.5" />
+      <line x1="60" y1="100" x2="140" y2="100" stroke="#C4B890" strokeWidth="0.5" />
+      {/* Tall building */}
+      <path d="M80 45 L80 90 L95 98 L95 53 Z" fill="#E8E4DC" />
+      <path d="M95 53 L95 98 L105 92 L105 47 Z" fill="#D4CFC6" />
+      <path d="M80 45 L90 40 L105 47 L95 53 Z" fill="#F5F2ED" />
+      {/* Windows */}
+      <rect x="83" y="55" width="4" height="4" fill="#4A6FA5" opacity="0.4" />
+      <rect x="83" y="63" width="4" height="4" fill="#4A6FA5" opacity="0.6" />
+      <rect x="83" y="71" width="4" height="4" fill="#E8712B" opacity="0.5" />
+      <rect x="89" y="55" width="4" height="4" fill="#4A6FA5" opacity="0.3" />
+      <rect x="89" y="63" width="4" height="4" fill="#4A6FA5" opacity="0.5" />
+      <rect x="97" y="55" width="4" height="4" fill="#4A6FA5" opacity="0.4" />
+      <rect x="97" y="63" width="4" height="4" fill="#E8712B" opacity="0.4" />
+      {/* Shorter building */}
+      <path d="M115 65 L115 95 L130 103 L130 73 Z" fill="#E8E4DC" />
+      <path d="M130 73 L130 103 L140 97 L140 67 Z" fill="#C8C2B5" />
+      <path d="M115 65 L125 60 L140 67 L130 73 Z" fill="#F0ECE4" />
+      {/* Windows on shorter building */}
+      <rect x="118" y="73" width="4" height="3" fill="#4A6FA5" opacity="0.3" />
+      <rect x="118" y="80" width="4" height="3" fill="#E8712B" opacity="0.4" />
+      <rect x="124" y="73" width="4" height="3" fill="#4A6FA5" opacity="0.5" />
+      {/* Small tree between buildings */}
+      <circle cx="108" cy="88" r="5" fill="#5E9E6E" />
+      <rect x="107" y="88" width="2" height="5" fill="#8B6B3E" />
     </svg>
   )
 }
 
-function PixelSatellite({ size = 48 }) {
-  const pixels = [
-    [0,0,0,0,0,0,1,0],
-    [0,0,0,0,0,1,0,0],
-    [0,0,0,0,1,0,0,0],
-    [0,0,0,2,2,2,0,0],
-    [0,0,2,2,2,2,2,0],
-    [0,0,0,2,2,2,0,0],
-    [0,1,0,0,1,0,0,0],
-    [1,0,0,0,0,0,0,0],
-  ]
-  const colors = ['transparent', '#4A90D9', '#8A7560']
-  const s = size / 8
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
-    </svg>
-  )
+// ── Scroll-triggered fade-up hook ──
+
+function useScrollReveal() {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect() } },
+      { threshold: 0.15 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return [ref, visible]
 }
 
-function PixelGamepad({ size = 48 }) {
-  const pixels = [
-    [0,0,0,0,0,0,0,0],
-    [0,1,1,1,1,1,1,0],
-    [1,1,1,1,1,1,1,1],
-    [1,0,2,0,1,0,3,1],
-    [1,2,2,2,1,3,0,1],
-    [1,0,2,0,1,0,3,1],
-    [0,1,1,1,1,1,1,0],
-    [0,0,1,0,0,1,0,0],
-  ]
-  const colors = ['transparent', '#5A4A38', '#D4A853', '#FF6B9D']
-  const s = size / 8
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ imageRendering: 'pixelated' }}>
-      {pixels.map((row, y) => row.map((c, x) => c ? (
-        <rect key={`${x}-${y}`} x={x * s} y={y * s} width={s} height={s} fill={colors[c]} />
-      ) : null))}
-    </svg>
-  )
-}
-
-// ── SVG sprite renderer for demo card (uses sprite data from lib/sprites) ──
+// ── SVG sprite renderer for demo card ──
 
 function SpriteRenderer({ type, scale = 8 }) {
   const sprite = SPRITES[type] || SPRITES.mountains
@@ -160,10 +184,10 @@ function SpriteRenderer({ type, scale = 8 }) {
 // ── Demo Data ──
 
 const DEMO_REGIONS = [
-  { id: 'demo-1', name: 'Morning Runs', type: 'mountains', category: 'physical', description: 'Building a daily running habit', color: '#4A90D9', progress: 65 },
-  { id: 'demo-2', name: 'Side Project', type: 'city', category: 'creative', description: 'Shipping my app by summer', color: '#D4A853', progress: 40 },
+  { id: 'demo-1', name: 'Morning Runs', type: 'mountains', category: 'physical', description: 'Building a daily running habit', color: '#4A6FA5', progress: 65 },
+  { id: 'demo-2', name: 'Side Project', type: 'city', category: 'creative', description: 'Shipping my app by summer', color: '#C45A1A', progress: 40 },
   { id: 'demo-3', name: 'Reading List', type: 'forest', category: 'learning', description: '24 books this year', color: '#5E9E6E', progress: 30 },
-  { id: 'demo-4', name: 'Savings Goal', type: 'coast', category: 'financial', description: 'Emergency fund by December', color: '#FF6B9D', progress: 55 },
+  { id: 'demo-4', name: 'Savings Goal', type: 'coast', category: 'financial', description: 'Emergency fund by December', color: '#3A7D9E', progress: 55 },
 ]
 
 const DEMO_CHECKINS = [
@@ -173,176 +197,123 @@ const DEMO_CHECKINS = [
   { id: 'c4', region_id: 'demo-4', duration_minutes: 15, notes: 'Moved $500 into savings.', mood: 4, created_at: new Date(Date.now() - 1000*60*60*24*7).toISOString() },
 ]
 
-const MOOD_EMOJI = {
-  1: String.fromCodePoint(0x1F629),
-  2: String.fromCodePoint(0x1F615),
-  3: String.fromCodePoint(0x1F610),
-  4: String.fromCodePoint(0x1F642),
-  5: String.fromCodePoint(0x1F525),
-}
+const MOOD_EMOJI = { 1: '\u{1F629}', 2: '\u{1F615}', 3: '\u{1F610}', 4: '\u{1F642}', 5: '\u{1F525}' }
 
-// ── Rich Demo Card (slides up from bottom of canvas) ──
+// ── Rich Demo Card ──
 
 function DemoCard({ region, onClose, onSignup }) {
   const checkins = DEMO_CHECKINS.filter(c => c.region_id === region.id)
   const latest = checkins[0]
   const regionColor = region.color || 'var(--accent-orange)'
-
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'var(--bg-surface-raised)',
-        border: '1px solid var(--border-light)',
-        borderBottom: 'none',
-        padding: 'var(--space-6)',
-        zIndex: 10,
-        animation: 'slide-up var(--duration-slow) var(--ease-out)',
-      }}
-    >
-      <div style={{ display: 'flex', gap: 'var(--space-6)', alignItems: 'flex-start' }}>
-        {/* Large pixel sprite */}
-        <div style={{ flexShrink: 0 }}>
-          <SpriteRenderer type={region.type} scale={8} />
-        </div>
-
-        {/* Content */}
+    <div style={{
+      position: 'absolute', bottom: 0, left: 0, right: 0,
+      background: 'var(--bg-surface-raised)', border: '1px solid var(--border-light)',
+      borderBottom: 'none', padding: '24px', zIndex: 10,
+      animation: 'fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+    }}>
+      <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+        <div style={{ flexShrink: 0 }}><SpriteRenderer type={region.type} scale={8} /></div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Name */}
-          <h3 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
-            fontSize: 'var(--text-2xl)',
-            color: regionColor,
-            marginBottom: 'var(--space-2)',
-          }}>
-            {region.name}
-          </h3>
-
-          {/* Type + Category pills */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
-            <span style={{
-              display: 'inline-block',
-              padding: '2px var(--space-2)',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: regionColor,
-              border: `1px solid ${regionColor}`,
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--accent-orange-bg)',
-            }}>
-              {region.type}
-            </span>
-            <span style={{
-              display: 'inline-block',
-              padding: '2px var(--space-2)',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              color: 'var(--text-muted)',
-              border: '1px solid var(--border-light)',
-              borderRadius: 'var(--radius-sm)',
-              background: 'transparent',
-            }}>
-              {region.category}
-            </span>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: '28px', color: regionColor, marginBottom: '8px' }}>{region.name}</h3>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: regionColor, border: `1px solid ${regionColor}`, borderRadius: '2px' }}>{region.type}</span>
+            <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', border: '1px solid var(--border-light)', borderRadius: '2px' }}>{region.category}</span>
           </div>
-
-          {/* Description */}
-          <p style={{
-            fontSize: 'var(--text-sm)',
-            color: 'var(--text-muted)',
-            lineHeight: 1.5,
-            marginBottom: 'var(--space-4)',
-          }}>
-            {region.description}
-          </p>
-
-          {/* Progress bar */}
-          <div style={{ marginBottom: 'var(--space-4)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-1)' }}>
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 600 }}>Progress</span>
-              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xs)', color: regionColor }}>{region.progress}%</span>
+          <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>{region.description}</p>
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Progress</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: regionColor }}>{region.progress}%</span>
             </div>
-            <div style={{ height: '6px', background: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
-              <div style={{
-                height: '100%',
-                width: `${region.progress}%`,
-                background: 'var(--accent-orange)',
-                borderRadius: 'var(--radius-sm)',
-                transition: 'width var(--duration-slow) var(--ease-out)',
-              }} />
+            <div style={{ height: '4px', background: 'var(--bg-muted)', borderRadius: '2px' }}>
+              <div style={{ height: '100%', width: `${region.progress}%`, background: regionColor, borderRadius: '2px', transition: 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
             </div>
           </div>
-
-          {/* Latest checkin note */}
           {latest && (
-            <div style={{
-              padding: 'var(--space-2) var(--space-3)',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-light)',
-              borderLeft: `3px solid ${regionColor}`,
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--space-4)',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-primary)' }}>
-                  {latest.duration_minutes} min {MOOD_EMOJI[latest.mood] || ''}
-                </span>
-                <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
-                  {new Date(latest.created_at).toLocaleDateString()}
-                </span>
+            <div style={{ padding: '8px 12px', background: 'var(--bg-surface)', border: '1px solid var(--border-light)', borderLeft: `3px solid ${regionColor}`, borderRadius: '4px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{latest.duration_minutes} min {MOOD_EMOJI[latest.mood] || ''}</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>{new Date(latest.created_at).toLocaleDateString()}</span>
               </div>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                {latest.notes}
-              </p>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.4 }}>{latest.notes}</p>
             </div>
           )}
-
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-            <button
-              type="button"
-              onClick={onSignup}
-              style={{
-                fontSize: 'var(--text-sm)',
-                padding: 'var(--space-2) var(--space-6)',
-                background: 'var(--accent-orange)',
-                color: '#FFFFFF',
-                border: '1px solid var(--accent-orange)',
-                borderRadius: 'var(--radius-md)',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Sign Up
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                fontSize: 'var(--text-sm)',
-                padding: 'var(--space-2) var(--space-4)',
-                background: 'transparent',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-mid)',
-                borderRadius: 'var(--radius-md)',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Close
-            </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={onSignup} className="btn" style={{ fontSize: '13px', padding: '8px 20px' }}>Sign Up</button>
+            <button onClick={onClose} className="btn btn--secondary" style={{ fontSize: '13px', padding: '8px 16px' }}>Close</button>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Magnetic Button ──
+
+function MagneticButton({ children, onClick, style, className = '' }) {
+  const ref = useRef(null)
+  const handleMouseMove = useCallback((e) => {
+    const el = ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = e.clientX - rect.left - rect.width / 2
+    const y = e.clientY - rect.top - rect.height / 2
+    el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`
+  }, [])
+  const handleMouseLeave = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.transform = ''
+    el.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }, [])
+  return (
+    <button ref={ref} onClick={onClick} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} className={className} style={{ ...style, willChange: 'transform' }}>
+      {children}
+    </button>
+  )
+}
+
+// ── Feature Section with scroll reveal ──
+
+function FeatureSection({ number, title, description, children, reverse, isMobile }) {
+  const [ref, visible] = useScrollReveal()
+  return (
+    <div ref={ref} style={{
+      display: 'grid',
+      gridTemplateColumns: isMobile ? '1fr' : reverse ? '1fr 1fr' : '1fr 1fr',
+      gap: isMobile ? '32px' : '64px',
+      alignItems: 'center',
+      marginBottom: isMobile ? '64px' : '120px',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(24px)',
+      transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+    }}>
+      <div style={{ order: isMobile ? 0 : (reverse ? 1 : 0) }}>
+        <span style={{
+          fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.1em',
+          textTransform: 'uppercase', color: 'var(--accent-orange)',
+          display: 'block', marginBottom: '16px',
+        }}>
+          / {number}
+        </span>
+        <h2 style={{
+          fontFamily: 'var(--font-display)', fontWeight: 400,
+          fontSize: isMobile ? '36px' : 'clamp(36px, 4vw, 56px)',
+          lineHeight: 1.05, letterSpacing: '-0.02em',
+          color: 'var(--text-primary)', marginBottom: '20px',
+        }}>
+          {title}
+        </h2>
+        <p style={{
+          fontFamily: 'var(--font-body)', fontSize: '16px',
+          color: 'var(--text-muted)', lineHeight: 1.65, maxWidth: '400px',
+        }}>
+          {description}
+        </p>
+      </div>
+      <div style={{ order: isMobile ? 1 : (reverse ? 0 : 1) }}>
+        {children}
       </div>
     </div>
   )
@@ -357,10 +328,16 @@ export default function Landing() {
   const [demoRegion, setDemoRegion] = useState(null)
   const [signupOpen, setSignupOpen] = useState(() => searchParams.get('signup') === '1')
   const isMobile = useIsMobile()
+  const [heroVisible, setHeroVisible] = useState(false)
 
   useEffect(() => {
     if (user) navigate('/map', { replace: true })
   }, [user, navigate])
+
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 100)
+    return () => clearTimeout(t)
+  }, [])
 
   const openSignup = useCallback(() => setSignupOpen(true), [])
   const closeSignup = useCallback(() => setSignupOpen(false), [])
@@ -369,277 +346,286 @@ export default function Landing() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
 
       {/* ── HERO ── */}
-      <section
-        style={{
-          position: 'relative',
-          height: '100vh',
-          overflow: 'hidden',
-          background: 'var(--bg-base)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}
-      >
+      <section style={{
+        position: 'relative', minHeight: '100vh', overflow: 'hidden',
+        background: 'var(--bg-base)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        padding: isMobile ? '0 24px' : '0 6vw',
+      }}>
         <div style={{
           position: 'relative', zIndex: 2,
-          height: '100%', display: 'flex', flexDirection: 'column',
-          justifyContent: 'center',
-          padding: '0 6vw',
-          maxWidth: '1100px',
+          maxWidth: '1100px', width: '100%',
         }}>
-          <span className="mono-label" style={{ marginBottom: '20px', color: 'var(--accent-orange)', opacity: 0.8 }}>
-            Goal operating system — v1.0
-          </span>
-
-          {/* TERRAIN on ONE line — bold display text */}
-          <h1 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
-            fontSize: isMobile ? 'clamp(32px, 11vw, 48px)' : 'clamp(48px, 9vw, 120px)',
-            lineHeight: 1.0,
-            letterSpacing: isMobile ? '0.02em' : '0.04em',
-            color: 'var(--text-primary)',
-            marginBottom: '32px',
-            whiteSpace: 'nowrap',
-          }}>
-            TERRAIN
-          </h1>
-
+          {/* Eyebrow */}
           <div style={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            alignItems: isMobile ? 'flex-start' : 'flex-end',
-            gap: isMobile ? '24px' : '48px',
-            flexWrap: 'wrap',
+            overflow: 'hidden', marginBottom: '24px',
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? 'translateY(0)' : 'translateY(12px)',
+            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
           }}>
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 'clamp(16px, 2.2vw, 22px)',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.5,
-              maxWidth: '320px',
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '11px',
+              letterSpacing: '0.15em', textTransform: 'uppercase',
+              color: 'var(--accent-orange)', fontWeight: 500,
             }}>
-              Your goals, mapped. A living terrain where
-              every region is a life area you're building.
-            </p>
+              / Goal Operating System
+            </span>
+          </div>
 
-            <div style={{
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
-              gap: '12px',
-              flexWrap: 'wrap',
-              alignItems: isMobile ? 'stretch' : 'center',
-              width: isMobile ? '100%' : 'auto',
+          {/* Headline — DM Serif Display, clip reveal */}
+          <div style={{ overflow: 'hidden', marginBottom: '32px' }}>
+            <h1 style={{
+              fontFamily: 'var(--font-display)', fontWeight: 400,
+              fontSize: isMobile ? 'clamp(48px, 14vw, 72px)' : 'clamp(72px, 10vw, 140px)',
+              lineHeight: 0.92, letterSpacing: '-0.03em',
+              color: 'var(--text-primary)',
+              transform: heroVisible ? 'translateY(0)' : 'translateY(110%)',
+              transition: 'transform 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.3s',
             }}>
-              <a href="#demo" style={{
-                textDecoration: 'none',
-                fontSize: isMobile ? '14px' : '15px',
-                padding: isMobile ? '12px 24px' : '14px 32px',
-                borderRadius: 'var(--radius-md)',
+              Terrain
+            </h1>
+          </div>
+
+          {/* Subheading */}
+          <p style={{
+            fontFamily: 'var(--font-body)', fontWeight: 400,
+            fontSize: isMobile ? '17px' : '20px',
+            color: 'var(--text-secondary)', lineHeight: 1.55,
+            maxWidth: '420px', marginBottom: '48px',
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? 'translateY(0)' : 'translateY(16px)',
+            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s',
+          }}>
+            Your goals, mapped. A living terrain where
+            every region is a life area you're building.
+          </p>
+
+          {/* CTAs */}
+          <div style={{
+            display: 'flex', flexDirection: isMobile ? 'column' : 'row',
+            gap: '12px', alignItems: isMobile ? 'stretch' : 'center',
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? 'translateY(0)' : 'translateY(16px)',
+            transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.75s',
+          }}>
+            <MagneticButton
+              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn"
+              style={{
+                fontSize: '15px', padding: '14px 32px',
                 textAlign: 'center',
-                background: 'var(--accent-orange)',
-                color: '#FFFFFF',
-                border: '1px solid var(--accent-orange)',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-block',
-              }}>
-                Start Exploring
-              </a>
-              <Link to="/login" style={{
-                textDecoration: 'none',
-                fontSize: isMobile ? '14px' : '15px',
-                padding: isMobile ? '12px 24px' : '14px 32px',
-                borderRadius: 'var(--radius-md)',
-                textAlign: 'center',
-                background: 'transparent',
-                color: 'var(--text-primary)',
-                border: '1px solid var(--border-mid)',
-                fontFamily: 'var(--font-body)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-block',
-              }}>
-                Log In
-              </Link>
-              <button
-                onClick={openSignup}
-                style={{
-                  fontSize: '14px',
-                  color: 'var(--text-muted)',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '3px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: isMobile ? '8px 0' : 0,
-                  fontFamily: 'inherit',
-                  textAlign: isMobile ? 'center' : 'left',
-                }}
-              >
-                or Sign Up
-              </button>
-            </div>
+              }}
+            >
+              Start Exploring
+            </MagneticButton>
+            <Link to="/login" className="btn btn--secondary" style={{
+              fontSize: '15px', padding: '14px 32px',
+              textAlign: 'center', textDecoration: 'none',
+            }}>
+              Log In
+            </Link>
+            <button onClick={openSignup} style={{
+              fontSize: '14px', color: 'var(--text-muted)',
+              textDecoration: 'underline', textUnderlineOffset: '3px',
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontFamily: 'inherit', padding: isMobile ? '8px 0' : 0,
+            }}>
+              or Sign Up
+            </button>
           </div>
         </div>
 
+        {/* Isometric tiles floating on right (desktop only) */}
+        {!isMobile && (
+          <div style={{
+            position: 'absolute', right: '6vw', top: '50%', transform: 'translateY(-50%)',
+            display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end',
+            opacity: heroVisible ? 1 : 0,
+            transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
+          }}>
+            <div style={{ transform: 'translateX(20px)', opacity: 0.9 }}><IsometricForest size={160} /></div>
+            <div style={{ transform: 'translateX(-30px)', opacity: 0.7 }}><IsometricMountain size={140} /></div>
+            <div style={{ transform: 'translateX(10px)', opacity: 0.8 }}><IsometricCoast size={130} /></div>
+          </div>
+        )}
+
+        {/* Scroll indicator */}
         <div style={{
-          position: 'absolute', bottom: isMobile ? '16px' : '32px', left: '6vw', zIndex: 2,
+          position: 'absolute', bottom: isMobile ? '24px' : '40px',
+          left: isMobile ? '24px' : '6vw', zIndex: 2,
           display: 'flex', alignItems: 'center', gap: '8px',
+          opacity: heroVisible ? 0.5 : 0,
+          transition: 'opacity 0.5s ease 1.2s',
         }}>
-          <span className="mono-label" style={{ color: 'var(--text-dim)' }}>scroll</span>
-          <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>scroll</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-dim)' }}/>
+          </svg>
         </div>
       </section>
 
       {/* ── FEATURES ── */}
       <section style={{
-        padding: isMobile ? '64px 6vw' : '120px 6vw',
-        maxWidth: '1100px',
-        margin: '0 auto',
+        padding: isMobile ? '64px 24px' : '120px 6vw',
+        maxWidth: '1100px', margin: '0 auto',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: isMobile ? '48px' : '80px' }}>
-          <span className="mono-label">How it works</span>
-          <hr className="dotted-divider" style={{ flex: 1, margin: 0 }} />
-        </div>
-
-        {/* Feature 01 */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '32px' : '64px',
-          alignItems: 'center',
-          marginBottom: isMobile ? '48px' : '80px',
+          display: 'flex', alignItems: 'center', gap: '16px',
+          marginBottom: isMobile ? '64px' : '120px',
         }}>
-          <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-orange)' }}>01</span>
-            <h2 style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: 'clamp(32px, 5vw, 60px)',
-              lineHeight: 1.1,
-              color: 'var(--text-primary)',
-              marginBottom: '24px',
-            }}>
-              Map<br />View
-            </h2>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '16px', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '380px' }}>
-              Each goal becomes a region on your terrain — mountains, forests, cities, coasts. The map breathes: weather shifts with your check-in recency.
-            </p>
-          </div>
-          {/* Mini map preview with icons placed on terrain */}
-          <div style={{
-            padding: 0,
-            aspectRatio: '4/3',
-            position: 'relative',
-            overflow: 'hidden',
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border-light)',
-            borderRadius: 'var(--radius-md)',
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '11px',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: 'var(--text-muted)', fontWeight: 500,
           }}>
-            {/* Grid dots background */}
+            How it works
+          </span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
+        </div>
+
+        {/* Feature 01 — Map View */}
+        <FeatureSection
+          number="01"
+          title="Map View"
+          description="Each goal becomes a region on your terrain — mountains, forests, cities, coasts. The map breathes: weather shifts with your check-in recency."
+          isMobile={isMobile}
+        >
+          <div style={{
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px',
+            padding: '24px', background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)', borderRadius: '8px',
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <IsometricMountain size={isMobile ? 100 : 140} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-mountains)', display: 'block', marginTop: '8px' }}>Fitness</span>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <IsometricCity size={isMobile ? 100 : 140} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-city)', display: 'block', marginTop: '8px' }}>Projects</span>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <IsometricForest size={isMobile ? 100 : 140} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-forest)', display: 'block', marginTop: '8px' }}>Learning</span>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <IsometricCoast size={isMobile ? 100 : 140} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-coast)', display: 'block', marginTop: '8px' }}>Finance</span>
+            </div>
+          </div>
+        </FeatureSection>
+
+        <div style={{ height: '1px', background: 'var(--border-light)', marginBottom: isMobile ? '64px' : '120px' }} />
+
+        {/* Feature 02 — Field Reports */}
+        <FeatureSection
+          number="02"
+          title="Field Reports"
+          description="AI-powered dispatches from your terrain. A wise cartographer notices patterns, names what it sees, and asks one good question. Under 80 words — always."
+          reverse
+          isMobile={isMobile}
+        >
+          <div style={{
+            padding: '24px', background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)', borderRadius: '8px',
+          }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-orange)' }} />
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent-orange)' }}>Field Report</span>
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-display)', fontStyle: 'italic',
+              fontSize: isMobile ? '18px' : '22px', lineHeight: 1.4,
+              color: 'var(--text-primary)', marginBottom: '16px',
+            }}>
+              "The mountain trail shows consistent footprints — 12 sessions this month.
+              Your reading forest, though, has gone quiet. When did the last book close?"
+            </p>
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '10px',
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: 'var(--text-dim)',
+            }}>
+              AI Cartographer / 3 min ago
+            </span>
+          </div>
+        </FeatureSection>
+
+        {/* Feature 03 — Explore Mode */}
+        <FeatureSection
+          number="03"
+          title="Explore Mode"
+          description="Walk through your goals as a platformer. Each region becomes a biome zone. Collect past reflections as orbs. Traverse your progress — literally."
+          isMobile={isMobile}
+        >
+          <div style={{
+            padding: '24px', background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)', borderRadius: '8px',
+            position: 'relative', overflow: 'hidden', minHeight: '200px',
+          }}>
+            {/* Platformer preview mockup */}
             <div style={{
-              position: 'absolute', inset: 0,
-              backgroundImage: 'radial-gradient(circle, rgba(200,194,181,0.25) 1px, transparent 1px)',
-              backgroundSize: '20px 20px',
+              display: 'flex', alignItems: 'flex-end', gap: '4px',
+              position: 'absolute', bottom: '40px', left: '24px', right: '24px',
+            }}>
+              {[20, 35, 25, 45, 30, 40, 20, 35, 50, 30, 25, 40].map((h, i) => (
+                <div key={i} style={{
+                  flex: 1, height: `${h}px`,
+                  background: i < 4 ? 'var(--region-forest)' : i < 8 ? 'var(--region-mountains)' : 'var(--region-coast)',
+                  opacity: 0.3 + (i % 3) * 0.2,
+                  borderRadius: '2px 2px 0 0',
+                }} />
+              ))}
+            </div>
+            {/* Ground line */}
+            <div style={{ position: 'absolute', bottom: '40px', left: '24px', right: '24px', height: '2px', background: 'var(--border-mid)' }} />
+            {/* Player silhouette */}
+            <div style={{
+              position: 'absolute', bottom: '42px', left: '35%',
+              width: '12px', height: '20px', borderRadius: '6px',
+              background: 'var(--accent-orange)', boxShadow: '0 0 12px rgba(232, 113, 43, 0.4)',
             }} />
-            {/* Region icons positioned on the "map" */}
-            <div style={{ position: 'absolute', top: '15%', left: '12%' }}>
-              <PixelMountain size={48} />
-              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-mountains)' }}>runs</span>
-            </div>
-            <div style={{ position: 'absolute', top: '25%', right: '15%' }}>
-              <PixelCity size={48} />
-              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-city)' }}>project</span>
-            </div>
-            <div style={{ position: 'absolute', bottom: '25%', left: '35%' }}>
-              <PixelTree size={48} />
-              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-forest)' }}>reading</span>
-            </div>
-            <div style={{ position: 'absolute', bottom: '15%', right: '25%' }}>
-              <PixelWave size={48} />
-              <span className="mono-label" style={{ display: 'block', textAlign: 'center', marginTop: '4px', fontSize: '9px', color: 'var(--region-coast)' }}>savings</span>
-            </div>
-            {/* Connecting dotted lines between regions */}
-            <svg viewBox="0 0 400 300" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
-              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
-              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
-            </svg>
-          </div>
-        </div>
-
-        <hr className="dotted-divider" />
-
-        {/* Features 02 + 03 */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? '32px' : '48px',
-          marginTop: isMobile ? '48px' : '80px',
-        }}>
-          <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--text-muted)' }}>02</span>
-            <div style={{ marginBottom: '16px' }}>
-              <PixelSatellite size={40} />
-            </div>
-            <h3 style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: 'clamp(26px, 3.5vw, 44px)',
-              lineHeight: 1.1,
-              color: 'var(--text-primary)',
-              marginBottom: '16px',
+            {/* Collectible orbs */}
+            {[45, 55, 65, 75].map((left, i) => (
+              <div key={i} style={{
+                position: 'absolute', bottom: `${60 + i * 15}px`, left: `${left}%`,
+                width: '8px', height: '8px', borderRadius: '50%',
+                background: '#F5C542', opacity: 0.6,
+                boxShadow: '0 0 6px rgba(245, 197, 66, 0.5)',
+              }} />
+            ))}
+            {/* Controls hint */}
+            <div style={{
+              position: 'absolute', bottom: '12px', left: '24px',
+              fontFamily: 'var(--font-mono)', fontSize: '10px',
+              letterSpacing: '0.08em', color: 'var(--text-dim)',
+              textTransform: 'uppercase',
             }}>
-              Field<br />Reports
-            </h3>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '16px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
-              AI-powered dispatches from your terrain. A wise cartographer notices patterns, names what it sees, and asks one good question. Under 80 words — always.
-            </p>
-          </div>
-          <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--text-muted)' }}>03</span>
-            <div style={{ marginBottom: '16px' }}>
-              <PixelGamepad size={40} />
+              WASD to move / Space to jump / E to interact
             </div>
-            <h3 style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 800,
-              fontSize: 'clamp(26px, 3.5vw, 44px)',
-              lineHeight: 1.1,
-              color: 'var(--text-primary)',
-              marginBottom: '16px',
-            }}>
-              Explore<br />Mode
-            </h3>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '16px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
-              Walk through your goals as a platformer. Each region becomes a biome zone. Collect past reflections as orbs. Traverse your progress — literally.
-            </p>
           </div>
-        </div>
+        </FeatureSection>
       </section>
 
       {/* ── DEMO SECTION ── */}
       <section id="demo" style={{
-        padding: isMobile ? '48px 6vw 64px' : '80px 6vw 120px',
-        maxWidth: '1100px',
-        margin: '0 auto',
+        padding: isMobile ? '48px 24px 64px' : '80px 6vw 120px',
+        maxWidth: '1100px', margin: '0 auto',
       }}>
-        <hr className="dotted-divider" style={{ marginBottom: isMobile ? '48px' : '80px' }} />
+        <div style={{ height: '1px', background: 'var(--border-light)', marginBottom: isMobile ? '48px' : '80px' }} />
 
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-orange)' }}>Interactive</span>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '11px',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: 'var(--accent-orange)', display: 'block', marginBottom: '16px',
+          }}>
+            / Interactive
+          </span>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
-            fontSize: 'clamp(40px, 6vw, 80px)',
-            color: 'var(--text-primary)',
-            marginBottom: '16px',
+            fontFamily: 'var(--font-display)', fontWeight: 400,
+            fontSize: isMobile ? '40px' : 'clamp(48px, 6vw, 80px)',
+            lineHeight: 0.95, letterSpacing: '-0.02em',
+            color: 'var(--text-primary)', marginBottom: '16px',
           }}>
             Try the Demo
           </h2>
@@ -648,17 +634,12 @@ export default function Landing() {
           </p>
         </div>
 
-        {/* Demo Canvas — full width, taller */}
         <div style={{
-          width: '100%',
-          maxWidth: '900px',
+          width: '100%', maxWidth: '900px',
           height: isMobile ? '300px' : '500px',
           margin: isMobile ? '0 auto 32px' : '0 auto 48px',
-          border: '1px solid var(--border-light)',
-          borderRadius: 'var(--radius-md)',
-          background: 'var(--bg-base)',
-          position: 'relative',
-          overflow: 'hidden',
+          border: '1px solid var(--border-light)', borderRadius: '8px',
+          background: 'var(--bg-base)', position: 'relative', overflow: 'hidden',
         }}>
           <TerrainCanvas
             regions={DEMO_REGIONS}
@@ -668,8 +649,6 @@ export default function Landing() {
             mini={false}
             theme={{}}
           />
-
-          {/* Rich inline card that slides up from bottom */}
           {demoRegion && (
             <DemoCard
               region={demoRegion}
@@ -680,23 +659,17 @@ export default function Landing() {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <button
+          <MagneticButton
             onClick={openSignup}
+            className="btn"
             style={{
               fontSize: isMobile ? '14px' : '16px',
               padding: isMobile ? '12px 24px' : '16px 40px',
-              borderRadius: 'var(--radius-md)',
               width: isMobile ? '100%' : 'auto',
-              background: 'var(--accent-orange)',
-              color: '#FFFFFF',
-              border: '1px solid var(--accent-orange)',
-              fontFamily: 'var(--font-body)',
-              fontWeight: 600,
-              cursor: 'pointer',
             }}
           >
             Sign Up to Build Yours
-          </button>
+          </MagneticButton>
         </div>
       </section>
 
@@ -704,64 +677,61 @@ export default function Landing() {
       <section style={{
         borderTop: '1px solid var(--border-light)',
         background: 'var(--bg-surface)',
-        padding: isMobile ? '48px 6vw' : '80px 6vw',
+        padding: isMobile ? '48px 24px' : '80px 6vw',
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: isMobile ? '24px' : '32px',
+        flexWrap: 'wrap', gap: isMobile ? '24px' : '32px',
       }}>
         <div>
-          <p className="mono-label" style={{ marginBottom: '8px', color: 'var(--text-muted)' }}>Ready to map your terrain?</p>
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '11px',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: 'var(--text-muted)', display: 'block', marginBottom: '12px',
+          }}>
+            Ready to map your terrain?
+          </span>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
-            fontSize: 'clamp(32px, 5vw, 64px)',
+            fontFamily: 'var(--font-display)', fontWeight: 400,
+            fontSize: isMobile ? '36px' : 'clamp(40px, 5vw, 72px)',
+            lineHeight: 0.95, letterSpacing: '-0.02em',
             color: 'var(--text-primary)',
-            lineHeight: 1.0,
           }}>
             Start building.
           </h2>
         </div>
-        <button
+        <MagneticButton
           onClick={openSignup}
+          className="btn"
           style={{
             fontSize: isMobile ? '14px' : '16px',
             padding: isMobile ? '12px 24px' : '16px 40px',
-            borderRadius: 'var(--radius-md)',
-            flexShrink: 0,
-            width: isMobile ? '100%' : 'auto',
-            background: 'var(--accent-orange)',
-            color: '#FFFFFF',
-            border: '1px solid var(--accent-orange)',
-            fontFamily: 'var(--font-body)',
-            fontWeight: 600,
-            cursor: 'pointer',
+            flexShrink: 0, width: isMobile ? '100%' : 'auto',
           }}
         >
           Create Your Map
-        </button>
+        </MagneticButton>
       </section>
 
       {/* ── FOOTER ── */}
       <footer style={{
-        padding: isMobile ? '16px 6vw' : '24px 6vw',
+        padding: isMobile ? '16px 24px' : '24px 6vw',
         borderTop: '1px solid var(--border-light)',
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: isMobile ? 'flex-start' : 'center',
-        justifyContent: 'space-between',
-        gap: isMobile ? '4px' : '0',
+        justifyContent: 'space-between', gap: isMobile ? '4px' : '0',
       }}>
-        <span className="mono-label">TERRAIN — Goal Operating System</span>
-        <span className="mono-label" style={{ color: 'var(--text-dim)' }}>Built with care</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+          Terrain — Goal Operating System
+        </span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>
+          Built with care
+        </span>
       </footer>
 
-      {/* Signup overlay */}
-      {signupOpen && (
-        <SignupOverlay onClose={closeSignup} />
-      )}
+      {signupOpen && <SignupOverlay onClose={closeSignup} />}
     </div>
   )
 }

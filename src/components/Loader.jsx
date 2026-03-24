@@ -11,7 +11,7 @@ export default function Loader({ message = 'Loading...' }) {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      background: 'var(--bg-base, #0D1117)',
+      background: 'var(--bg-base)',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -33,10 +33,10 @@ export default function Loader({ message = 'Loading...' }) {
           left: '50%',
           transform: 'translateX(-50%)',
           fontSize: 'var(--text-sm, 14px)',
-          color: 'var(--text-dim, rgba(245, 230, 200, 0.3))',
+          color: 'var(--text-muted)',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          fontFamily: "var(--font-heading, 'Space Mono', monospace)",
+          fontFamily: "var(--font-heading, 'Inter', sans-serif)",
           animation: 'pulse-subtle 2s ease-in-out infinite',
         }}
       >

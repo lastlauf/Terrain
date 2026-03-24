@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useIsMobile } from '../hooks/useIsMobile.js'
-import { PixelPaletteIcon } from './PixelIcons.jsx'
 
-export default function Navbar({ onThemeToggle, onReplayTour }) {
+export default function Navbar({ onReplayTour }) {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -29,19 +28,18 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '0 var(--space-6)',
-      background: 'rgba(13, 10, 6, 0.85)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      borderBottom: '2px solid var(--border-retro)',
+      background: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border-light)',
       zIndex: 50,
     }}>
       {/* Logo */}
       <Link to="/map" style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'var(--text-xl)',
-        color: 'var(--accent-gold)',
+        fontFamily: 'var(--font-heading)',
+        fontWeight: 800,
+        fontSize: 'var(--text-base)',
+        letterSpacing: '0.08em',
+        color: 'var(--text-primary)',
         textDecoration: 'none',
-        letterSpacing: '1px',
       }}>
         TERRAIN
       </Link>
@@ -55,7 +53,8 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
         <Link to="/map" style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'var(--text-sm)',
-          color: location.pathname === '/map' ? 'var(--accent-gold)' : 'var(--text-muted)',
+          color: location.pathname === '/map' ? 'var(--accent-orange)' : 'var(--text-muted)',
+          fontWeight: location.pathname === '/map' ? 600 : 400,
           textDecoration: 'none',
           textTransform: 'uppercase',
           letterSpacing: '1px',
@@ -67,7 +66,8 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
         <Link to="/explore" style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'var(--text-sm)',
-          color: location.pathname === '/explore' ? 'var(--accent-gold)' : 'var(--text-muted)',
+          color: location.pathname === '/explore' ? 'var(--accent-orange)' : 'var(--text-muted)',
+          fontWeight: location.pathname === '/explore' ? 600 : 400,
           textDecoration: 'none',
           textTransform: 'uppercase',
           letterSpacing: '1px',
@@ -75,24 +75,6 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
         }}>
           Explore
         </Link>
-
-        {onThemeToggle && (
-          <button
-            onClick={onThemeToggle}
-            style={{
-              padding: 'var(--space-1)',
-              transition: 'opacity var(--duration-fast) var(--ease-out)',
-              opacity: 0.7,
-              display: 'flex',
-              alignItems: 'center',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
-            title="Theme settings"
-          >
-            <PixelPaletteIcon size={24} />
-          </button>
-        )}
 
         {/* User menu */}
         <div style={{ position: 'relative' }}>
@@ -105,9 +87,9 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
               padding: isMobile ? 'var(--space-1)' : 'var(--space-1) var(--space-3)',
               fontSize: 'var(--text-sm)',
               color: 'var(--text-primary)',
-              border: '1px solid var(--border-retro)',
+              border: '1px solid var(--border-light)',
               borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-glass)',
+              background: 'transparent',
               cursor: 'pointer',
             }}
           >
@@ -115,12 +97,12 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
               width: '24px',
               height: '24px',
               borderRadius: '50%',
-              background: 'var(--accent-gold)',
+              background: 'var(--accent-orange)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 'var(--text-xs)',
-              color: 'var(--bg-base)',
+              color: '#FFFFFF',
               fontWeight: 700,
             }}>
               {username[0].toUpperCase()}
@@ -135,9 +117,10 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
               right: 0,
               marginTop: 'var(--space-1)',
               minWidth: '160px',
-              background: 'var(--bg-surface)',
-              border: '2px solid var(--border-retro)',
+              background: 'var(--bg-surface-raised)',
+              border: '1px solid var(--border-light)',
               borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-md)',
               padding: 'var(--space-2)',
               zIndex: 60,
               animation: 'slide-up var(--duration-fast) var(--ease-out)',
@@ -154,7 +137,7 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
                     borderRadius: 'var(--radius-sm)',
                     transition: 'background var(--duration-fast)',
                   }}
-                  onMouseEnter={(e) => e.target.style.background = 'var(--bg-glass)'}
+                  onMouseEnter={(e) => e.target.style.background = 'var(--bg-muted)'}
                   onMouseLeave={(e) => e.target.style.background = 'transparent'}
                 >
                   Replay Tour
@@ -171,7 +154,7 @@ export default function Navbar({ onThemeToggle, onReplayTour }) {
                   borderRadius: 'var(--radius-sm)',
                   transition: 'background var(--duration-fast)',
                 }}
-                onMouseEnter={(e) => e.target.style.background = 'var(--bg-glass)'}
+                onMouseEnter={(e) => e.target.style.background = 'var(--bg-muted)'}
                 onMouseLeave={(e) => e.target.style.background = 'transparent'}
               >
                 Sign Out

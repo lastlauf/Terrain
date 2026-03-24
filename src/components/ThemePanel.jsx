@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 
 const SKY_PRESETS = [
-  { value: 'dawn', label: 'Dawn', colors: ['#2A1A1A', '#4A2A2A', '#D4A853'] },
-  { value: 'day', label: 'Day', colors: ['#1A2A3A', '#3A5A7A', '#4A90D9'] },
-  { value: 'dusk', label: 'Dusk', colors: ['#2A1A2A', '#4A2A4A', '#E8632A'] },
-  { value: 'night', label: 'Night', colors: ['#0A0A1A', '#1A1A2A', '#2A2A4A'] },
-  { value: 'storm', label: 'Storm', colors: ['#0A0A0A', '#1A1A1A', '#2A2A2A'] },
+  { value: 'dawn', label: 'Dawn', colors: ['#C8A882', '#E8D0A8', '#E8712B'] },
+  { value: 'day', label: 'Day', colors: ['#A8C4D8', '#C8DCE8', '#4A6FA5'] },
+  { value: 'dusk', label: 'Dusk', colors: ['#C8907A', '#E8B090', '#E8712B'] },
+  { value: 'night', label: 'Night', colors: ['#3A4A5A', '#4A5A6A', '#5A6A7A'] },
+  { value: 'storm', label: 'Storm', colors: ['#5A5A5A', '#6A6A6A', '#7A7A7A'] },
 ]
 
 const GROUND_STYLES = ['natural', 'pixelated', 'wireframe']
 const PARTICLE_OPTIONS = ['fireflies', 'snowflakes', 'rain', 'none']
-const CHARACTER_COLORS = ['#D4A853', '#4A90D9', '#FF6B9D', '#5E9E6E', '#3A72B0', '#D4568A']
+const CHARACTER_COLORS = ['#E8712B', '#4A6FA5', '#4A8C5C', '#3A7D9E', '#C45A1A', '#7A7268']
 
 export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }) {
   const [localTheme, setLocalTheme] = useState(theme)
@@ -54,10 +54,9 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
       bottom: 0,
       width: '320px',
       maxWidth: '100vw',
-      background: 'rgba(26, 21, 16, 0.95)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      borderRight: '3px solid var(--border-retro)',
+      background: 'var(--bg-surface-raised)',
+      borderRight: '1px solid var(--border-light)',
+      boxShadow: 'var(--shadow-lg)',
       zIndex: 60,
       display: 'flex',
       flexDirection: 'column',
@@ -67,15 +66,16 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
       {/* Header */}
       <div style={{
         padding: 'var(--space-6)',
-        borderBottom: '2px solid var(--border-retro)',
+        borderBottom: '1px solid var(--border-light)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
         <h2 style={{
-          fontFamily: 'var(--font-display)',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 700,
           fontSize: 'var(--text-xl)',
-          color: 'var(--accent-gold)',
+          color: 'var(--text-primary)',
         }}>
           THEME
         </h2>
@@ -123,7 +123,7 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
                   width: '48px',
                   height: '48px',
                   background: `linear-gradient(180deg, ${sky.colors[0]}, ${sky.colors[1]}, ${sky.colors[2]})`,
-                  border: `2px solid ${localTheme.sky_color === sky.value ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
+                  border: `2px solid ${localTheme.sky_color === sky.value ? 'var(--accent-orange)' : 'var(--border-light)'}`,
                   cursor: 'pointer',
                   position: 'relative',
                   transition: 'border-color var(--duration-fast) var(--ease-out)',
@@ -156,9 +156,9 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
                   flex: 1,
                   padding: 'var(--space-2)',
                   fontSize: 'var(--text-sm)',
-                  background: localTheme.ground_style === style ? 'var(--accent-gold)' : 'var(--bg-surface)',
-                  color: localTheme.ground_style === style ? 'var(--bg-base)' : 'var(--text-muted)',
-                  border: `2px solid ${localTheme.ground_style === style ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
+                  background: localTheme.ground_style === style ? 'var(--accent-orange)' : 'var(--bg-surface)',
+                  color: localTheme.ground_style === style ? '#FFFFFF' : 'var(--text-muted)',
+                  border: `1px solid ${localTheme.ground_style === style ? 'var(--accent-orange)' : 'var(--border-light)'}`,
                   cursor: 'pointer',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -192,9 +192,9 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
                 style={{
                   padding: 'var(--space-2) var(--space-3)',
                   fontSize: 'var(--text-sm)',
-                  background: localTheme.particle_fx === fx ? 'var(--accent-gold)' : 'var(--bg-surface)',
-                  color: localTheme.particle_fx === fx ? 'var(--bg-base)' : 'var(--text-muted)',
-                  border: `2px solid ${localTheme.particle_fx === fx ? 'var(--accent-gold)' : 'var(--border-retro)'}`,
+                  background: localTheme.particle_fx === fx ? 'var(--accent-orange)' : 'var(--bg-surface)',
+                  color: localTheme.particle_fx === fx ? '#FFFFFF' : 'var(--text-muted)',
+                  border: `1px solid ${localTheme.particle_fx === fx ? 'var(--accent-orange)' : 'var(--border-light)'}`,
                   cursor: 'pointer',
                   fontWeight: 600,
                   textTransform: 'capitalize',
@@ -242,7 +242,7 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
       {/* Footer: Reset + Save */}
       <div style={{
         padding: 'var(--space-4) var(--space-6)',
-        borderTop: '2px solid var(--border-retro)',
+        borderTop: '1px solid var(--border-light)',
         display: 'flex',
         gap: 'var(--space-3)',
       }}>

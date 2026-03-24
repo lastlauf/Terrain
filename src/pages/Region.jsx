@@ -224,9 +224,10 @@ export default function Region() {
         }}>
           <div>
             <h1 style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 700,
               fontSize: 'var(--text-3xl)',
-              color: region.color || 'var(--accent-gold)',
+              color: region.color || 'var(--accent-orange)',
               marginBottom: 'var(--space-2)',
             }}>
               {region.name}
@@ -294,7 +295,7 @@ export default function Region() {
             <span style={{
               fontFamily: 'var(--font-heading)',
               fontSize: 'var(--text-sm)',
-              color: region.color || 'var(--accent-gold)',
+              color: region.color || 'var(--accent-orange)',
             }}>
               {region.progress || 0}%
             </span>
@@ -302,13 +303,13 @@ export default function Region() {
           <div style={{
             height: '8px',
             background: 'var(--bg-surface)',
-            border: '1px solid var(--border-retro)',
+            border: '1px solid var(--border-light)',
             borderRadius: '4px',
           }}>
             <div style={{
               height: '100%',
               width: `${region.progress || 0}%`,
-              background: region.color || 'var(--accent-gold)',
+              background: 'var(--accent-orange)',
               borderRadius: '4px',
               transition: 'width var(--duration-slow) var(--ease-out)',
             }} />
@@ -316,10 +317,13 @@ export default function Region() {
         </div>
 
         {/* Terrain preview */}
-        <div className="glass-panel" style={{
+        <div style={{
           height: '280px',
           marginBottom: 'var(--space-8)',
           overflow: 'hidden',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-md)',
         }}>
           <TerrainCanvas
             regions={[]}
@@ -352,7 +356,7 @@ export default function Region() {
                 color: 'var(--text-dim)',
                 padding: 'var(--space-6)',
                 textAlign: 'center',
-                border: '1px dashed var(--border-retro)',
+                border: '1px dashed var(--border-mid)',
                 borderRadius: 'var(--radius-md)',
               }}>
                 No check-ins yet. Log your first session.
@@ -368,10 +372,10 @@ export default function Region() {
                     key={c.id}
                     style={{
                       padding: 'var(--space-4)',
-                      background: 'var(--bg-glass)',
-                      border: '1px solid var(--border-retro)',
+                      background: 'var(--bg-surface-raised)',
+                      border: '1px solid var(--border-light)',
                       borderRadius: 'var(--radius-md)',
-                      borderLeft: `3px solid ${region.color || 'var(--accent-gold)'}`,
+                      borderLeft: `3px solid ${region.color || 'var(--accent-orange)'}`,
                     }}
                   >
                     <div style={{
@@ -444,8 +448,8 @@ export default function Region() {
                     alignItems: 'center',
                     gap: 'var(--space-3)',
                     padding: 'var(--space-3) var(--space-4)',
-                    background: 'var(--bg-glass)',
-                    border: '1px solid var(--border-retro)',
+                    background: 'var(--bg-surface-raised)',
+                    border: '1px solid var(--border-light)',
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -457,8 +461,8 @@ export default function Region() {
                     width: '20px',
                     height: '20px',
                     borderRadius: '4px',
-                    border: `2px solid ${m.completed ? (region.color || 'var(--accent-gold)') : 'var(--border-retro)'}`,
-                    background: m.completed ? (region.color || 'var(--accent-gold)') : 'transparent',
+                    border: `1px solid ${m.completed ? (region.color || 'var(--accent-orange)') : 'var(--border-mid)'}`,
+                    background: m.completed ? (region.color || 'var(--accent-orange)') : 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

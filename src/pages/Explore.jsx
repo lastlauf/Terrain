@@ -66,7 +66,7 @@ export default function Explore() {
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(13, 10, 6, 0.85)',
+          background: 'rgba(26, 23, 20, 0.35)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -75,9 +75,10 @@ export default function Explore() {
           animation: 'fade-in var(--duration-fast) var(--ease-out)',
         }}>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-2xl)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
           }}>
             Return to Map?

@@ -100,11 +100,11 @@ export default function OnboardingTour({ onComplete }) {
       zIndex: 100,
       pointerEvents: 'auto',
     }}>
-      {/* Dark overlay */}
+      {/* Warm overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'rgba(0, 0, 0, 0.75)',
+        background: 'rgba(26, 23, 20, 0.35)',
         backdropFilter: 'blur(2px)',
         WebkitBackdropFilter: 'blur(2px)',
       }} />
@@ -117,8 +117,10 @@ export default function OnboardingTour({ onComplete }) {
         transform: 'translate(-50%, -50%)',
         width: '420px',
         maxWidth: 'calc(100vw - 48px)',
-        background: 'rgba(26, 21, 16, 0.97)',
-        border: '3px solid var(--border-retro)',
+        background: 'var(--bg-surface-raised)',
+        border: '1px solid var(--border-mid)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-lg)',
         padding: 'var(--space-8)',
         animation: 'slide-up 300ms var(--ease-out)',
       }}>
@@ -137,9 +139,10 @@ export default function OnboardingTour({ onComplete }) {
 
         {/* Title */}
         <h2 style={{
-          fontFamily: 'var(--font-display)',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 700,
           fontSize: 'var(--text-2xl)',
-          color: 'var(--accent-gold)',
+          color: 'var(--text-primary)',
           marginBottom: 'var(--space-3)',
           lineHeight: 1.2,
         }}>
@@ -169,7 +172,7 @@ export default function OnboardingTour({ onComplete }) {
               style={{
                 width: i === step ? '16px' : '6px',
                 height: '6px',
-                background: i === step ? 'var(--accent-gold)' : i < step ? 'var(--accent-blue)' : 'var(--border-retro)',
+                background: i === step ? 'var(--accent-orange)' : i < step ? 'var(--border-mid)' : 'var(--border-light)',
                 transition: 'all 200ms var(--ease-out)',
               }}
             />

@@ -45,13 +45,13 @@ export default function LandmarkNaming({ regionName, milestoneTitle, onSubmit, o
       className="modal-overlay"
       onClick={handleOverlayClick}
       style={{
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(26, 23, 20, 0.40)',
         backdropFilter: 'none',
         WebkitBackdropFilter: 'none',
       }}
     >
       <div
-        className="glass-panel modal-content"
+        className="modal-content"
         style={{
           maxWidth: '440px',
           textAlign: 'center',
@@ -59,15 +59,21 @@ export default function LandmarkNaming({ regionName, milestoneTitle, onSubmit, o
           flexDirection: 'column',
           alignItems: 'center',
           gap: 'var(--space-6)',
+          background: 'var(--bg-surface-raised)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-lg)',
+          padding: 'var(--space-8)',
         }}
       >
         {/* Announcement */}
         <div>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-lg)',
-            color: 'var(--accent-gold)',
-            letterSpacing: '2px',
+            color: 'var(--accent-orange)',
+            letterSpacing: '0.06em',
             marginBottom: 'var(--space-3)',
           }}>
             A NEW PLACE HAS BEEN BUILT
@@ -108,19 +114,19 @@ export default function LandmarkNaming({ regionName, milestoneTitle, onSubmit, o
             style={{
               width: '100%',
               padding: 'var(--space-3) var(--space-4)',
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 600,
               fontSize: 'var(--text-base)',
               color: 'var(--text-primary)',
               background: 'var(--bg-surface)',
-              border: '3px solid var(--border-retro)',
-              borderRadius: 0,
+              border: '1px solid var(--border-mid)',
+              borderRadius: 'var(--radius-md)',
               outline: 'none',
               textAlign: 'center',
-              letterSpacing: '1px',
               transition: 'border-color var(--duration-fast) var(--ease-out)',
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--accent-gold)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--border-retro)'}
+            onFocus={(e) => e.target.style.borderColor = 'var(--accent-orange)'}
+            onBlur={(e) => e.target.style.borderColor = 'var(--border-mid)'}
           />
 
           <div style={{

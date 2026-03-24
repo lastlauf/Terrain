@@ -84,7 +84,7 @@ export default function Onboarding() {
               width: i <= step ? '32px' : '8px',
               height: '8px',
               borderRadius: '4px',
-              background: i <= step ? 'var(--accent-gold)' : 'var(--border-retro)',
+              background: i <= step ? 'var(--accent-orange)' : 'var(--border-mid)',
               transition: 'all var(--duration-slow) var(--ease-out)',
             }}
           />
@@ -102,9 +102,10 @@ export default function Onboarding() {
           marginBottom: 'var(--space-8)',
         }}>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-3xl)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             marginBottom: 'var(--space-2)',
           }}>
             {step === 0 ? `Welcome, ${username}` : STEPS[step].title}
@@ -149,7 +150,13 @@ export default function Onboarding() {
         )}
 
         {(step === 1 || step === 2 || step === 3) && (
-          <div className="glass-panel-heavy" style={{ padding: 'var(--space-8)' }}>
+          <div style={{
+            background: 'var(--bg-surface-raised)',
+            border: '1px solid var(--border-light)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-md)',
+            padding: 'var(--space-8)',
+          }}>
             <AddRegionModal
               inline
               onSubmit={handleRegionCreated}
@@ -171,11 +178,13 @@ export default function Onboarding() {
               {regions.slice(0, 3).map((r, i) => (
                 <div
                   key={r.id}
-                  className="glass-panel"
                   style={{
                     padding: 'var(--space-4) var(--space-6)',
                     textAlign: 'center',
                     animation: `slide-up ${300 + i * 150}ms var(--ease-out)`,
+                    background: 'var(--bg-surface-raised)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-md)',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-1)' }}>

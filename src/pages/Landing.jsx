@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useIsMobile } from '../hooks/useIsMobile.js'
-import { drawPixelGrid } from '../lib/pixels.js'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
 import SignupOverlay from '../components/SignupOverlay.jsx'
 import {
@@ -187,7 +186,7 @@ const MOOD_EMOJI = {
 function DemoCard({ region, onClose, onSignup }) {
   const checkins = DEMO_CHECKINS.filter(c => c.region_id === region.id)
   const latest = checkins[0]
-  const regionColor = region.color || 'var(--accent-gold)'
+  const regionColor = region.color || 'var(--accent-orange)'
 
   return (
     <div
@@ -196,8 +195,8 @@ function DemoCard({ region, onClose, onSignup }) {
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'var(--bg-surface)',
-        border: '3px solid var(--border-retro)',
+        background: 'var(--bg-surface-raised)',
+        border: '1px solid var(--border-light)',
         borderBottom: 'none',
         padding: 'var(--space-6)',
         zIndex: 10,
@@ -214,11 +213,11 @@ function DemoCard({ region, onClose, onSignup }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           {/* Name */}
           <h3 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 700,
             fontSize: 'var(--text-2xl)',
             color: regionColor,
             marginBottom: 'var(--space-2)',
-            letterSpacing: '0.04em',
           }}>
             {region.name}
           </h3>
@@ -229,12 +228,13 @@ function DemoCard({ region, onClose, onSignup }) {
               display: 'inline-block',
               padding: '2px var(--space-2)',
               fontSize: 'var(--text-xs)',
-              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               color: regionColor,
-              border: `2px solid ${regionColor}`,
-              background: 'transparent',
+              border: `1px solid ${regionColor}`,
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--accent-orange-bg)',
             }}>
               {region.type}
             </span>
@@ -242,11 +242,12 @@ function DemoCard({ region, onClose, onSignup }) {
               display: 'inline-block',
               padding: '2px var(--space-2)',
               fontSize: 'var(--text-xs)',
-              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
               textTransform: 'uppercase',
-              letterSpacing: '0.08em',
+              letterSpacing: '0.06em',
               color: 'var(--text-muted)',
-              border: '2px solid var(--border-retro)',
+              border: '1px solid var(--border-light)',
+              borderRadius: 'var(--radius-sm)',
               background: 'transparent',
             }}>
               {region.category}
@@ -269,11 +270,12 @@ function DemoCard({ region, onClose, onSignup }) {
               <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 600 }}>Progress</span>
               <span style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xs)', color: regionColor }}>{region.progress}%</span>
             </div>
-            <div style={{ height: '6px', background: 'rgba(0,0,0,0.4)', border: '2px solid var(--border-retro)' }}>
+            <div style={{ height: '6px', background: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-light)' }}>
               <div style={{
                 height: '100%',
                 width: `${region.progress}%`,
-                background: regionColor,
+                background: 'var(--accent-orange)',
+                borderRadius: 'var(--radius-sm)',
                 transition: 'width var(--duration-slow) var(--ease-out)',
               }} />
             </div>
@@ -283,9 +285,10 @@ function DemoCard({ region, onClose, onSignup }) {
           {latest && (
             <div style={{
               padding: 'var(--space-2) var(--space-3)',
-              background: 'var(--bg-glass)',
-              border: '2px solid var(--border-retro)',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-light)',
               borderLeft: `3px solid ${regionColor}`,
+              borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--space-4)',
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
@@ -306,17 +309,35 @@ function DemoCard({ region, onClose, onSignup }) {
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
             <button
               type="button"
-              className="btn-retro"
               onClick={onSignup}
-              style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) var(--space-6)' }}
+              style={{
+                fontSize: 'var(--text-sm)',
+                padding: 'var(--space-2) var(--space-6)',
+                background: 'var(--accent-orange)',
+                color: '#FFFFFF',
+                border: '1px solid var(--accent-orange)',
+                borderRadius: 'var(--radius-md)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
             >
               Sign Up
             </button>
             <button
               type="button"
-              className="btn-retro btn-retro--secondary"
               onClick={onClose}
-              style={{ fontSize: 'var(--text-sm)', padding: 'var(--space-2) var(--space-4)' }}
+              style={{
+                fontSize: 'var(--text-sm)',
+                padding: 'var(--space-2) var(--space-4)',
+                background: 'transparent',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-mid)',
+                borderRadius: 'var(--radius-md)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
             >
               Close
             </button>
@@ -333,8 +354,6 @@ export default function Landing() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
-  const canvasRef = useRef(null)
-  const containerRef = useRef(null)
   const [demoRegion, setDemoRegion] = useState(null)
   const [signupOpen, setSignupOpen] = useState(() => searchParams.get('signup') === '1')
   const isMobile = useIsMobile()
@@ -342,48 +361,6 @@ export default function Landing() {
   useEffect(() => {
     if (user) navigate('/map', { replace: true })
   }, [user, navigate])
-
-  // Pixel grid hero background
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let running = true
-    let time = 0
-
-    function render() {
-      if (!running) return
-      const dpr = window.devicePixelRatio || 1
-      const container = containerRef.current
-      if (!container) { requestAnimationFrame(render); return }
-      const rect = container.getBoundingClientRect()
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      canvas.style.width = rect.width + 'px'
-      canvas.style.height = rect.height + 'px'
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      const W = rect.width
-      const H = rect.height
-      time += 0.005
-
-      ctx.fillStyle = '#0D0A06'
-      ctx.fillRect(0, 0, W, H)
-
-      // Draw pixel grid
-      drawPixelGrid(ctx, W, H, time)
-
-      // Fade gradient at bottom
-      const g = ctx.createLinearGradient(0, H * 0.75, 0, H)
-      g.addColorStop(0, 'rgba(13, 10, 6, 0)')
-      g.addColorStop(1, '#0D0A06')
-      ctx.fillStyle = g
-      ctx.fillRect(0, H * 0.75, W, H * 0.25)
-
-      requestAnimationFrame(render)
-    }
-    render()
-    return () => { running = false }
-  }, [])
 
   const openSignup = useCallback(() => setSignupOpen(true), [])
   const closeSignup = useCallback(() => setSignupOpen(false), [])
@@ -393,18 +370,16 @@ export default function Landing() {
 
       {/* ── HERO ── */}
       <section
-        className="scanlines"
-        style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}
+        style={{
+          position: 'relative',
+          height: '100vh',
+          overflow: 'hidden',
+          background: 'var(--bg-base)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
       >
-        <div ref={containerRef} style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
-        </div>
-
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 30% 50%, transparent 25%, rgba(13,10,6,0.65) 75%)',
-        }} />
-
         <div style={{
           position: 'relative', zIndex: 2,
           height: '100%', display: 'flex', flexDirection: 'column',
@@ -412,21 +387,18 @@ export default function Landing() {
           padding: '0 6vw',
           maxWidth: '1100px',
         }}>
-          <span className="mono-label" style={{ marginBottom: '20px', color: 'var(--accent-gold)', opacity: 0.7 }}>
+          <span className="mono-label" style={{ marginBottom: '20px', color: 'var(--accent-orange)', opacity: 0.8 }}>
             Goal operating system — v1.0
           </span>
 
-          {/* TERRAIN on ONE line — gradient text */}
+          {/* TERRAIN on ONE line — bold display text */}
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: isMobile ? 'clamp(32px, 11vw, 48px)' : 'clamp(48px, 9vw, 120px)',
             lineHeight: 1.0,
             letterSpacing: isMobile ? '0.02em' : '0.04em',
-            background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 0 40px rgba(212,168,83,0.15))',
+            color: 'var(--text-primary)',
             marginBottom: '32px',
             whiteSpace: 'nowrap',
           }}>
@@ -443,7 +415,7 @@ export default function Landing() {
             <p style={{
               fontFamily: 'var(--font-body)',
               fontSize: 'clamp(16px, 2.2vw, 22px)',
-              color: 'var(--text-muted)',
+              color: 'var(--text-secondary)',
               lineHeight: 1.5,
               maxWidth: '320px',
             }}>
@@ -459,21 +431,35 @@ export default function Landing() {
               alignItems: isMobile ? 'stretch' : 'center',
               width: isMobile ? '100%' : 'auto',
             }}>
-              <a href="#demo" className="btn-retro" style={{
+              <a href="#demo" style={{
                 textDecoration: 'none',
                 fontSize: isMobile ? '14px' : '15px',
                 padding: isMobile ? '12px 24px' : '14px 32px',
-                borderRadius: '50px',
+                borderRadius: 'var(--radius-md)',
                 textAlign: 'center',
+                background: 'var(--accent-orange)',
+                color: '#FFFFFF',
+                border: '1px solid var(--accent-orange)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-block',
               }}>
                 Start Exploring
               </a>
-              <Link to="/login" className="btn-retro btn-retro--secondary" style={{
+              <Link to="/login" style={{
                 textDecoration: 'none',
                 fontSize: isMobile ? '14px' : '15px',
                 padding: isMobile ? '12px 24px' : '14px 32px',
-                borderRadius: '50px',
+                borderRadius: 'var(--radius-md)',
                 textAlign: 'center',
+                background: 'transparent',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-mid)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-block',
               }}>
                 Log In
               </Link>
@@ -500,7 +486,6 @@ export default function Landing() {
 
         <div style={{
           position: 'absolute', bottom: isMobile ? '16px' : '32px', left: '6vw', zIndex: 2,
-          animation: 'float 2s ease-in-out infinite',
           display: 'flex', alignItems: 'center', gap: '8px',
         }}>
           <span className="mono-label" style={{ color: 'var(--text-dim)' }}>scroll</span>
@@ -532,12 +517,12 @@ export default function Landing() {
           marginBottom: isMobile ? '48px' : '80px',
         }}>
           <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>01</span>
+            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-orange)' }}>01</span>
             <h2 style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 800,
               fontSize: 'clamp(32px, 5vw, 60px)',
               lineHeight: 1.1,
-              letterSpacing: '0.1em',
               color: 'var(--text-primary)',
               marginBottom: '24px',
             }}>
@@ -548,17 +533,19 @@ export default function Landing() {
             </p>
           </div>
           {/* Mini map preview with icons placed on terrain */}
-          <div className="glass-panel" style={{
+          <div style={{
             padding: 0,
             aspectRatio: '4/3',
             position: 'relative',
             overflow: 'hidden',
-            background: 'var(--bg-base)',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-light)',
+            borderRadius: 'var(--radius-md)',
           }}>
             {/* Grid dots background */}
             <div style={{
               position: 'absolute', inset: 0,
-              backgroundImage: 'radial-gradient(circle, rgba(245,230,200,0.06) 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(circle, rgba(200,194,181,0.25) 1px, transparent 1px)',
               backgroundSize: '20px 20px',
             }} />
             {/* Region icons positioned on the "map" */}
@@ -580,9 +567,9 @@ export default function Landing() {
             </div>
             {/* Connecting dotted lines between regions */}
             <svg viewBox="0 0 400 300" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
-              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
-              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-retro)" strokeWidth="2" strokeDasharray="4 4" opacity="0.4" />
+              <line x1="80" y1="75" x2="310" y2="105" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+              <line x1="170" y1="210" x2="80" y2="75" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+              <line x1="170" y1="210" x2="280" y2="230" stroke="var(--border-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
             </svg>
           </div>
         </div>
@@ -597,15 +584,15 @@ export default function Landing() {
           marginTop: isMobile ? '48px' : '80px',
         }}>
           <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-blue)' }}>02</span>
+            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--text-muted)' }}>02</span>
             <div style={{ marginBottom: '16px' }}>
               <PixelSatellite size={40} />
             </div>
             <h3 style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 800,
               fontSize: 'clamp(26px, 3.5vw, 44px)',
               lineHeight: 1.1,
-              letterSpacing: '0.1em',
               color: 'var(--text-primary)',
               marginBottom: '16px',
             }}>
@@ -616,15 +603,15 @@ export default function Landing() {
             </p>
           </div>
           <div>
-            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-pink)' }}>03</span>
+            <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--text-muted)' }}>03</span>
             <div style={{ marginBottom: '16px' }}>
               <PixelGamepad size={40} />
             </div>
             <h3 style={{
-              fontFamily: 'var(--font-display)',
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 800,
               fontSize: 'clamp(26px, 3.5vw, 44px)',
               lineHeight: 1.1,
-              letterSpacing: '0.1em',
               color: 'var(--text-primary)',
               marginBottom: '16px',
             }}>
@@ -646,11 +633,11 @@ export default function Landing() {
         <hr className="dotted-divider" style={{ marginBottom: isMobile ? '48px' : '80px' }} />
 
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-gold)' }}>Interactive</span>
+          <span className="mono-label" style={{ display: 'block', marginBottom: '12px', color: 'var(--accent-orange)' }}>Interactive</span>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: 'clamp(40px, 6vw, 80px)',
-            letterSpacing: '0.1em',
             color: 'var(--text-primary)',
             marginBottom: '16px',
           }}>
@@ -667,7 +654,8 @@ export default function Landing() {
           maxWidth: '900px',
           height: isMobile ? '300px' : '500px',
           margin: isMobile ? '0 auto 32px' : '0 auto 48px',
-          border: '3px solid var(--border-retro)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-md)',
           background: 'var(--bg-base)',
           position: 'relative',
           overflow: 'hidden',
@@ -694,12 +682,17 @@ export default function Landing() {
         <div style={{ textAlign: 'center' }}>
           <button
             onClick={openSignup}
-            className="btn-retro btn-retro--orange"
             style={{
               fontSize: isMobile ? '14px' : '16px',
               padding: isMobile ? '12px 24px' : '16px 40px',
-              borderRadius: '50px',
+              borderRadius: 'var(--radius-md)',
               width: isMobile ? '100%' : 'auto',
+              background: 'var(--accent-orange)',
+              color: '#FFFFFF',
+              border: '1px solid var(--accent-orange)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 600,
+              cursor: 'pointer',
             }}
           >
             Sign Up to Build Yours
@@ -709,7 +702,8 @@ export default function Landing() {
 
       {/* ── CTA FOOTER STRIP ── */}
       <section style={{
-        borderTop: '2px solid var(--border-retro)',
+        borderTop: '1px solid var(--border-light)',
+        background: 'var(--bg-surface)',
         padding: isMobile ? '48px 6vw' : '80px 6vw',
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
@@ -719,26 +713,31 @@ export default function Landing() {
         gap: isMobile ? '24px' : '32px',
       }}>
         <div>
-          <p className="mono-label" style={{ marginBottom: '8px' }}>Ready to map your terrain?</p>
+          <p className="mono-label" style={{ marginBottom: '8px', color: 'var(--text-muted)' }}>Ready to map your terrain?</p>
           <h2 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: 'clamp(32px, 5vw, 64px)',
-            color: 'var(--accent-gold)',
+            color: 'var(--text-primary)',
             lineHeight: 1.0,
-            letterSpacing: '0.04em',
           }}>
             Start building.
           </h2>
         </div>
         <button
           onClick={openSignup}
-          className="btn-retro btn-retro--orange"
           style={{
             fontSize: isMobile ? '14px' : '16px',
             padding: isMobile ? '12px 24px' : '16px 40px',
-            borderRadius: '50px',
+            borderRadius: 'var(--radius-md)',
             flexShrink: 0,
             width: isMobile ? '100%' : 'auto',
+            background: 'var(--accent-orange)',
+            color: '#FFFFFF',
+            border: '1px solid var(--accent-orange)',
+            fontFamily: 'var(--font-body)',
+            fontWeight: 600,
+            cursor: 'pointer',
           }}
         >
           Create Your Map
@@ -748,7 +747,7 @@ export default function Landing() {
       {/* ── FOOTER ── */}
       <footer style={{
         padding: isMobile ? '16px 6vw' : '24px 6vw',
-        borderTop: '1px solid var(--border-retro)',
+        borderTop: '1px solid var(--border-light)',
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         alignItems: isMobile ? 'flex-start' : 'center',

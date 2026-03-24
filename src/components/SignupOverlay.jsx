@@ -51,7 +51,6 @@ export default function SignupOverlay({ onClose }) {
       style={{ zIndex: 200 }}
     >
       <div
-        className="glass-panel-heavy"
         style={{
           width: '100%',
           maxWidth: isMobile ? 'calc(100vw - 24px)' : '440px',
@@ -60,6 +59,10 @@ export default function SignupOverlay({ onClose }) {
           padding: isMobile ? 'var(--space-6)' : 'var(--space-8)',
           position: 'relative',
           animation: 'slide-up var(--duration-slow) var(--ease-out)',
+          background: 'var(--bg-surface-raised)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         {/* Close button */}
@@ -77,17 +80,17 @@ export default function SignupOverlay({ onClose }) {
             fontSize: 'var(--text-lg)',
             color: 'var(--text-muted)',
             background: 'transparent',
-            border: '2px solid var(--border-retro)',
+            border: '1px solid var(--border-light)',
             cursor: 'pointer',
             transition: 'color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out)',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = 'var(--text-primary)'
-            e.currentTarget.style.borderColor = 'var(--text-muted)'
+            e.currentTarget.style.borderColor = 'var(--border-mid)'
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = 'var(--text-muted)'
-            e.currentTarget.style.borderColor = 'var(--border-retro)'
+            e.currentTarget.style.borderColor = 'var(--border-light)'
           }}
           title="Close"
         >
@@ -96,17 +99,14 @@ export default function SignupOverlay({ onClose }) {
           </svg>
         </button>
 
-        {/* Gradient TERRAIN logo */}
+        {/* TERRAIN logo */}
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: 'clamp(32px, 8vw, 44px)',
             letterSpacing: '0.04em',
-            background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 0 20px rgba(212,168,83,0.15))',
+            color: 'var(--text-primary)',
           }}>
             TERRAIN
           </h1>
@@ -116,18 +116,29 @@ export default function SignupOverlay({ onClose }) {
           <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
             <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>
               <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <rect x="4" y="12" width="40" height="28" stroke="var(--accent-gold)" strokeWidth="3" fill="none" />
-                <path d="M4 12l20 16 20-16" stroke="var(--accent-gold)" strokeWidth="3" fill="none" />
+                <rect x="4" y="12" width="40" height="28" stroke="var(--accent-orange)" strokeWidth="3" fill="none" />
+                <path d="M4 12l20 16 20-16" stroke="var(--accent-orange)" strokeWidth="3" fill="none" />
               </svg>
             </div>
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)' }}>
               Check your email
             </h2>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-              We sent a confirmation link to <strong style={{ color: 'var(--accent-gold)' }}>{email}</strong>.
+              We sent a confirmation link to <strong style={{ color: 'var(--accent-orange)' }}>{email}</strong>.
               Click it to activate your account, then log in.
             </p>
-            <Link to="/login" className="btn-retro" style={{ textDecoration: 'none', display: 'inline-block', marginTop: 'var(--space-6)' }}>
+            <Link to="/login" style={{
+              textDecoration: 'none',
+              display: 'inline-block',
+              marginTop: 'var(--space-6)',
+              background: 'var(--accent-orange)',
+              color: '#FFFFFF',
+              border: '1px solid var(--accent-orange)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-3) var(--space-6)',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 600,
+            }}>
               Go to Login
             </Link>
           </div>
@@ -147,8 +158,9 @@ export default function SignupOverlay({ onClose }) {
               <div style={{
                 padding: 'var(--space-3)',
                 marginBottom: 'var(--space-4)',
-                background: 'rgba(232, 67, 42, 0.1)',
+                background: 'rgba(217, 59, 32, 0.08)',
                 border: '1px solid var(--danger)',
+                borderRadius: 'var(--radius-md)',
                 fontSize: 'var(--text-sm)',
                 color: 'var(--danger)',
               }}>
@@ -222,9 +234,20 @@ export default function SignupOverlay({ onClose }) {
 
               <button
                 type="submit"
-                className="btn-retro"
                 disabled={loading}
-                style={{ width: '100%' }}
+                style={{
+                  width: '100%',
+                  background: 'var(--accent-orange)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-3) var(--space-4)',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  fontSize: 'var(--text-base)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.7 : 1,
+                }}
               >
                 {loading ? 'Creating account...' : 'Sign Up'}
               </button>
@@ -237,7 +260,7 @@ export default function SignupOverlay({ onClose }) {
               color: 'var(--text-muted)',
             }}>
               Already have an account?{' '}
-              <Link to="/login" style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
+              <Link to="/login" style={{ color: 'var(--accent-orange)', fontWeight: 600 }}>
                 Log In
               </Link>
             </p>

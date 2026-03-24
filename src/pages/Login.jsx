@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useIsMobile } from '../hooks/useIsMobile.js'
-import { PixelSparkleIcon } from '../components/PixelIcons.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -67,14 +66,11 @@ export default function Login() {
       <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: 'clamp(40px, 10vw, 56px)',
             letterSpacing: '0.04em',
-            background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 0 30px rgba(212,168,83,0.15))',
+            color: 'var(--text-primary)',
           }}>
             TERRAIN
           </h1>
@@ -85,7 +81,13 @@ export default function Login() {
         width: '100%',
         maxWidth: '400px',
       }}>
-        <div className="glass-panel-heavy" style={{ padding: isMobile ? 'var(--space-6)' : 'var(--space-8)' }}>
+        <div style={{
+          background: 'var(--bg-surface-raised)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-md)',
+          padding: isMobile ? 'var(--space-6)' : 'var(--space-8)',
+        }}>
           <h2 style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 'var(--text-xl)',
@@ -119,7 +121,7 @@ export default function Login() {
                 fontSize: 'var(--text-3xl)',
                 marginBottom: 'var(--space-4)',
               }}>
-                <PixelSparkleIcon size={48} />
+                ✉
               </div>
               <p style={{
                 fontFamily: 'var(--font-heading)',
@@ -181,19 +183,42 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="btn-retro"
                 disabled={loading}
-                style={{ width: '100%', marginBottom: 'var(--space-3)' }}
+                style={{
+                  width: '100%',
+                  marginBottom: 'var(--space-3)',
+                  background: 'var(--accent-orange)',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-3) var(--space-4)',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  fontSize: 'var(--text-base)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.7 : 1,
+                }}
               >
                 {loading ? 'Signing in...' : 'Log In'}
               </button>
 
               <button
                 type="button"
-                className="btn-retro btn-retro--secondary"
                 onClick={handleMagicLink}
                 disabled={loading}
-                style={{ width: '100%' }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  color: 'var(--accent-orange)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 'var(--space-3) var(--space-4)',
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  fontSize: 'var(--text-base)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.7 : 1,
+                }}
               >
                 {isMobile ? 'Magic Link' : 'Send Magic Link'}
               </button>
@@ -208,7 +233,7 @@ export default function Login() {
           color: 'var(--text-muted)',
         }}>
           No account yet?{' '}
-          <Link to="/signup" style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
+          <Link to="/signup" style={{ color: 'var(--accent-orange)', fontWeight: 600 }}>
             Sign Up
           </Link>
         </p>
@@ -220,7 +245,7 @@ export default function Login() {
         left: 0,
         right: 0,
         padding: isMobile ? '12px 6vw' : '16px 6vw',
-        borderTop: '1px solid var(--border-retro)',
+        borderTop: '1px solid var(--border-light)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

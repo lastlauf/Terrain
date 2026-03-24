@@ -58,14 +58,11 @@ export default function Signup() {
       <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
             fontSize: 'clamp(40px, 10vw, 56px)',
             letterSpacing: '0.04em',
-            background: 'linear-gradient(135deg, #4A90D9 0%, #FF6B9D 45%, #D4A853 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            filter: 'drop-shadow(0 0 30px rgba(212,168,83,0.15))',
+            color: 'var(--text-primary)',
           }}>
             TERRAIN
           </h1>
@@ -76,7 +73,13 @@ export default function Signup() {
         width: '100%',
         maxWidth: '400px',
       }}>
-        <div className="glass-panel-heavy" style={{ padding: 'var(--space-8)' }}>
+        <div style={{
+          background: 'var(--bg-surface-raised)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-md)',
+          padding: 'var(--space-8)',
+        }}>
 
           {confirmed ? (
             <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
@@ -85,10 +88,21 @@ export default function Signup() {
                 Check your email
               </h2>
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                We sent a confirmation link to <strong style={{ color: 'var(--accent-gold)' }}>{email}</strong>.
+                We sent a confirmation link to <strong style={{ color: 'var(--accent-orange)' }}>{email}</strong>.
                 Click it to activate your account, then log in.
               </p>
-              <Link to="/login" className="btn-retro" style={{ textDecoration: 'none', display: 'inline-block', marginTop: 'var(--space-6)' }}>
+              <Link to="/login" style={{
+                textDecoration: 'none',
+                display: 'inline-block',
+                marginTop: 'var(--space-6)',
+                background: 'var(--accent-orange)',
+                color: '#FFFFFF',
+                border: '1px solid var(--accent-orange)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-3) var(--space-6)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+              }}>
                 Go to Login
               </Link>
             </div>
@@ -184,9 +198,20 @@ export default function Signup() {
 
             <button
               type="submit"
-              className="btn-retro"
               disabled={loading}
-              style={{ width: '100%' }}
+              style={{
+                width: '100%',
+                background: 'var(--accent-orange)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-3) var(--space-4)',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 600,
+                fontSize: 'var(--text-base)',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1,
+              }}
             >
               {loading ? 'Creating account...' : 'Sign Up'}
             </button>
@@ -202,7 +227,7 @@ export default function Signup() {
           color: 'var(--text-muted)',
         }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
+          <Link to="/login" style={{ color: 'var(--accent-orange)', fontWeight: 600 }}>
             Log In
           </Link>
         </p>

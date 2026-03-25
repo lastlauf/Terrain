@@ -66,20 +66,20 @@ export function drawTerrainRegion(ctx, region, x, y, width, height, weather) {
 export function generateMapLayout(regions) {
   if (!regions || regions.length === 0) return []
 
-  // Winding path pattern for isometric tiles
+  // Winding path — guaranteed no overlap with wide horizontal spacing
   const pathPattern = [
-    { dx: 1, dy: 0.4 },
-    { dx: 1, dy: -0.3 },
-    { dx: 1, dy: 0.5 },
+    { dx: 1, dy: 0.25 },
     { dx: 1, dy: -0.2 },
     { dx: 1, dy: 0.3 },
-    { dx: 0.5, dy: 0.6 },
+    { dx: 1, dy: -0.25 },
+    { dx: 1, dy: 0.15 },
+    { dx: 1, dy: -0.1 },
   ]
-  const CELL = 180  // spacing between isometric tiles
+  const CELL = 220  // wide spacing so tiles never overlap
   const TILE_W = 120
   const TILE_H = 100 // tile height including depth
-  const startX = 180
-  const startY = 180
+  const startX = 200
+  const startY = 220
 
   return regions.map((region, i) => {
     // Use stored position if available (migrate old 48px coords to new scale)

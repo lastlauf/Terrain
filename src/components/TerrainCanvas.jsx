@@ -191,6 +191,45 @@ export default function TerrainCanvas({
 
       const layout = layoutRef.current
 
+      // 2b. Draw isometric dot grid floor (world-space)
+      {
+        const gridSpacing = 40
+        const dotSize = 2
+        // Compute visible world bounds
+        const worldLeft = -s.offset.x / s.scale - 200
+        const worldTop = -s.offset.y / s.scale - 200
+        const worldRight = worldLeft + W / s.scale + 400
+        const worldBottom = worldTop + H / s.scale + 400
+        // Mouse in world space
+        const mwx = (s.mousePos.x - s.offset.x) / s.scale
+        const mwy = (s.mousePos.y - s.offset.y) / s.scale
+
+        const startCol = Math.floor(worldLeft / gridSpacing)
+        const endCol = Math.ceil(worldRight / gridSpacing)
+        const startRow = Math.floor(worldTop / gridSpacing)
+        const endRow = Math.ceil(worldBottom / gridSpacing)
+
+        for (let row = startRow; row <= endRow; row++) {
+          for (let col = startCol; col <= endCol; col++) {
+            const gx = col * gridSpacing
+            const gy = row * gridSpacing
+            // Distance from mouse for interactive glow
+            const dx = gx - mwx
+            const dy = gy - mwy
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            const proximity = Math.max(0, 1 - dist / 200)
+            const baseAlpha = 0.06
+            const alpha = baseAlpha + proximity * 0.18
+            ctx.fillStyle = `rgba(168, 158, 142, ${alpha})`
+            ctx.fillRect(
+              Math.round(gx - dotSize / 2),
+              Math.round(gy - dotSize / 2),
+              dotSize, dotSize
+            )
+          }
+        }
+      }
+
       // 3. Draw paths between connected regions
       if (layout.length > 1) {
         for (let i = 0; i < layout.length - 1; i++) {
@@ -227,15 +266,25 @@ export default function TerrainCanvas({
           drawSprite(ctx, weatherSprite, weatherPalette, cx + 48, cy - 40, 2)
         }
 
-        // Region name below the diorama
+        // Region name below the diorama — white pill background
         const nameY = cy + 55 + 16
-        ctx.fillStyle = '#4A4540'
         ctx.font = "bold 13px 'Inter', sans-serif"
         ctx.textAlign = 'center'
-        ctx.shadowColor = 'rgba(245, 242, 237, 0.9)'
-        ctx.shadowBlur = 4
-        ctx.fillText(l.region.name, cx, nameY, 140)
-        ctx.shadowBlur = 0
+        const nameText = l.region.name
+        const nameW = ctx.measureText(nameText).width
+        const pillPadX = 10
+        const pillPadY = 4
+        const pillH = 18
+        // White pill behind text
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
+        const pillX = cx - nameW / 2 - pillPadX
+        const pillY = nameY - pillH + pillPadY
+        ctx.beginPath()
+        ctx.roundRect(pillX, pillY, nameW + pillPadX * 2, pillH, 9)
+        ctx.fill()
+        // Text
+        ctx.fillStyle = '#4A4540'
+        ctx.fillText(nameText, cx, nameY, 140)
       }
 
       // 4b. Draw landmarks for completed milestones

@@ -59,11 +59,12 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
   const content = (
     <form onSubmit={handleSubmit}>
       <h2 style={{
-        fontFamily: 'var(--font-heading)',
-        fontWeight: 700,
+        fontFamily: 'var(--font-display)',
+        fontWeight: 400,
         fontSize: 'var(--text-xl)',
         color: 'var(--text-primary)',
         marginBottom: 'var(--space-6)',
+        letterSpacing: '0.06em',
       }}>
         New Region
       </h2>

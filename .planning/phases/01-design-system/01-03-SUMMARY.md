@@ -154,3 +154,11 @@ None — all 10 files are fully rethemed. No placeholder content or hardcoded em
 ---
 *Phase: 01-design-system*
 *Completed: 2026-03-24*
+
+## Self-Check: PASSED
+
+- All 10 modified files exist on disk
+- Task 1 commit `0208901` exists
+- Task 2 commit `acb653f` exists
+- Metadata commit `d24d7d1` exists
+- SUMMARY.md at `.planning/phases/01-design-system/01-03-SUMMARY.md` confirmed written

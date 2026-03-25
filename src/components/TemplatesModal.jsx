@@ -93,11 +93,12 @@ export default function TemplatesModal({ onClose, onCreateRegions }) {
         overflow: 'auto',
       }}>
         <h2 style={{
-          fontFamily: 'var(--font-heading)',
-          fontWeight: 700,
+          fontFamily: 'var(--font-display)',
+          fontWeight: 400,
           fontSize: 'var(--text-xl)',
           color: 'var(--text-primary)',
           marginBottom: 'var(--space-2)',
+          letterSpacing: '0.06em',
         }}>
           TEMPLATES
         </h2>

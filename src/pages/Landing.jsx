@@ -215,7 +215,7 @@ function DemoCard({ region, onClose, onSignup }) {
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
         <div style={{ flexShrink: 0 }}><SpriteRenderer type={region.type} scale={8} /></div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: '28px', color: regionColor, marginBottom: '8px' }}>{region.name}</h3>
+          <h3 style={{ fontFamily: "'Daydream', var(--font-display)", fontWeight: 400, fontSize: '20px', letterSpacing: '0.06em', color: regionColor, marginBottom: '8px' }}>{region.name}</h3>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: regionColor, border: `1px solid ${regionColor}`, borderRadius: '2px' }}>{region.type}</span>
             <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', border: '1px solid var(--border-light)', borderRadius: '2px' }}>{region.category}</span>
@@ -298,9 +298,9 @@ function FeatureSection({ number, title, description, children, reverse, isMobil
           / {number}
         </span>
         <h2 style={{
-          fontFamily: 'var(--font-display)', fontWeight: 400,
-          fontSize: isMobile ? '36px' : 'clamp(36px, 4vw, 56px)',
-          lineHeight: 1.05, letterSpacing: '-0.02em',
+          fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
+          fontSize: isMobile ? '24px' : 'clamp(24px, 3vw, 36px)',
+          lineHeight: 1.2, letterSpacing: '0.08em',
           color: 'var(--text-primary)', marginBottom: '20px',
         }}>
           {title}
@@ -372,12 +372,12 @@ export default function Landing() {
             </span>
           </div>
 
-          {/* Headline — DM Serif Display, clip reveal */}
+          {/* Headline — Daydream display font */}
           <div style={{ overflow: 'hidden', marginBottom: '32px' }}>
             <h1 style={{
-              fontFamily: 'var(--font-display)', fontWeight: 400,
-              fontSize: isMobile ? 'clamp(48px, 14vw, 72px)' : 'clamp(72px, 10vw, 140px)',
-              lineHeight: 0.92, letterSpacing: '-0.03em',
+              fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
+              fontSize: isMobile ? 'clamp(36px, 11vw, 56px)' : 'clamp(56px, 7vw, 96px)',
+              lineHeight: 1.1, letterSpacing: '0.1em',
               color: 'var(--text-primary)',
               transform: heroVisible ? 'translateY(0)' : 'translateY(110%)',
               transition: 'transform 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.3s',
@@ -410,16 +410,16 @@ export default function Landing() {
           }}>
             <MagneticButton
               onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
-              className="btn"
+              className="btn btn--display"
               style={{
-                fontSize: '15px', padding: '14px 32px',
+                fontSize: isMobile ? '14px' : '16px', padding: '14px 32px',
                 textAlign: 'center',
               }}
             >
               Start Exploring
             </MagneticButton>
             <Link to="/login" className="btn btn--secondary" style={{
-              fontSize: '15px', padding: '14px 32px',
+              fontSize: '14px', padding: '14px 32px',
               textAlign: 'center', textDecoration: 'none',
             }}>
               Log In
@@ -622,9 +622,9 @@ export default function Landing() {
             / Interactive
           </span>
           <h2 style={{
-            fontFamily: 'var(--font-display)', fontWeight: 400,
-            fontSize: isMobile ? '40px' : 'clamp(48px, 6vw, 80px)',
-            lineHeight: 0.95, letterSpacing: '-0.02em',
+            fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
+            fontSize: isMobile ? '28px' : 'clamp(32px, 4vw, 48px)',
+            lineHeight: 1.15, letterSpacing: '0.08em',
             color: 'var(--text-primary)', marginBottom: '16px',
           }}>
             Try the Demo
@@ -634,42 +634,58 @@ export default function Landing() {
           </p>
         </div>
 
+        {/* Portal Window — recessed neo-skeu container */}
         <div style={{
           width: '100%', maxWidth: '900px',
-          height: isMobile ? '300px' : '500px',
-          margin: isMobile ? '0 auto 32px' : '0 auto 48px',
-          border: '1px solid var(--border-light)', borderRadius: '8px',
-          background: 'var(--bg-base)', position: 'relative', overflow: 'hidden',
+          margin: '0 auto', position: 'relative',
         }}>
-          <TerrainCanvas
-            regions={DEMO_REGIONS}
-            checkins={DEMO_CHECKINS}
-            onRegionClick={(region) => setDemoRegion(region)}
-            interactive={true}
-            mini={false}
-            theme={{}}
-          />
-          {demoRegion && (
-            <DemoCard
-              region={demoRegion}
-              onClose={() => setDemoRegion(null)}
-              onSignup={() => { setDemoRegion(null); openSignup() }}
+          {/* Portal frame — inset shadow = recessed feel */}
+          <div style={{
+            height: isMobile ? '320px' : '500px',
+            borderRadius: '20px',
+            background: '#EBE7E0',
+            boxShadow: `
+              inset 6px 6px 14px rgba(166, 158, 143, 0.35),
+              inset -6px -6px 14px rgba(255, 255, 255, 0.6),
+              8px 8px 20px rgba(166, 158, 143, 0.2),
+              -4px -4px 12px rgba(255, 255, 255, 0.5)
+            `,
+            border: '1px solid var(--border-light)',
+            overflow: 'hidden', position: 'relative',
+          }}>
+            <TerrainCanvas
+              regions={DEMO_REGIONS}
+              checkins={DEMO_CHECKINS}
+              onRegionClick={(region) => setDemoRegion(region)}
+              interactive={true}
+              mini={false}
+              theme={{}}
             />
-          )}
-        </div>
+            {demoRegion && (
+              <DemoCard
+                region={demoRegion}
+                onClose={() => setDemoRegion(null)}
+                onSignup={() => { setDemoRegion(null); openSignup() }}
+              />
+            )}
+          </div>
 
-        <div style={{ textAlign: 'center' }}>
-          <MagneticButton
-            onClick={openSignup}
-            className="btn"
-            style={{
-              fontSize: isMobile ? '14px' : '16px',
-              padding: isMobile ? '12px 24px' : '16px 40px',
-              width: isMobile ? '100%' : 'auto',
-            }}
-          >
-            Sign Up to Build Yours
-          </MagneticButton>
+          {/* Floating button bar ON TOP of the portal */}
+          <div style={{
+            display: 'flex', justifyContent: 'center', gap: '12px',
+            marginTop: '-28px', position: 'relative', zIndex: 20,
+          }}>
+            <MagneticButton
+              onClick={openSignup}
+              className="btn btn--display"
+              style={{
+                fontSize: isMobile ? '14px' : '16px',
+                padding: isMobile ? '12px 24px' : '14px 32px',
+              }}
+            >
+              Sign Up to Build Yours
+            </MagneticButton>
+          </div>
         </div>
       </section>
 
@@ -693,9 +709,9 @@ export default function Landing() {
             Ready to map your terrain?
           </span>
           <h2 style={{
-            fontFamily: 'var(--font-display)', fontWeight: 400,
-            fontSize: isMobile ? '36px' : 'clamp(40px, 5vw, 72px)',
-            lineHeight: 0.95, letterSpacing: '-0.02em',
+            fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
+            fontSize: isMobile ? '24px' : 'clamp(28px, 3.5vw, 44px)',
+            lineHeight: 1.15, letterSpacing: '0.08em',
             color: 'var(--text-primary)',
           }}>
             Start building.
@@ -703,7 +719,7 @@ export default function Landing() {
         </div>
         <MagneticButton
           onClick={openSignup}
-          className="btn"
+          className="btn btn--display"
           style={{
             fontSize: isMobile ? '14px' : '16px',
             padding: isMobile ? '12px 24px' : '16px 40px',

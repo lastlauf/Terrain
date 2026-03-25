@@ -34,14 +34,14 @@ export default function Navbar({ onReplayTour }) {
     }}>
       {/* Logo */}
       <Link to="/map" style={{
-        fontFamily: 'var(--font-heading)',
-        fontWeight: 800,
-        fontSize: 'var(--text-base)',
-        letterSpacing: '0.08em',
+        fontFamily: "'Daydream', var(--font-display)",
+        fontWeight: 400,
+        fontSize: '14px',
+        letterSpacing: '0.1em',
         color: 'var(--text-primary)',
         textDecoration: 'none',
       }}>
-        TERRAIN
+        Terrain
       </Link>
 
       {/* Nav links */}

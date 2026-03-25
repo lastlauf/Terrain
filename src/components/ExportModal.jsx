@@ -87,12 +87,12 @@ export default function ExportModal({
 
         {/* Title */}
         <h2 style={{
-          fontFamily: 'var(--font-heading)',
-          fontWeight: 700,
+          fontFamily: 'var(--font-display)',
+          fontWeight: 400,
           fontSize: 'var(--text-xl)',
           color: 'var(--text-primary)',
           marginBottom: 'var(--space-6)',
-          letterSpacing: '0.04em',
+          letterSpacing: '0.06em',
         }}>
           {singleRegion ? 'Export Region' : 'Export Your Journey'}
         </h2>

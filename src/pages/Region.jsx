@@ -224,11 +224,12 @@ export default function Region() {
         }}>
           <div>
             <h1 style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 700,
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
               fontSize: 'var(--text-3xl)',
               color: region.color || 'var(--accent-orange)',
               marginBottom: 'var(--space-2)',
+              letterSpacing: '0.06em',
             }}>
               {region.name}
             </h1>
@@ -342,10 +343,12 @@ export default function Region() {
           {/* Check-in history */}
           <div>
             <h2 style={{
-              fontFamily: 'var(--font-heading)',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
               fontSize: 'var(--text-lg)',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-4)',
+              letterSpacing: '0.06em',
             }}>
               Check-in History
             </h2>
@@ -425,10 +428,12 @@ export default function Region() {
           {/* Milestones */}
           <div>
             <h2 style={{
-              fontFamily: 'var(--font-heading)',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 400,
               fontSize: 'var(--text-lg)',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-4)',
+              letterSpacing: '0.06em',
             }}>
               Milestones
             </h2>

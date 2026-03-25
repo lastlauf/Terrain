@@ -104,11 +104,12 @@ export default function FieldReport({ region, checkins, open, onClose }) {
       }}>
         <div>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-1)',
+            letterSpacing: '0.06em',
           }}>
             FIELD REPORT
           </h2>

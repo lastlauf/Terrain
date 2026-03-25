@@ -102,11 +102,12 @@ export default function Onboarding() {
           marginBottom: 'var(--space-8)',
         }}>
           <h1 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-3xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-2)',
+            letterSpacing: '0.06em',
           }}>
             {step === 0 ? `Welcome, ${username}` : STEPS[step].title}
           </h1>

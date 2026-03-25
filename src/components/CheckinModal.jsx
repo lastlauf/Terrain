@@ -40,11 +40,12 @@ export default function CheckinModal({ region, onClose, onSubmit }) {
       <div className="modal-content glass-panel-heavy">
         <form onSubmit={handleSubmit}>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-1)',
+            letterSpacing: '0.06em',
           }}>
             Log Session
           </h2>

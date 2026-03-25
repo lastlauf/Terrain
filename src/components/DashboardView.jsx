@@ -460,11 +460,11 @@ export default function DashboardView({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)' }}>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-lg)',
             color: 'var(--text-primary)',
-            letterSpacing: '0.08em',
+            letterSpacing: '0.06em',
           }}>
             DASHBOARD
           </h2>

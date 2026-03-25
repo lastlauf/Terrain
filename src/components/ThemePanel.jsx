@@ -72,10 +72,11 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
         justifyContent: 'space-between',
       }}>
         <h2 style={{
-          fontFamily: 'var(--font-heading)',
-          fontWeight: 700,
+          fontFamily: 'var(--font-display)',
+          fontWeight: 400,
           fontSize: 'var(--text-xl)',
           color: 'var(--text-primary)',
+          letterSpacing: '0.06em',
         }}>
           THEME
         </h2>

@@ -58,10 +58,10 @@ export default function Signup() {
       <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <h1 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 800,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'clamp(40px, 10vw, 56px)',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.06em',
             color: 'var(--text-primary)',
           }}>
             TERRAIN
@@ -84,7 +84,7 @@ export default function Signup() {
           {confirmed ? (
             <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
               <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>✉️</div>
-              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)', letterSpacing: '0.06em' }}>
                 Check your email
               </h2>
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -109,11 +109,13 @@ export default function Signup() {
           ) : (
           <>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
             textAlign: 'center',
+            letterSpacing: '0.06em',
           }}>
             Create Account
           </h2>

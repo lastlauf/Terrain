@@ -69,8 +69,8 @@ export default function LandmarkNaming({ regionName, milestoneTitle, onSubmit, o
         {/* Announcement */}
         <div>
           <h2 style={{
-            fontFamily: 'var(--font-heading)',
-            fontWeight: 700,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 400,
             fontSize: 'var(--text-lg)',
             color: 'var(--accent-orange)',
             letterSpacing: '0.06em',

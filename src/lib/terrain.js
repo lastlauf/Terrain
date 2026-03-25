@@ -66,28 +66,30 @@ export function drawTerrainRegion(ctx, region, x, y, width, height, weather) {
 export function generateMapLayout(regions) {
   if (!regions || regions.length === 0) return []
 
-  // Winding path pattern: right, down-right, right, up-right, right, down
+  // Winding path pattern for isometric tiles
   const pathPattern = [
-    { dx: 1, dy: 0 },
-    { dx: 1, dy: 1 },
-    { dx: 1, dy: 0 },
-    { dx: 1, dy: -1 },
-    { dx: 1, dy: 0 },
-    { dx: 0, dy: 1 },
+    { dx: 1, dy: 0.4 },
+    { dx: 1, dy: -0.3 },
+    { dx: 1, dy: 0.5 },
+    { dx: 1, dy: -0.2 },
+    { dx: 1, dy: 0.3 },
+    { dx: 0.5, dy: 0.6 },
   ]
-  const CELL = 100  // grid cell size with padding
-  const startX = 80
-  const startY = 200
+  const CELL = 180  // spacing between isometric tiles
+  const TILE_W = 120
+  const TILE_H = 100 // tile height including depth
+  const startX = 180
+  const startY = 180
 
   return regions.map((region, i) => {
-    // Use stored position if available
+    // Use stored position if available (migrate old 48px coords to new scale)
     if (region.position_x != null && region.position_y != null) {
       return {
         region,
         x: region.position_x,
         y: region.position_y,
-        w: 48,
-        h: 48,
+        w: TILE_W,
+        h: TILE_H,
       }
     }
 
@@ -98,6 +100,6 @@ export function generateMapLayout(regions) {
       x += step.dx * CELL
       y += step.dy * CELL
     }
-    return { region, x, y, w: 48, h: 48 }
+    return { region, x, y, w: TILE_W, h: TILE_H }
   })
 }

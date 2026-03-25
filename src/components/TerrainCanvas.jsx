@@ -8,6 +8,7 @@ import {
   LANDMARK_SPRITES,
   STAR_SPRITE, STAR_PALETTE,
 } from '../lib/sprites.js'
+import { drawIsoDiorama } from '../lib/isometric.js'
 
 export default function TerrainCanvas({
   regions,
@@ -114,8 +115,8 @@ export default function TerrainCanvas({
 
     for (let i = layoutRef.current.length - 1; i >= 0; i--) {
       const l = layoutRef.current[i]
-      // Generous hit area around the sprite
-      const hitRadius = 28
+      // Generous hit area around the isometric tile
+      const hitRadius = 65
       const cx = l.x + l.w / 2
       const cy = l.y + l.h / 2
       const dx = worldX - cx
@@ -203,57 +204,37 @@ export default function TerrainCanvas({
         }
       }
 
-      // 4. Draw each region
+      // 4. Draw each region as isometric diorama
       for (const l of layout) {
         const type = l.region.type || 'mountains'
-        const sprite = SPRITES[type] || SPRITES.mountains
-        const palette = PALETTES[type] || PALETTES.mountains
         const regionColor = REGION_COLORS[type] || '#D4A853'
-
-        // Hover glow (draw behind sprite)
-        if (interactive && s.hoverRegion && s.hoverRegion.id === l.region.id) {
-          ctx.fillStyle = regionColor.replace(')', ',0.2)').replace('rgb', 'rgba').replace('#', '')
-          // Use a hex-to-rgba approach
-          const r = parseInt(regionColor.slice(1, 3), 16)
-          const g = parseInt(regionColor.slice(3, 5), 16)
-          const b = parseInt(regionColor.slice(5, 7), 16)
-          ctx.fillStyle = `rgba(${r},${g},${b},0.2)`
-          ctx.fillRect(l.x - 4, l.y - 4, l.w + 8, l.h + 8)
-        }
-
-        // Draw the region sprite at scale=4 (12*4=48)
-        drawSprite(ctx, sprite, palette, l.x, l.y, 4)
-
-        // Progress bar below (48px wide, 4px tall)
+        const isHovered = interactive && s.hoverRegion && s.hoverRegion.id === l.region.id
         const progress = l.region.progress || 0
-        const barY = l.y + l.h + 4
-        const barW = 48
-        const barH = 4
 
-        ctx.fillStyle = 'rgba(26, 23, 20, 0.1)'
-        ctx.fillRect(l.x, barY, barW, barH)
+        // Center of the isometric tile
+        const cx = l.x + l.w / 2
+        const cy = l.y + l.h / 2
 
-        if (progress > 0) {
-          ctx.fillStyle = regionColor
-          ctx.fillRect(l.x, barY, barW * (progress / 100), barH)
-        }
+        // Draw the isometric diorama
+        drawIsoDiorama(ctx, type, cx, cy, s.time, progress, isHovered)
 
-        // Weather sprite (8x8 at scale=2 = 16px) upper-right
+        // Weather sprite (8x8 at scale=2 = 16px) upper-right of tile
         const lastDate = getLastCheckin(l.region.id)
         const weather = getWeatherStatus(lastDate)
         const weatherSprite = WEATHER_SPRITES[weather]
         const weatherPalette = WEATHER_PALETTES[weather]
         if (weatherSprite) {
-          drawSprite(ctx, weatherSprite, weatherPalette, l.x + l.w - 4, l.y - 12, 2)
+          drawSprite(ctx, weatherSprite, weatherPalette, cx + 48, cy - 40, 2)
         }
 
-        // Region name below
+        // Region name below the diorama
+        const nameY = cy + 55 + 16
         ctx.fillStyle = '#4A4540'
-        ctx.font = "11px 'Inter', sans-serif"
+        ctx.font = "bold 13px 'Inter', sans-serif"
         ctx.textAlign = 'center'
-        ctx.shadowColor = 'rgba(245, 242, 237, 0.8)'
-        ctx.shadowBlur = 3
-        ctx.fillText(l.region.name, l.x + l.w / 2, barY + barH + 14, 80)
+        ctx.shadowColor = 'rgba(245, 242, 237, 0.9)'
+        ctx.shadowBlur = 4
+        ctx.fillText(l.region.name, cx, nameY, 140)
         ctx.shadowBlur = 0
       }
 
@@ -290,21 +271,27 @@ export default function TerrainCanvas({
         }
       }
 
-      // Add region placeholder (dashed square)
+      // Add region placeholder (dashed isometric diamond)
       if (interactive && !mini && !singleRegion && layout.length > 0) {
         const last = layout[layout.length - 1]
-        const addX = last.x + 100
-        const addY = last.y
-        ctx.strokeStyle = 'rgba(212, 168, 83, 0.2)'
+        const addCx = last.x + last.w / 2 + 180
+        const addCy = last.y + last.h / 2
+        ctx.strokeStyle = 'rgba(200, 194, 181, 0.4)'
         ctx.lineWidth = 2
-        ctx.setLineDash([4, 4])
-        ctx.strokeRect(addX, addY, 48, 48)
+        ctx.setLineDash([6, 6])
+        ctx.beginPath()
+        ctx.moveTo(addCx, addCy - 30)
+        ctx.lineTo(addCx + 60, addCy)
+        ctx.lineTo(addCx, addCy + 30)
+        ctx.lineTo(addCx - 60, addCy)
+        ctx.closePath()
+        ctx.stroke()
         ctx.setLineDash([])
 
-        ctx.fillStyle = 'rgba(212, 168, 83, 0.3)'
-        ctx.font = "bold 24px 'Inter', sans-serif"
+        ctx.fillStyle = 'rgba(200, 194, 181, 0.5)'
+        ctx.font = "bold 28px 'Inter', sans-serif"
         ctx.textAlign = 'center'
-        ctx.fillText('+', addX + 24, addY + 32)
+        ctx.fillText('+', addCx, addCy + 10)
       }
 
       ctx.restore()

@@ -17,10 +17,12 @@ export default function TerrainCanvas({
   onRegionClick,
   onAddClick,
   interactive = true,
+  locked: lockedProp = false,
   mini = false,
   singleRegion = null,
   theme = {},
 }) {
+  const locked = !!lockedProp
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
   const animFrameRef = useRef(null)
@@ -59,25 +61,38 @@ export default function TerrainCanvas({
       const newLayout = generateMapLayout(regions)
       layoutRef.current = newLayout
 
-      // Auto-center the map on all regions
+      // Auto-center (and auto-fit if locked)
       if (newLayout.length > 0 && containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect()
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
         newLayout.forEach(l => {
-          minX = Math.min(minX, l.x)
-          maxX = Math.max(maxX, l.x + l.w)
-          minY = Math.min(minY, l.y)
-          maxY = Math.max(maxY, l.y + l.h)
+          // Include extra space for diorama height above tile center
+          minX = Math.min(minX, l.x - 20)
+          maxX = Math.max(maxX, l.x + l.w + 20)
+          minY = Math.min(minY, l.y - 60) // account for peaks/trees above
+          maxY = Math.max(maxY, l.y + l.h + 40) // account for labels below
         })
         const contentW = maxX - minX
         const contentH = maxY - minY
         const centerX = minX + contentW / 2
         const centerY = minY + contentH / 2
-        stateRef.current.offset.x = rect.width / 2 - centerX
-        stateRef.current.offset.y = rect.height / 2 - centerY
+
+        if (locked) {
+          // Fit all content into the viewport with padding
+          const pad = 24
+          const scaleX = (rect.width - pad * 2) / contentW
+          const scaleY = (rect.height - pad * 2) / contentH
+          const fitScale = Math.min(scaleX, scaleY, 1) // never zoom past 1x
+          stateRef.current.scale = fitScale
+          stateRef.current.offset.x = rect.width / 2 - centerX * fitScale
+          stateRef.current.offset.y = rect.height / 2 - centerY * fitScale
+        } else {
+          stateRef.current.offset.x = rect.width / 2 - centerX
+          stateRef.current.offset.y = rect.height / 2 - centerY
+        }
       }
     }
-  }, [regions, singleRegion])
+  }, [regions, singleRegion, locked])
 
   // Initialize square particles
   useEffect(() => {
@@ -403,11 +418,11 @@ export default function TerrainCanvas({
       running = false
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [regions, checkins, milestones, interactive, mini, singleRegion, theme, getLastCheckin, hitTest])
+  }, [regions, checkins, milestones, interactive, locked, mini, singleRegion, theme, getLastCheckin, hitTest])
 
   // Mouse/touch handlers
   const handleMouseDown = (e) => {
-    if (!interactive) return
+    if (!interactive || locked) return
     const s = stateRef.current
     s.dragging = true
     s.dragStart = { x: e.clientX, y: e.clientY }
@@ -469,7 +484,7 @@ export default function TerrainCanvas({
   }
 
   const handleWheel = (e) => {
-    if (!interactive) return
+    if (!interactive || locked) return
     e.preventDefault()
     const s = stateRef.current
     const rect = containerRef.current?.getBoundingClientRect()
@@ -489,7 +504,7 @@ export default function TerrainCanvas({
 
   // Touch handlers
   const handleTouchStart = (e) => {
-    if (!interactive) return
+    if (!interactive || locked) return
     const s = stateRef.current
 
     if (e.touches.length === 1) {

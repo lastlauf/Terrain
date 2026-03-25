@@ -658,6 +658,7 @@ export default function Landing() {
               checkins={DEMO_CHECKINS}
               onRegionClick={(region) => setDemoRegion(region)}
               interactive={true}
+              locked={true}
               mini={false}
               theme={{}}
             />

@@ -162,7 +162,7 @@ function HeroPixelScene({ visible, isMobile }) {
 
     function resize() {
       const w = canvas.parentElement.offsetWidth
-      const h = isMobile ? 300 : 440
+      const h = isMobile ? 320 : 520
       const dpr = window.devicePixelRatio || 1
       canvas.width = w * dpr
       canvas.height = h * dpr
@@ -331,13 +331,13 @@ function HeroPixelScene({ visible, isMobile }) {
         }
       }
 
-      const blockW = isMobile ? 24 : 36
-      const blockD = isMobile ? 6 : 10
+      const blockW = isMobile ? 26 : 42
+      const blockD = isMobile ? 7 : 12
       const centerP = Math.round(cx / P)
       const baseY = Math.round(H / P * 0.48)
 
       // Forest (left)
-      const fx = centerP - (isMobile ? 46 : 72)
+      const fx = centerP - (isMobile ? 50 : 100)
       const fy = baseY - 4
       isoBlock(fx, fy, blockW, blockD, blockD, '#5E9E6E', '#8B8680', '#A09A93')
       // Grass detail on top
@@ -380,7 +380,7 @@ function HeroPixelScene({ visible, isMobile }) {
       pixelTree(ccx - 1, ccy - blockD - 5, 1)
 
       // Mountains (right)
-      const mx = centerP + (isMobile ? 46 : 72)
+      const mx = centerP + (isMobile ? 50 : 100)
       const my = baseY - 4
       isoBlock(mx, my, blockW, blockD, blockD, '#6BAF7B', '#8B8680', '#A09A93')
       // Mountain (detailed triangular, larger)
@@ -447,7 +447,7 @@ function HeroPixelScene({ visible, isMobile }) {
 
   return (
     <div style={{
-      position: 'relative', width: '100%', maxWidth: '800px',
+      position: 'relative', width: '100%', maxWidth: '1100px',
       opacity: visible ? 1 : 0,
       transform: visible ? 'translateY(0)' : 'translateY(30px)',
       transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
@@ -818,26 +818,21 @@ export default function Landing() {
           isMobile={isMobile}
         >
           <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px',
-            padding: '24px', background: 'var(--bg-surface)',
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px',
+            padding: '32px', background: 'var(--bg-surface)',
             border: '1px solid var(--border-light)', borderRadius: '8px',
           }}>
-            <div style={{ textAlign: 'center' }}>
-              <IsometricMountain size={isMobile ? 100 : 140} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-mountains)', display: 'block', marginTop: '8px' }}>Fitness</span>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <IsometricCity size={isMobile ? 100 : 140} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-city)', display: 'block', marginTop: '8px' }}>Projects</span>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <IsometricForest size={isMobile ? 100 : 140} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-forest)', display: 'block', marginTop: '8px' }}>Learning</span>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <IsometricCoast size={isMobile ? 100 : 140} />
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--region-coast)', display: 'block', marginTop: '8px' }}>Finance</span>
-            </div>
+            {[
+              { type: 'mountains', label: 'Fitness', color: 'var(--region-mountains)' },
+              { type: 'city', label: 'Projects', color: 'var(--region-city)' },
+              { type: 'forest', label: 'Learning', color: 'var(--region-forest)' },
+              { type: 'coast', label: 'Finance', color: 'var(--region-coast)' },
+            ].map(item => (
+              <div key={item.type} style={{ textAlign: 'center' }}>
+                <SpriteRenderer type={item.type} scale={isMobile ? 8 : 10} />
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: item.color, display: 'block', marginTop: '12px' }}>{item.label}</span>
+              </div>
+            ))}
           </div>
         </FeatureSection>
 

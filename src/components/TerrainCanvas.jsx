@@ -648,12 +648,12 @@ export default function TerrainCanvas({
         ctx.fillText(name, tx + 8, ty + 16)
       }
 
-      // Controls hint (bottom-left, screen space)
+      // Controls hint (centered bottom, screen space)
       if (!mini && interactive) {
-        ctx.fillStyle = 'rgba(74, 69, 64, 0.3)'
+        ctx.fillStyle = 'rgba(74, 69, 64, 0.35)'
         ctx.font = "11px 'Inter', sans-serif"
-        ctx.textAlign = 'left'
-        ctx.fillText('WASD to walk  ·  Space to jump  ·  E to interact  ·  Shift to run', 16, H - 16)
+        ctx.textAlign = 'center'
+        ctx.fillText('WASD to walk  ·  Space to jump  ·  E to interact  ·  Shift to run', W / 2, H - 16)
       }
 
       animFrameRef.current = requestAnimationFrame(render)
@@ -729,23 +729,10 @@ export default function TerrainCanvas({
     s.dragging = false
   }
 
+  // Zoom disabled — pan only
   const handleWheel = (e) => {
     if (!interactive || locked) return
-    e.preventDefault()
-    const s = stateRef.current
-    const rect = containerRef.current?.getBoundingClientRect()
-    if (!rect) return
-
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
-
-    const zoomFactor = e.deltaY > 0 ? 0.92 : 1.08
-    const newScale = Math.max(0.3, Math.min(3, s.scale * zoomFactor))
-
-    // Zoom toward mouse position
-    s.offset.x = mouseX - (mouseX - s.offset.x) * (newScale / s.scale)
-    s.offset.y = mouseY - (mouseY - s.offset.y) * (newScale / s.scale)
-    s.scale = newScale
+    // Do nothing — zoom is disabled, use click+drag to pan
   }
 
   // Touch handlers
@@ -774,17 +761,8 @@ export default function TerrainCanvas({
       const touch = e.touches[0]
       s.offset.x = s.lastOffset.x + (touch.clientX - s.dragStart.x)
       s.offset.y = s.lastOffset.y + (touch.clientY - s.dragStart.y)
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX
-      const dy = e.touches[0].clientY - e.touches[1].clientY
-      const dist = Math.sqrt(dx * dx + dy * dy)
-
-      if (s.pinchDist > 0) {
-        const scale = dist / s.pinchDist
-        s.scale = Math.max(0.3, Math.min(3, s.scale * scale))
-      }
-      s.pinchDist = dist
     }
+    // Pinch zoom disabled
   }
 
   const handleTouchEnd = (e) => {

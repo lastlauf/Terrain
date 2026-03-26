@@ -126,15 +126,9 @@ export default function TerrainCanvas({
     stateRef.current.particles = particles
   }, [mini])
 
-  // Initialize character at first region center
-  useEffect(() => {
-    const layout = layoutRef.current
-    if (layout.length > 0 && !stateRef.current.character.active) {
-      const first = layout[0]
-      stateRef.current.character.x = first.x + first.w / 2
-      stateRef.current.character.y = first.y + first.h / 2 + 20
-    }
-  }, [regions])
+  // Character init flag
+  const charInitRef = useRef(false)
+  useEffect(() => { charInitRef.current = false }, [regions])
 
   // Keyboard handlers for character movement
   useEffect(() => {
@@ -254,12 +248,20 @@ export default function TerrainCanvas({
 
       const layout = layoutRef.current
 
+      // Init character position at first region (once per region change)
+      if (!charInitRef.current && layout.length > 0) {
+        const first = layout[0]
+        s.character.x = first.x + first.w / 2
+        s.character.y = first.y + first.h / 2 + 20
+        charInitRef.current = true
+      }
+
       // 2b. Draw isometric dot grid floor (world-space)
       // True isometric grid — dots placed on a 2:1 diamond pattern
       {
-        const isoW = 40  // horizontal spacing between dots
-        const isoH = 20  // vertical spacing (half of isoW for 2:1 iso ratio)
-        const dotSize = 1.5
+        const isoW = 20  // horizontal spacing between dots (denser)
+        const isoH = 10  // vertical spacing (half of isoW for 2:1 iso ratio)
+        const dotSize = 1
         // Compute visible world bounds with margin
         const worldLeft = -s.offset.x / s.scale - 300
         const worldTop = -s.offset.y / s.scale - 300
@@ -285,10 +287,10 @@ export default function TerrainCanvas({
             const dx = gx - mwx
             const dy = gy - mwy
             const dist = Math.sqrt(dx * dx + dy * dy)
-            const proximity = Math.max(0, 1 - dist / 140)
-            const baseAlpha = 0.07
-            const alpha = baseAlpha + proximity * 0.28
-            const size = dotSize + proximity * 2
+            const proximity = Math.max(0, 1 - dist / 100)
+            const baseAlpha = 0.06
+            const alpha = baseAlpha + proximity * 0.2
+            const size = dotSize + proximity * 1.2
             ctx.fillStyle = `rgba(168, 158, 142, ${alpha})`
             ctx.beginPath()
             ctx.arc(Math.round(gx), Math.round(gy), size, 0, Math.PI * 2)
@@ -333,25 +335,20 @@ export default function TerrainCanvas({
           drawSprite(ctx, weatherSprite, weatherPalette, cx + 48, cy - 40, 2)
         }
 
-        // Region name below the diorama — white pill background
-        const nameY = cy + 55 + 16
-        ctx.font = "bold 13px 'Inter', sans-serif"
-        ctx.textAlign = 'center'
-        const nameText = l.region.name
-        const nameW = ctx.measureText(nameText).width
-        const pillPadX = 10
-        const pillPadY = 4
-        const pillH = 18
-        // White pill behind text
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
-        const pillX = cx - nameW / 2 - pillPadX
-        const pillY = nameY - pillH + pillPadY
-        ctx.beginPath()
-        ctx.roundRect(pillX, pillY, nameW + pillPadX * 2, pillH, 9)
-        ctx.fill()
-        // Text
-        ctx.fillStyle = '#4A4540'
-        ctx.fillText(nameText, cx, nameY, 140)
+        // Region name — only show on hover
+        if (interactive && s.hoverRegion && s.hoverRegion.id === l.region.id) {
+          const nameY = cy + 55 + 16
+          ctx.font = "bold 13px 'Inter', sans-serif"
+          ctx.textAlign = 'center'
+          const nameText = l.region.name
+          const nameW = ctx.measureText(nameText).width
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
+          ctx.beginPath()
+          ctx.roundRect(cx - nameW / 2 - 10, nameY - 14, nameW + 20, 18, 9)
+          ctx.fill()
+          ctx.fillStyle = '#4A4540'
+          ctx.fillText(nameText, cx, nameY, 140)
+        }
       }
 
       // 4b. Draw landmarks for completed milestones

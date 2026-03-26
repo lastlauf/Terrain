@@ -431,23 +431,7 @@ function HeroPixelScene({ visible, isMobile }) {
       const charBob = Math.sin(time * 3) * 1.5
       drawChar(fx + blockW + 6, fy - blockD + 2, charBob, time * 4)
 
-      // Labels with white pill bg
-      ctx.font = "600 11px 'Inter', sans-serif"
-      ctx.textAlign = 'center'
-      const labels = [
-        [fx * P, (fy + blockD + 6) * P, 'Morning Runs'],
-        [ccx * P, (ccy + blockD + 6) * P, 'Side Project'],
-        [mx * P, (my + blockD + 6) * P, 'Fitness Goal'],
-      ]
-      for (const [lx, ly, text] of labels) {
-        const tw = ctx.measureText(text).width
-        ctx.fillStyle = 'rgba(255,255,255,0.92)'
-        ctx.beginPath()
-        ctx.roundRect(lx - tw / 2 - 8, ly - 7, tw + 16, 18, 9)
-        ctx.fill()
-        ctx.fillStyle = '#4A4540'
-        ctx.fillText(text, lx, ly + 5)
-      }
+      // No labels on hero — clean look
 
       frameRef.current = requestAnimationFrame(render)
     }
@@ -467,13 +451,10 @@ function HeroPixelScene({ visible, isMobile }) {
       opacity: visible ? 1 : 0,
       transform: visible ? 'translateY(0)' : 'translateY(30px)',
       transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
-      filter: 'drop-shadow(0 8px 24px rgba(166, 158, 143, 0.25))',
-      borderRadius: '16px',
-      overflow: 'hidden',
     }}>
       <canvas
         ref={canvasRef}
-        style={{ display: 'block', width: '100%', imageRendering: 'pixelated', background: '#F5F2ED', borderRadius: '16px' }}
+        style={{ display: 'block', width: '100%', imageRendering: 'pixelated' }}
       />
     </div>
   )
@@ -1004,7 +985,7 @@ export default function Landing() {
               checkins={DEMO_CHECKINS}
               onRegionClick={(region) => setDemoRegion(region)}
               interactive={true}
-              locked={true}
+              locked={false}
               mini={false}
               theme={{}}
             />

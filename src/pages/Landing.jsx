@@ -345,114 +345,237 @@ export default function Landing() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
 
+      {/* ── STICKY HEADER NAV ── */}
+      <header style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px',
+        background: 'rgba(245, 242, 237, 0.85)',
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--border-light)',
+      }}>
+        <span style={{
+          fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
+          fontSize: '14px', letterSpacing: '0.1em', color: 'var(--text-primary)',
+        }}>
+          Terrain
+        </span>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <Link to="/login" style={{
+            fontFamily: 'var(--font-heading)', fontSize: '13px', fontWeight: 500,
+            color: 'var(--text-muted)', textDecoration: 'none', letterSpacing: '0.04em',
+          }}>
+            Log In
+          </Link>
+          <button onClick={openSignup} className="btn" style={{
+            fontSize: '13px', padding: '8px 20px',
+          }}>
+            Sign Up
+          </button>
+        </div>
+      </header>
+
       {/* ── HERO ── */}
       <section style={{
         position: 'relative', minHeight: '100vh', overflow: 'hidden',
         background: 'var(--bg-base)',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: isMobile ? '0 24px' : '0 6vw',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', alignItems: 'center',
+        padding: isMobile ? '80px 24px 48px' : '80px 6vw 48px',
+        textAlign: 'center',
       }}>
+        {/* Text content */}
         <div style={{
           position: 'relative', zIndex: 2,
-          maxWidth: '1100px', width: '100%',
+          maxWidth: '640px', width: '100%', marginBottom: isMobile ? '32px' : '48px',
         }}>
-          {/* Eyebrow */}
+          {/* Tagline */}
           <div style={{
-            overflow: 'hidden', marginBottom: '24px',
+            overflow: 'hidden', marginBottom: '16px',
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0)' : 'translateY(12px)',
             transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s',
           }}>
             <span style={{
-              fontFamily: 'var(--font-mono)', fontSize: '11px',
-              letterSpacing: '0.15em', textTransform: 'uppercase',
+              fontFamily: 'var(--font-mono)', fontSize: '12px',
+              letterSpacing: '0.12em', textTransform: 'uppercase',
               color: 'var(--accent-orange)', fontWeight: 500,
             }}>
-              / Goal Operating System
+              A Goal Operating System
             </span>
           </div>
 
-          {/* Headline — Daydream display font */}
-          <div style={{ overflow: 'hidden', marginBottom: '32px' }}>
+          {/* Headline */}
+          <div style={{ overflow: 'hidden', marginBottom: '24px' }}>
             <h1 style={{
               fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-              fontSize: isMobile ? 'clamp(36px, 11vw, 56px)' : 'clamp(56px, 7vw, 96px)',
-              lineHeight: 1.1, letterSpacing: '0.1em',
+              fontSize: isMobile ? 'clamp(28px, 9vw, 44px)' : 'clamp(40px, 4.5vw, 64px)',
+              lineHeight: 1.15, letterSpacing: '0.08em',
               color: 'var(--text-primary)',
               transform: heroVisible ? 'translateY(0)' : 'translateY(110%)',
               transition: 'transform 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.3s',
             }}>
-              Terrain
+              Build your world,<br />one goal at a time
             </h1>
           </div>
 
-          {/* Subheading */}
+          {/* Body copy */}
           <p style={{
             fontFamily: 'var(--font-body)', fontWeight: 400,
-            fontSize: isMobile ? '17px' : '20px',
-            color: 'var(--text-secondary)', lineHeight: 1.55,
-            maxWidth: '420px', marginBottom: '48px',
+            fontSize: isMobile ? '16px' : '18px',
+            color: 'var(--text-secondary)', lineHeight: 1.6,
+            maxWidth: '480px', margin: '0 auto 36px',
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0)' : 'translateY(16px)',
             transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s',
           }}>
-            Your goals, mapped. A living terrain where
-            every region is a life area you're building.
+            Terrain turns your goals into a living, illustrated map. Check in on what matters, watch your world grow, and walk through your progress — literally.
           </p>
 
-          {/* CTAs */}
+          {/* CTA */}
           <div style={{
-            display: 'flex', flexDirection: isMobile ? 'column' : 'row',
-            gap: '12px', alignItems: isMobile ? 'stretch' : 'center',
+            display: 'flex', justifyContent: 'center', gap: '12px',
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0)' : 'translateY(16px)',
             transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.75s',
           }}>
             <MagneticButton
-              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={openSignup}
               className="btn btn--display"
-              style={{
-                fontSize: isMobile ? '14px' : '16px', padding: '14px 32px',
-                textAlign: 'center',
-              }}
+              style={{ fontSize: isMobile ? '14px' : '16px', padding: '14px 32px' }}
             >
-              Start Exploring
+              Get Started Free
             </MagneticButton>
-            <Link to="/login" className="btn btn--secondary" style={{
-              fontSize: '14px', padding: '14px 32px',
-              textAlign: 'center', textDecoration: 'none',
-            }}>
-              Log In
-            </Link>
-            <button onClick={openSignup} style={{
-              fontSize: '14px', color: 'var(--text-muted)',
-              textDecoration: 'underline', textUnderlineOffset: '3px',
-              background: 'none', border: 'none', cursor: 'pointer',
-              fontFamily: 'inherit', padding: isMobile ? '8px 0' : 0,
-            }}>
-              or Sign Up
-            </button>
+            <MagneticButton
+              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn btn--secondary"
+              style={{ fontSize: '14px', padding: '14px 24px' }}
+            >
+              Try the Demo
+            </MagneticButton>
           </div>
         </div>
 
-        {/* Isometric tiles floating on right (desktop only) */}
-        {!isMobile && (
-          <div style={{
-            position: 'absolute', right: '6vw', top: '50%', transform: 'translateY(-50%)',
-            display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-end',
-            opacity: heroVisible ? 1 : 0,
-            transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
-          }}>
-            <div style={{ transform: 'translateX(20px)', opacity: 0.9 }}><IsometricForest size={160} /></div>
-            <div style={{ transform: 'translateX(-30px)', opacity: 0.7 }}><IsometricMountain size={140} /></div>
-            <div style={{ transform: 'translateX(10px)', opacity: 0.8 }}><IsometricCoast size={130} /></div>
-          </div>
-        )}
+        {/* Large isometric hero illustration — detailed scene */}
+        <div style={{
+          position: 'relative', width: '100%', maxWidth: '700px',
+          opacity: heroVisible ? 1 : 0,
+          transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
+        }}>
+          <svg width="100%" viewBox="0 0 700 400" fill="none" style={{ display: 'block' }}>
+            {/* Isometric ground plane */}
+            <path d="M350 360 L50 200 L350 40 L650 200 Z" fill="#E8E4DC" stroke="#DDD8CE" strokeWidth="1" />
+            {/* Grid lines on ground */}
+            {[1,2,3,4,5].map(i => (
+              <g key={`grid-${i}`} opacity="0.15">
+                <line x1={50 + i*50} y1={200 - i*26.67} x2={350 + i*50} y2={360 - i*26.67} stroke="#C8C2B5" strokeWidth="0.5" />
+                <line x1={350 - i*50} y1={40 + i*26.67} x2={650 - i*50} y2={200 + i*26.67} stroke="#C8C2B5" strokeWidth="0.5" />
+              </g>
+            ))}
+
+            {/* Forest region — left */}
+            <g>
+              <path d="M200 240 L130 200 L130 170 L200 210 Z" fill="#8B8680" />
+              <path d="M200 240 L270 200 L270 170 L200 210 Z" fill="#A09A93" />
+              <path d="M130 170 L200 130 L270 170 L200 210 Z" fill="#5E9E6E" />
+              {/* Trees */}
+              <polygon points="175,95 160,130 190,130" fill="#3D7A4A" />
+              <polygon points="175,85 163,118 187,118" fill="#4A8C5C" />
+              <polygon points="175,75 166,105 184,105" fill="#5E9E6E" />
+              <rect x="173" y="130" width="4" height="8" fill="#8B6B3E" />
+              <polygon points="210,100 198,128 222,128" fill="#3D7A4A" />
+              <polygon points="210,90 200,115 220,115" fill="#4A8C5C" />
+              <rect x="208" y="128" width="4" height="8" fill="#8B6B3E" />
+              {/* Small cabin */}
+              <path d="M155 148 L155 160 L170 153 L170 141 Z" fill="#C4A882" />
+              <path d="M155 148 L148 144 L148 156 L155 160 Z" fill="#A89070" />
+              <path d="M148 144 L155 138 L170 144 L163 148 Z" fill="#D4B892" />
+            </g>
+
+            {/* City region — center */}
+            <g>
+              <path d="M350 280 L280 240 L280 210 L350 250 Z" fill="#8B8680" />
+              <path d="M350 280 L420 240 L420 210 L350 250 Z" fill="#A09A93" />
+              <path d="M280 210 L350 170 L420 210 L350 250 Z" fill="#D4C8A0" />
+              {/* Tall building */}
+              <path d="M330 120 L330 175 L350 185 L350 130 Z" fill="#E8E4DC" />
+              <path d="M350 130 L350 185 L365 177 L365 122 Z" fill="#D4CFC6" />
+              <path d="M330 120 L345 113 L365 122 L350 130 Z" fill="#F5F2ED" />
+              {/* Windows */}
+              <rect x="334" y="132" width="5" height="4" fill="#4A6FA5" opacity="0.4" />
+              <rect x="334" y="142" width="5" height="4" fill="#4A6FA5" opacity="0.6" />
+              <rect x="334" y="152" width="5" height="4" fill="#E8712B" opacity="0.5" />
+              <rect x="342" y="132" width="5" height="4" fill="#4A6FA5" opacity="0.3" />
+              <rect x="342" y="142" width="5" height="4" fill="#4A6FA5" opacity="0.5" />
+              {/* Shorter building */}
+              <path d="M375 155 L375 185 L395 195 L395 165 Z" fill="#E8E4DC" />
+              <path d="M395 165 L395 195 L405 189 L405 159 Z" fill="#C8C2B5" />
+              <path d="M375 155 L388 148 L405 159 L395 165 Z" fill="#F0ECE4" />
+              {/* Tree */}
+              <circle cx="310" cy="195" r="6" fill="#5E9E6E" />
+              <rect x="309" y="195" width="2" height="6" fill="#8B6B3E" />
+            </g>
+
+            {/* Mountain region — right */}
+            <g>
+              <path d="M500 240 L430 200 L430 170 L500 210 Z" fill="#8B8680" />
+              <path d="M500 240 L570 200 L570 170 L500 210 Z" fill="#A09A93" />
+              <path d="M430 170 L500 130 L570 170 L500 210 Z" fill="#6BAF7B" />
+              {/* Mountain peaks */}
+              <polygon points="500,65 460,140 540,140" fill="#4A6FA5" />
+              <polygon points="500,65 475,110 525,110" fill="#5A82B8" />
+              <polygon points="500,65 487,88 513,88" fill="#F5F2ED" />
+              {/* Smaller peak */}
+              <polygon points="540,95 520,140 560,140" fill="#3D5E8C" />
+              <polygon points="540,95 530,118 550,118" fill="#4A6FA5" />
+              {/* Trail */}
+              <path d="M450 185 Q475 175 500 180 Q520 185 545 172" stroke="#D4C8A0" strokeWidth="2" fill="none" strokeDasharray="4 3" opacity="0.6" />
+            </g>
+
+            {/* Animated character — small walking figure */}
+            <g className="hero-character">
+              <circle cx="305" cy="218" r="4" fill="#E8712B" />
+              <rect x="303" y="222" width="4" height="7" rx="1" fill="#E8712B" />
+              {/* Shadow */}
+              <ellipse cx="305" cy="231" rx="5" ry="2" fill="rgba(0,0,0,0.08)" />
+            </g>
+
+            {/* Paths between regions */}
+            <path d="M230 210 Q290 230 320 240" stroke="#C8C2B5" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
+            <path d="M380 240 Q430 230 470 210" stroke="#C8C2B5" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
+
+            {/* Labels */}
+            <g>
+              <rect x="160" y="248" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
+              <text x="200" y="262" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Morning Runs</text>
+            </g>
+            <g>
+              <rect x="310" y="288" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
+              <text x="350" y="302" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Side Project</text>
+            </g>
+            <g>
+              <rect x="460" y="248" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
+              <text x="500" y="262" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Fitness Goal</text>
+            </g>
+          </svg>
+
+          {/* CSS animation for the character bobbing */}
+          <style>{`
+            .hero-character {
+              animation: hero-bob 2s ease-in-out infinite;
+            }
+            @keyframes hero-bob {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-4px); }
+            }
+          `}</style>
+        </div>
 
         {/* Scroll indicator */}
         <div style={{
-          position: 'absolute', bottom: isMobile ? '24px' : '40px',
-          left: isMobile ? '24px' : '6vw', zIndex: 2,
+          position: 'absolute', bottom: isMobile ? '24px' : '32px',
+          left: '50%', transform: 'translateX(-50%)', zIndex: 2,
           display: 'flex', alignItems: 'center', gap: '8px',
           opacity: heroVisible ? 0.5 : 0,
           transition: 'opacity 0.5s ease 1.2s',

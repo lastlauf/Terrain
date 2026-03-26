@@ -207,40 +207,43 @@ export default function TerrainCanvas({
       const layout = layoutRef.current
 
       // 2b. Draw isometric dot grid floor (world-space)
+      // Diamond pattern — every other row offset by half
       {
-        const gridSpacing = 40
+        const gridSpacing = 32
         const dotSize = 2
         // Compute visible world bounds
         const worldLeft = -s.offset.x / s.scale - 200
         const worldTop = -s.offset.y / s.scale - 200
         const worldRight = worldLeft + W / s.scale + 400
         const worldBottom = worldTop + H / s.scale + 400
-        // Mouse in world space
+        // Mouse in world space for interactive glow
         const mwx = (s.mousePos.x - s.offset.x) / s.scale
         const mwy = (s.mousePos.y - s.offset.y) / s.scale
 
-        const startCol = Math.floor(worldLeft / gridSpacing)
-        const endCol = Math.ceil(worldRight / gridSpacing)
-        const startRow = Math.floor(worldTop / gridSpacing)
-        const endRow = Math.ceil(worldBottom / gridSpacing)
+        const startCol = Math.floor(worldLeft / gridSpacing) - 1
+        const endCol = Math.ceil(worldRight / gridSpacing) + 1
+        const halfRow = gridSpacing * 0.5
+        const startRow = Math.floor(worldTop / halfRow) - 1
+        const endRow = Math.ceil(worldBottom / halfRow) + 1
 
         for (let row = startRow; row <= endRow; row++) {
+          const isOddRow = row % 2 !== 0
+          const offsetX = isOddRow ? gridSpacing * 0.5 : 0
           for (let col = startCol; col <= endCol; col++) {
-            const gx = col * gridSpacing
-            const gy = row * gridSpacing
+            const gx = col * gridSpacing + offsetX
+            const gy = row * halfRow
             // Distance from mouse for interactive glow
             const dx = gx - mwx
             const dy = gy - mwy
             const dist = Math.sqrt(dx * dx + dy * dy)
-            const proximity = Math.max(0, 1 - dist / 200)
-            const baseAlpha = 0.06
-            const alpha = baseAlpha + proximity * 0.18
+            const proximity = Math.max(0, 1 - dist / 160)
+            const baseAlpha = 0.08
+            const alpha = baseAlpha + proximity * 0.25
+            const size = dotSize + proximity * 1.5
             ctx.fillStyle = `rgba(168, 158, 142, ${alpha})`
-            ctx.fillRect(
-              Math.round(gx - dotSize / 2),
-              Math.round(gy - dotSize / 2),
-              dotSize, dotSize
-            )
+            ctx.beginPath()
+            ctx.arc(Math.round(gx), Math.round(gy), size, 0, Math.PI * 2)
+            ctx.fill()
           }
         }
       }

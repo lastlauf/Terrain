@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Loader from '../components/Loader.jsx'
 import Navbar from '../components/Navbar.jsx'
 import TerrainCanvas from '../components/TerrainCanvas.jsx'
 import AddRegionModal from '../components/AddRegionModal.jsx'
@@ -71,6 +72,22 @@ export default function Map() {
   const { regions, createRegion, updateRegion } = useRegions()
   const { checkins, fetchCheckins, createCheckin } = useCheckins()
   const { theme, updateTheme } = useTheme()
+
+  // Loading sequence
+  const [mapReady, setMapReady] = useState(false)
+  const loadTimerRef = useRef(null)
+
+  useEffect(() => {
+    // Show loading screen for at least 2s, then wait for regions to load
+    loadTimerRef.current = setTimeout(() => {
+      setMapReady(true)
+    }, 2200)
+    return () => clearTimeout(loadTimerRef.current)
+  }, [])
+
+  // If regions arrive before timer, we still wait for the timer
+  // If regions take longer, we wait for both
+  const isLoading = !mapReady || (regions === null)
 
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [checkinRegion, setCheckinRegion] = useState(null)
@@ -316,6 +333,11 @@ export default function Map() {
 
   // Detect mobile
   const isMobile = useIsMobile()
+
+  // Show loading sequence while map initializes
+  if (isLoading) {
+    return <Loader message="Building your terrain..." />
+  }
 
   return (
     <div style={{

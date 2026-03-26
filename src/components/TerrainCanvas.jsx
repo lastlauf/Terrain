@@ -45,6 +45,9 @@ export default function TerrainCanvas({
       bobPhase: 0,       // walking bob animation
       nearRegion: null,   // region the character is near
       active: false,      // whether character mode is engaged
+      jumpVy: 0,          // vertical jump velocity
+      jumpY: 0,           // current jump height offset
+      grounded: true,     // on ground
     },
     keys: {},            // currently pressed keys
   })
@@ -138,15 +141,15 @@ export default function TerrainCanvas({
     if (mini || !interactive) return
 
     const handleKeyDown = (e) => {
-      const key = e.key.toLowerCase()
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'e', 'shift'].includes(key)) {
+      const key = e.key === ' ' ? 'space' : e.key.toLowerCase()
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'e', 'shift', 'space'].includes(key)) {
         stateRef.current.keys[key] = true
         stateRef.current.character.active = true
         e.preventDefault()
       }
     }
     const handleKeyUp = (e) => {
-      const key = e.key.toLowerCase()
+      const key = e.key === ' ' ? 'space' : e.key.toLowerCase()
       stateRef.current.keys[key] = false
     }
 
@@ -436,6 +439,20 @@ export default function TerrainCanvas({
 
         if (Math.abs(ch.vx) > 0.1) ch.facing = ch.vx > 0 ? 1 : -1
 
+        // Jump physics
+        if (keys.space && ch.grounded) {
+          ch.jumpVy = -6
+          ch.grounded = false
+          keys.space = false
+        }
+        ch.jumpVy += 0.35 // gravity
+        ch.jumpY += ch.jumpVy
+        if (ch.jumpY >= 0) {
+          ch.jumpY = 0
+          ch.jumpVy = 0
+          ch.grounded = true
+        }
+
         // Walking bob
         const isMoving = Math.abs(ch.vx) > 0.3 || Math.abs(ch.vy) > 0.3
         if (isMoving) ch.bobPhase += 0.15
@@ -444,6 +461,7 @@ export default function TerrainCanvas({
         // Check proximity to regions
         let nearest = null
         let nearestDist = 80
+        let nearestLayout = null
         for (const l of layout) {
           const rcx = l.x + l.w / 2
           const rcy = l.y + l.h / 2
@@ -453,9 +471,25 @@ export default function TerrainCanvas({
           if (dist < nearestDist) {
             nearestDist = dist
             nearest = l.region
+            nearestLayout = l
           }
         }
         ch.nearRegion = nearest
+
+        // E to jump-to / interact with nearby region
+        if (keys.e && ch.nearRegion && nearestLayout) {
+          // Teleport character onto the region
+          const tgtX = nearestLayout.x + nearestLayout.w / 2
+          const tgtY = nearestLayout.y + nearestLayout.h / 2 + 20
+          ch.x += (tgtX - ch.x) * 0.3
+          ch.y += (tgtY - ch.y) * 0.3
+          if (Math.abs(ch.x - tgtX) < 3 && Math.abs(ch.y - tgtY) < 3) {
+            ch.x = tgtX
+            ch.y = tgtY
+            if (onRegionClick) onRegionClick(ch.nearRegion)
+            keys.e = false
+          }
+        }
 
         // Auto-center camera on character when active
         if (ch.active && containerRef.current) {
@@ -466,17 +500,13 @@ export default function TerrainCanvas({
           s.offset.y += (targetOffY - s.offset.y) * 0.05
         }
 
-        // E to interact with nearby region
-        if (keys.e && ch.nearRegion && onRegionClick) {
-          onRegionClick(ch.nearRegion)
-          keys.e = false // consume
-        }
-
-        // Draw shadow (larger)
-        const bobY = Math.sin(ch.bobPhase) * 3
-        ctx.fillStyle = 'rgba(0,0,0,0.08)'
+        // Draw shadow (larger) — shadow stays on ground, shrinks when jumping
+        const jumpOff = ch.jumpY
+        const shadowScale = 1 - Math.abs(jumpOff) / 30
+        const bobY = Math.sin(ch.bobPhase) * 3 + jumpOff
+        ctx.fillStyle = `rgba(0,0,0,${0.08 * Math.max(0.3, shadowScale)})`
         ctx.beginPath()
-        ctx.ellipse(ch.x, ch.y + 18, 12, 5, 0, 0, Math.PI * 2)
+        ctx.ellipse(ch.x, ch.y + 18, 12 * Math.max(0.5, shadowScale), 5 * Math.max(0.5, shadowScale), 0, 0, Math.PI * 2)
         ctx.fill()
 
         // Draw character — larger isometric figure
@@ -622,11 +652,11 @@ export default function TerrainCanvas({
       }
 
       // Controls hint (bottom-left, screen space)
-      if (!mini && interactive && !s.character.active) {
+      if (!mini && interactive) {
         ctx.fillStyle = 'rgba(74, 69, 64, 0.3)'
         ctx.font = "11px 'Inter', sans-serif"
         ctx.textAlign = 'left'
-        ctx.fillText('WASD to walk  ·  E to interact  ·  Shift to run', 16, H - 16)
+        ctx.fillText('WASD to walk  ·  Space to jump  ·  E to interact  ·  Shift to run', 16, H - 16)
       }
 
       animFrameRef.current = requestAnimationFrame(render)

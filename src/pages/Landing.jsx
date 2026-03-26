@@ -156,13 +156,13 @@ function HeroPixelScene({ visible, isMobile }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    const P = 4 // pixel size
+    const P = 2 // smaller pixels = more detail
     let time = 0
     let running = true
 
     function resize() {
       const w = canvas.parentElement.offsetWidth
-      const h = isMobile ? 240 : 360
+      const h = isMobile ? 300 : 440
       const dpr = window.devicePixelRatio || 1
       canvas.width = w * dpr
       canvas.height = h * dpr
@@ -172,15 +172,13 @@ function HeroPixelScene({ visible, isMobile }) {
     }
     resize()
 
-    // Pixel drawing helper
     function px(x, y, color) {
       ctx.fillStyle = color
       ctx.fillRect(x * P, y * P, P, P)
     }
 
-    // Isometric block base (draws at pixel coords)
+    // Isometric block with outline
     function isoBlock(bx, by, w, h, d, topColor, leftColor, rightColor) {
-      // Top face (diamond)
       ctx.fillStyle = topColor
       ctx.beginPath()
       ctx.moveTo(bx * P, (by - d) * P)
@@ -189,7 +187,9 @@ function HeroPixelScene({ visible, isMobile }) {
       ctx.lineTo((bx - w) * P, (by - d + w / 2) * P)
       ctx.closePath()
       ctx.fill()
-      // Left face
+      ctx.strokeStyle = 'rgba(74,69,64,0.15)'
+      ctx.lineWidth = 1
+      ctx.stroke()
       ctx.fillStyle = leftColor
       ctx.beginPath()
       ctx.moveTo((bx - w) * P, (by - d + w / 2) * P)
@@ -198,7 +198,7 @@ function HeroPixelScene({ visible, isMobile }) {
       ctx.lineTo((bx - w) * P, (by + h - w / 2) * P)
       ctx.closePath()
       ctx.fill()
-      // Right face
+      ctx.stroke()
       ctx.fillStyle = rightColor
       ctx.beginPath()
       ctx.moveTo((bx + w) * P, (by - d + w / 2) * P)
@@ -207,43 +207,107 @@ function HeroPixelScene({ visible, isMobile }) {
       ctx.lineTo((bx + w) * P, (by + h - w / 2) * P)
       ctx.closePath()
       ctx.fill()
+      ctx.stroke()
     }
 
-    // Pixel tree
-    function pixelTree(tx, ty, h) {
-      // Trunk
-      for (let i = 0; i < 3; i++) px(tx, ty + h + i, '#8B6B3E')
-      // Foliage layers
-      const greens = ['#3D7A4A', '#4A8C5C', '#5E9E6E']
-      for (let layer = 0; layer < 3; layer++) {
-        const w = 3 - layer
-        const yy = ty + h - layer * 2
-        for (let dx = -w; dx <= w; dx++) {
-          for (let dy = 0; dy < 2; dy++) {
-            px(tx + dx, yy - dy, greens[layer])
+    // Detailed pixel tree with trunk gradient
+    function pixelTree(tx, ty, size) {
+      const h = size * 3
+      for (let i = 0; i < 4; i++) { px(tx, ty + h + i, '#7A5E35'); px(tx + 1, ty + h + i, '#8B6B3E') }
+      const layers = [
+        { w: size + 2, h: 3, c: '#3D7A4A' },
+        { w: size + 1, h: 3, c: '#4A8C5C' },
+        { w: size, h: 2, c: '#5E9E6E' },
+        { w: size - 1, h: 2, c: '#6BAF7B' },
+      ]
+      let yy = ty + h
+      for (const l of layers) {
+        for (let dy = 0; dy < l.h; dy++) {
+          for (let dx = -l.w; dx <= l.w; dx++) {
+            px(tx + dx, yy - dy, l.c)
           }
         }
+        yy -= l.h
       }
+      // Snow on top
+      for (let dx = -1; dx <= 1; dx++) px(tx + dx, yy, '#F5F2ED')
     }
 
-    // Pixel building
-    function pixelBuilding(bx, by, w, h, wallColor, roofColor, windowColor) {
-      // Wall
-      for (let x = 0; x < w; x++) {
-        for (let y = 0; y < h; y++) {
-          px(bx + x, by - y, wallColor)
+    // Detailed building with window glow
+    function pixelBuilding(bx, by, w, h, wallColor, roofColor, wColors) {
+      for (let x = 0; x < w; x++) for (let y = 0; y < h; y++) px(bx + x, by - y, wallColor)
+      // Roof (pitched)
+      for (let x = -1; x <= w; x++) { px(bx + x, by - h, roofColor); px(bx + x, by - h - 1, roofColor) }
+      // Antenna/detail
+      px(bx + Math.floor(w / 2), by - h - 2, '#9E9890')
+      px(bx + Math.floor(w / 2), by - h - 3, '#9E9890')
+      // Windows (2x2 with varied colors)
+      for (let wy = 3; wy < h - 2; wy += 4) {
+        for (let wx = 1; wx < w - 1; wx += 3) {
+          const wc = wColors[Math.floor(Math.random() * 10) < 3 ? 1 : 0]
+          px(bx + wx, by - wy, wc); px(bx + wx + 1, by - wy, wc)
+          px(bx + wx, by - wy - 1, wc); px(bx + wx + 1, by - wy - 1, wc)
         }
       }
-      // Roof
-      for (let x = -1; x <= w; x++) px(bx + x, by - h, roofColor)
-      for (let x = 0; x < w; x++) px(bx + x, by - h - 1, roofColor)
-      // Windows
-      for (let wy = 2; wy < h - 1; wy += 3) {
-        for (let wx = 1; wx < w - 1; wx += 2) {
-          px(bx + wx, by - wy, windowColor)
-          px(bx + wx, by - wy - 1, windowColor)
-        }
-      }
+      // Door
+      px(bx + Math.floor(w / 2), by, '#8B6B3E')
+      px(bx + Math.floor(w / 2), by - 1, '#8B6B3E')
+      px(bx + Math.floor(w / 2) + 1, by, '#7A5E35')
+      px(bx + Math.floor(w / 2) + 1, by - 1, '#7A5E35')
+    }
+
+    // Pixel character (larger, more detailed)
+    function drawChar(cx, cy, bob, legAnim) {
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.07)'
+      ctx.beginPath()
+      ctx.ellipse(cx * P, (cy + 2) * P, 10, 4, 0, 0, Math.PI * 2)
+      ctx.fill()
+      const b = Math.round(bob)
+      // Legs
+      const lp = Math.sin(legAnim)
+      ctx.fillStyle = '#C45A1A'
+      for (let y = 0; y < 4 + Math.round(lp); y++) { px(cx - 2, cy - 2 + b + y, '#C45A1A'); px(cx - 1, cy - 2 + b + y, '#C45A1A') }
+      for (let y = 0; y < 4 - Math.round(lp); y++) { px(cx + 1, cy - 2 + b + y, '#C45A1A'); px(cx + 2, cy - 2 + b + y, '#C45A1A') }
+      // Body
+      for (let dx = -3; dx <= 3; dx++) for (let dy = -10; dy <= -3; dy++) px(cx + dx, cy + dy + b, '#E8712B')
+      // Body highlight
+      for (let dy = -9; dy <= -4; dy++) px(cx - 2, cy + dy + b, '#F0924A')
+      // Arms
+      for (let dy = -8; dy <= -4; dy++) { px(cx - 4, cy + dy + b + Math.round(lp), '#E8712B'); px(cx + 4, cy + dy + b - Math.round(lp), '#E8712B') }
+      // Head
+      for (let dx = -4; dx <= 4; dx++) for (let dy = -16; dy <= -11; dy++) px(cx + dx, cy + dy + b, '#E8712B')
+      // Hair/cap
+      for (let dx = -4; dx <= 4; dx++) for (let dy = -17; dy <= -15; dy++) px(cx + dx, cy + dy + b, '#C45A1A')
+      // Eyes
+      px(cx - 2, cy - 14 + b, '#FFF'); px(cx - 1, cy - 14 + b, '#FFF')
+      px(cx + 1, cy - 14 + b, '#FFF'); px(cx + 2, cy - 14 + b, '#FFF')
+      // Pupils
+      px(cx - 1, cy - 14 + b, '#1A1714'); px(cx + 2, cy - 14 + b, '#1A1714')
+      // Mouth
+      px(cx - 1, cy - 12 + b, '#C45A1A'); px(cx, cy - 12 + b, '#C45A1A'); px(cx + 1, cy - 12 + b, '#C45A1A')
+      // Indicator arrow
+      const indBob = Math.sin(time * 3) * 3
+      ctx.fillStyle = '#E8712B'
+      ctx.beginPath()
+      ctx.moveTo(cx * P, (cy - 18 + b) * P + indBob * P)
+      ctx.lineTo((cx - 3) * P, (cy - 22 + b) * P + indBob * P)
+      ctx.lineTo((cx + 3) * P, (cy - 22 + b) * P + indBob * P)
+      ctx.closePath()
+      ctx.fill()
+    }
+
+    // Campfire
+    function drawFire(fx, fy) {
+      // Logs
+      px(fx - 1, fy, '#7A5E35'); px(fx, fy, '#8B6B3E'); px(fx + 1, fy, '#7A5E35')
+      // Flames (animated)
+      const flicker = Math.sin(time * 8)
+      px(fx, fy - 1, '#E8712B')
+      px(fx, fy - 2, flicker > 0 ? '#F5C542' : '#E8712B')
+      if (flicker > 0.3) px(fx - 1, fy - 1, '#E8712B')
+      if (flicker < -0.3) px(fx + 1, fy - 1, '#E8712B')
+      px(fx, fy - 3, flicker > 0 ? '#F5C542' : 'transparent')
     }
 
     function render() {
@@ -255,119 +319,132 @@ function HeroPixelScene({ visible, isMobile }) {
 
       ctx.clearRect(0, 0, W, H)
 
-      // Isometric dot grid background
-      const gridS = 24
-      for (let gy = 0; gy < H; gy += gridS) {
-        const isOdd = Math.floor(gy / gridS) & 1
-        for (let gx = isOdd ? gridS / 2 : 0; gx < W; gx += gridS) {
-          ctx.fillStyle = 'rgba(200, 194, 181, 0.12)'
-          ctx.fillRect(Math.round(gx), Math.round(gy), 2, 2)
+      // Isometric dot grid — 2:1 ratio diamond
+      const gW = 20, gH = 10
+      for (let row = 0; row < Math.ceil(H / gH) + 1; row++) {
+        const odd = row & 1
+        for (let col = 0; col < Math.ceil(W / gW) + 1; col++) {
+          const gx = col * gW + (odd ? gW / 2 : 0)
+          const gy = row * gH
+          ctx.fillStyle = 'rgba(200, 194, 181, 0.1)'
+          ctx.fillRect(Math.round(gx), Math.round(gy), 1.5, 1.5)
         }
       }
 
-      // Three isometric blocks with pixel content
-      const blockW = isMobile ? 12 : 18
-      const blockD = isMobile ? 4 : 6
+      const blockW = isMobile ? 24 : 36
+      const blockD = isMobile ? 6 : 10
+      const centerP = Math.round(cx / P)
+      const baseY = Math.round(H / P * 0.48)
 
-      // Forest (left) — staggered iso layout
-      const fx = Math.round(cx / P) - (isMobile ? 24 : 38)
-      const fy = Math.round(H / P / 2) - (isMobile ? 2 : 4)
+      // Forest (left)
+      const fx = centerP - (isMobile ? 46 : 72)
+      const fy = baseY - 4
       isoBlock(fx, fy, blockW, blockD, blockD, '#5E9E6E', '#8B8680', '#A09A93')
-      pixelTree(fx - 4, fy - blockD - 6, 3)
-      pixelTree(fx - 1, fy - blockD - 8, 4)
-      pixelTree(fx + 3, fy - blockD - 5, 3)
-      // Cabin pixels
-      for (let x = 0; x < 4; x++) for (let y = 0; y < 3; y++) px(fx + 5 + x, fy - blockD - y - 1, '#C4A882')
-      for (let x = 0; x < 5; x++) px(fx + 5 + x, fy - blockD - 4, '#A89070')
+      // Grass detail on top
+      for (let i = 0; i < 8; i++) {
+        const gx = fx - blockW + 4 + Math.floor(i * blockW / 4)
+        const gy = fy - blockD + Math.round(blockW / 4) - 1
+        px(gx, gy, '#6BAF7B'); px(gx + 1, gy, '#5E9E6E')
+      }
+      pixelTree(fx - 8, fy - blockD - 10, 3)
+      pixelTree(fx - 3, fy - blockD - 14, 4)
+      pixelTree(fx + 4, fy - blockD - 11, 3)
+      pixelTree(fx + 10, fy - blockD - 8, 2)
+      // Cabin
+      for (let x = 0; x < 8; x++) for (let y = 0; y < 6; y++) px(fx + 12 + x, fy - blockD - y - 1, '#C4A882')
+      for (let x = 0; x < 9; x++) { px(fx + 12 + x, fy - blockD - 7, '#A89070'); px(fx + 12 + x, fy - blockD - 8, '#8B6B3E') }
+      // Cabin window
+      px(fx + 14, fy - blockD - 3, '#F5C542'); px(fx + 15, fy - blockD - 3, '#F5C542')
+      px(fx + 14, fy - blockD - 4, '#F5C542'); px(fx + 15, fy - blockD - 4, '#F5C542')
+      // Campfire
+      drawFire(fx + 6, fy - blockD)
 
-      // City (center) — lower for isometric depth
-      const ccx = Math.round(cx / P)
-      const ccy = fy + (isMobile ? 10 : 14)
+      // City (center, lower)
+      const ccx = centerP
+      const ccy = baseY + (isMobile ? 16 : 22)
       isoBlock(ccx, ccy, blockW, blockD, blockD, '#D4C8A0', '#8B8680', '#A09A93')
-      pixelBuilding(ccx - 5, ccy - blockD, 4, isMobile ? 8 : 12, '#E8E4DC', '#D4CFC6', '#4A6FA5')
-      pixelBuilding(ccx + 2, ccy - blockD, 3, isMobile ? 6 : 9, '#E8E4DC', '#C8C2B5', '#E8712B')
+      // Grid lines on city top
+      ctx.strokeStyle = 'rgba(200,194,181,0.2)'
+      ctx.lineWidth = 0.5
+      for (let i = 1; i < 4; i++) {
+        const off = i * blockW / 4
+        ctx.beginPath()
+        ctx.moveTo((ccx - blockW + off) * P, (ccy - blockD + off / 2) * P)
+        ctx.lineTo((ccx + off) * P, (ccy - blockD + blockW - off / 2) * P)
+        ctx.stroke()
+      }
+      pixelBuilding(ccx - 10, ccy - blockD, 8, isMobile ? 16 : 24, '#E8E4DC', '#D4CFC6', ['#4A6FA5', '#E8712B'])
+      pixelBuilding(ccx + 4, ccy - blockD, 6, isMobile ? 12 : 18, '#E8E4DC', '#C8C2B5', ['#4A6FA5', '#F5C542'])
+      pixelBuilding(ccx + 12, ccy - blockD, 5, isMobile ? 8 : 12, '#F0ECE4', '#DDD8CE', ['#3A7D9E', '#E8712B'])
+      // Small tree between buildings
+      pixelTree(ccx - 1, ccy - blockD - 5, 1)
 
       // Mountains (right)
-      const mx = Math.round(cx / P) + (isMobile ? 24 : 38)
-      const my = fy
+      const mx = centerP + (isMobile ? 46 : 72)
+      const my = baseY - 4
       isoBlock(mx, my, blockW, blockD, blockD, '#6BAF7B', '#8B8680', '#A09A93')
-      // Mountain pixels
-      const mh = isMobile ? 10 : 14
+      // Mountain (detailed triangular, larger)
+      const mh = isMobile ? 20 : 28
       for (let row = 0; row < mh; row++) {
         const w = Math.round((mh - row) * 0.7)
         for (let dx = -w; dx <= w; dx++) {
-          const c = row < 3 ? '#F5F2ED' : row < 6 ? '#5A82B8' : '#4A6FA5'
+          let c
+          if (row > mh - 4) c = '#F5F2ED' // snow cap
+          else if (row > mh - 8) c = '#C8D8E8' // light rock
+          else if (row > mh / 2) c = '#5A82B8'
+          else c = '#4A6FA5'
           px(mx + dx, my - blockD - row, c)
         }
       }
-      // Smaller peak
-      for (let row = 0; row < Math.round(mh * 0.6); row++) {
-        const w = Math.round((mh * 0.6 - row) * 0.6)
+      // Second peak
+      const mh2 = Math.round(mh * 0.55)
+      for (let row = 0; row < mh2; row++) {
+        const w = Math.round((mh2 - row) * 0.55)
         for (let dx = -w; dx <= w; dx++) {
-          px(mx + 8 + dx, my - blockD - row, row < 2 ? '#5A82B8' : '#3D5E8C')
+          const c = row > mh2 - 3 ? '#5A82B8' : '#3D5E8C'
+          px(mx + 14 + dx, my - blockD - row, c)
         }
       }
+      // Trail (dotted)
+      for (let i = 0; i < 16; i += 2) {
+        px(mx - 12 + i, my - blockD + Math.round(Math.sin(i * 0.5) * 2), '#D4C8A0')
+      }
+      // Small rocks
+      px(mx - 10, my - blockD, '#9E9890'); px(mx - 9, my - blockD, '#B5AFA8')
+      px(mx + 8, my - blockD - 1, '#A8A29C')
 
       // Dotted paths between regions
       ctx.strokeStyle = 'rgba(200, 194, 181, 0.4)'
-      ctx.lineWidth = 2
+      ctx.lineWidth = 1.5
       ctx.setLineDash([4, 4])
       ctx.beginPath()
-      ctx.moveTo(fx * P + blockW * P, fy * P)
-      ctx.lineTo(ccx * P - blockW * P, ccy * P)
+      ctx.moveTo((fx + blockW) * P, fy * P)
+      ctx.quadraticCurveTo(cx, (fy + 10) * P, (ccx - blockW) * P, ccy * P)
       ctx.stroke()
       ctx.beginPath()
-      ctx.moveTo(ccx * P + blockW * P, ccy * P)
-      ctx.lineTo(mx * P - blockW * P, my * P)
+      ctx.moveTo((ccx + blockW) * P, ccy * P)
+      ctx.quadraticCurveTo(cx + 100, (my + 10) * P, (mx - blockW) * P, my * P)
       ctx.stroke()
       ctx.setLineDash([])
 
-      // Animated character near city
-      const charX = (ccx - 8) * P
-      const charBob = Math.sin(time * 3) * 3
-      const charY = (ccy - blockD - 2) * P + charBob
-      // Shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.06)'
-      ctx.beginPath()
-      ctx.ellipse(charX, (ccy - blockD) * P + 4, 8, 3, 0, 0, Math.PI * 2)
-      ctx.fill()
-      // Body (pixel blocks)
-      ctx.fillStyle = '#E8712B'
-      ctx.fillRect(charX - 3, charY - 4, 6, 8)
-      // Head
-      ctx.fillRect(charX - 4, charY - 10, 8, 6)
-      // Eyes
-      ctx.fillStyle = '#FFF'
-      ctx.fillRect(charX - 1, charY - 8, 2, 2)
-      ctx.fillRect(charX + 2, charY - 8, 2, 2)
-      // Legs
-      ctx.fillStyle = '#C45A1A'
-      const legPhase = Math.sin(time * 4)
-      ctx.fillRect(charX - 2, charY + 4, 2, 4 + legPhase)
-      ctx.fillRect(charX + 1, charY + 4, 2, 4 - legPhase)
-      // Bouncing indicator
-      const indY = charY - 16 + Math.sin(time * 3) * 3
-      ctx.fillStyle = '#E8712B'
-      ctx.beginPath()
-      ctx.moveTo(charX, indY + 4)
-      ctx.lineTo(charX - 4, indY)
-      ctx.lineTo(charX + 4, indY)
-      ctx.closePath()
-      ctx.fill()
+      // Character (larger, near forest)
+      const charBob = Math.sin(time * 3) * 1.5
+      drawChar(fx + blockW + 6, fy - blockD + 2, charBob, time * 4)
 
-      // Labels
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'
-      ctx.font = "bold 10px 'Inter', sans-serif"
+      // Labels with white pill bg
+      ctx.font = "600 11px 'Inter', sans-serif"
       ctx.textAlign = 'center'
       const labels = [
-        [fx * P, (fy + blockD + 4) * P, 'Morning Runs'],
-        [ccx * P, (ccy + blockD + 4) * P, 'Side Project'],
-        [mx * P, (my + blockD + 4) * P, 'Fitness Goal'],
+        [fx * P, (fy + blockD + 6) * P, 'Morning Runs'],
+        [ccx * P, (ccy + blockD + 6) * P, 'Side Project'],
+        [mx * P, (my + blockD + 6) * P, 'Fitness Goal'],
       ]
       for (const [lx, ly, text] of labels) {
         const tw = ctx.measureText(text).width
-        ctx.fillStyle = 'rgba(255,255,255,0.9)'
-        ctx.fillRect(lx - tw / 2 - 6, ly - 6, tw + 12, 16)
+        ctx.fillStyle = 'rgba(255,255,255,0.92)'
+        ctx.beginPath()
+        ctx.roundRect(lx - tw / 2 - 8, ly - 7, tw + 16, 18, 9)
+        ctx.fill()
         ctx.fillStyle = '#4A4540'
         ctx.fillText(text, lx, ly + 5)
       }
@@ -386,14 +463,17 @@ function HeroPixelScene({ visible, isMobile }) {
 
   return (
     <div style={{
-      position: 'relative', width: '100%', maxWidth: '700px',
+      position: 'relative', width: '100%', maxWidth: '800px',
       opacity: visible ? 1 : 0,
       transform: visible ? 'translateY(0)' : 'translateY(30px)',
       transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
+      filter: 'drop-shadow(0 8px 24px rgba(166, 158, 143, 0.25))',
+      borderRadius: '16px',
+      overflow: 'hidden',
     }}>
       <canvas
         ref={canvasRef}
-        style={{ display: 'block', width: '100%', imageRendering: 'pixelated' }}
+        style={{ display: 'block', width: '100%', imageRendering: 'pixelated', background: '#F5F2ED', borderRadius: '16px' }}
       />
     </div>
   )
@@ -749,11 +829,11 @@ export default function Landing() {
           <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }} />
         </div>
 
-        {/* Feature 01 — Map View */}
+        {/* Feature 01 — Map View + List View */}
         <FeatureSection
           number="01"
-          title="Map View"
-          description="Each goal becomes a region on your terrain — mountains, forests, cities, coasts. The map breathes: weather shifts with your check-in recency."
+          title="Map & List"
+          description="Toggle between a living isometric map and a clean task list. Map view shows your goals as illustrated terrain regions. List view gives you a focused productivity checklist. Same data, two ways to see it."
           isMobile={isMobile}
         >
           <div style={{

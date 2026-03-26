@@ -107,7 +107,7 @@ export default function Onboarding() {
             fontSize: 'var(--text-3xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-2)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
           }}>
             {step === 0 ? `Welcome, ${username}` : STEPS[step].title}
           </h1>

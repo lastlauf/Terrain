@@ -73,7 +73,7 @@ export default function LandmarkNaming({ regionName, milestoneTitle, onSubmit, o
             fontWeight: 400,
             fontSize: 'var(--text-lg)',
             color: 'var(--accent-orange)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
             marginBottom: 'var(--space-3)',
           }}>
             A NEW PLACE HAS BEEN BUILT

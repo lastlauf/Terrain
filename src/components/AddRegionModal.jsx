@@ -64,7 +64,7 @@ export default function AddRegionModal({ onClose, onSubmit, inline = false }) {
         fontSize: 'var(--text-xl)',
         color: 'var(--text-primary)',
         marginBottom: 'var(--space-6)',
-        letterSpacing: '0.06em',
+        letterSpacing: '-0.01em',
       }}>
         New Region
       </h2>

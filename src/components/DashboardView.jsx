@@ -138,7 +138,7 @@ function RegionRow({
               fontSize: '10px',
               fontFamily: 'var(--font-mono)',
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
               color: regionColor,
               border: `1px solid ${regionColor}`,
               padding: '0 4px',
@@ -150,7 +150,7 @@ function RegionRow({
               fontSize: '10px',
               fontFamily: 'var(--font-mono)',
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
               color: catColor,
               border: `1px solid ${catColor}`,
               padding: '0 4px',
@@ -464,7 +464,7 @@ export default function DashboardView({
             fontWeight: 400,
             fontSize: 'var(--text-lg)',
             color: 'var(--text-primary)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
           }}>
             DASHBOARD
           </h2>
@@ -503,7 +503,7 @@ export default function DashboardView({
                   fontSize: '10px',
                   fontFamily: 'var(--font-mono)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
+                  letterSpacing: '-0.01em',
                   padding: '2px 8px',
                   lineHeight: '16px',
                   color: active ? '#FFFFFF' : catColorVal,

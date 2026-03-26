@@ -69,7 +69,7 @@ export default function Login() {
             fontFamily: 'var(--font-display)',
             fontWeight: 400,
             fontSize: 'clamp(40px, 10vw, 56px)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
             color: 'var(--text-primary)',
           }}>
             TERRAIN
@@ -95,7 +95,7 @@ export default function Login() {
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
             textAlign: 'center',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
           }}>
             Welcome Back
           </h2>

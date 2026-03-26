@@ -1,11 +1,11 @@
 /* ============================================
    TERRAIN — Global Styles
-   Neo-skeu portal with Daydream display font
+   Neo-skeu portal with Calive Pixel display font
    ============================================ */
 
 @font-face {
-  font-family: 'Daydream';
-  src: url('/fonts/Daydream-DEMO.otf') format('opentype');
+  font-family: 'CalivePixel';
+  src: url('/fonts/CalivePixel.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -55,8 +55,8 @@
   --text-4xl: 64px;
   --text-5xl: 96px;
 
-  /* Fonts — Daydream display + Inter utility */
-  --font-display: 'Daydream', 'DM Serif Display', Georgia, serif;
+  /* Fonts — CalivePixel display + Inter utility */
+  --font-display: 'CalivePixel', 'DM Serif Display', Georgia, serif;
   --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -281,11 +281,11 @@ h1, h2, h3, h4, h5, h6 {
     -2px -2px 5px rgba(255, 255, 255, 0.5);
 }
 
-/* Large display buttons — Daydream font */
+/* Large display buttons — CalivePixel font */
 .btn--display {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
-  letter-spacing: 0.05em;
+  font-size: var(--text-xl);
+  letter-spacing: -0.01em;
   padding: 16px 36px;
   border-radius: 16px;
 }

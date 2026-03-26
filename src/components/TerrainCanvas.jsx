@@ -37,6 +37,16 @@ export default function TerrainCanvas({
     particles: [],
     time: 0,
     pinchDist: 0,
+    // Walkable character state
+    character: {
+      x: 0, y: 0,       // world position
+      vx: 0, vy: 0,     // velocity
+      facing: 1,         // 1 = right, -1 = left
+      bobPhase: 0,       // walking bob animation
+      nearRegion: null,   // region the character is near
+      active: false,      // whether character mode is engaged
+    },
+    keys: {},            // currently pressed keys
   })
 
   const layoutRef = useRef([])
@@ -112,6 +122,41 @@ export default function TerrainCanvas({
     }
     stateRef.current.particles = particles
   }, [mini])
+
+  // Initialize character at first region center
+  useEffect(() => {
+    const layout = layoutRef.current
+    if (layout.length > 0 && !stateRef.current.character.active) {
+      const first = layout[0]
+      stateRef.current.character.x = first.x + first.w / 2
+      stateRef.current.character.y = first.y + first.h / 2 + 20
+    }
+  }, [regions])
+
+  // Keyboard handlers for character movement
+  useEffect(() => {
+    if (mini || !interactive) return
+
+    const handleKeyDown = (e) => {
+      const key = e.key.toLowerCase()
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'e', 'shift'].includes(key)) {
+        stateRef.current.keys[key] = true
+        stateRef.current.character.active = true
+        e.preventDefault()
+      }
+    }
+    const handleKeyUp = (e) => {
+      const key = e.key.toLowerCase()
+      stateRef.current.keys[key] = false
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [mini, interactive])
 
   // Get last checkin date for a region
   const getLastCheckin = useCallback((regionId) => {
@@ -361,6 +406,121 @@ export default function TerrainCanvas({
         ctx.fillText('+', addCx, addCy + 10)
       }
 
+      // 6. Walkable character — update physics and draw
+      if (!mini && interactive) {
+        const ch = s.character
+        const keys = s.keys
+        const speed = keys.shift ? 3.5 : 2
+        const friction = 0.82
+
+        // Movement input
+        let inputX = 0, inputY = 0
+        if (keys.a || keys.arrowleft) inputX -= 1
+        if (keys.d || keys.arrowright) inputX += 1
+        if (keys.w || keys.arrowup) inputY -= 1
+        if (keys.s || keys.arrowdown) inputY += 1
+
+        // Normalize diagonal
+        if (inputX !== 0 && inputY !== 0) {
+          inputX *= 0.707
+          inputY *= 0.707
+        }
+
+        ch.vx += inputX * speed * 0.3
+        ch.vy += inputY * speed * 0.3
+        ch.vx *= friction
+        ch.vy *= friction
+        ch.x += ch.vx
+        ch.y += ch.vy
+
+        if (Math.abs(ch.vx) > 0.1) ch.facing = ch.vx > 0 ? 1 : -1
+
+        // Walking bob
+        const isMoving = Math.abs(ch.vx) > 0.3 || Math.abs(ch.vy) > 0.3
+        if (isMoving) ch.bobPhase += 0.15
+        else ch.bobPhase *= 0.9
+
+        // Check proximity to regions
+        let nearest = null
+        let nearestDist = 80
+        for (const l of layout) {
+          const rcx = l.x + l.w / 2
+          const rcy = l.y + l.h / 2
+          const dx = ch.x - rcx
+          const dy = ch.y - rcy
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < nearestDist) {
+            nearestDist = dist
+            nearest = l.region
+          }
+        }
+        ch.nearRegion = nearest
+
+        // Auto-center camera on character when active
+        if (ch.active && containerRef.current) {
+          const cRect = containerRef.current.getBoundingClientRect()
+          const targetOffX = cRect.width / 2 - ch.x * s.scale
+          const targetOffY = cRect.height / 2 - ch.y * s.scale
+          s.offset.x += (targetOffX - s.offset.x) * 0.05
+          s.offset.y += (targetOffY - s.offset.y) * 0.05
+        }
+
+        // E to interact with nearby region
+        if (keys.e && ch.nearRegion && onRegionClick) {
+          onRegionClick(ch.nearRegion)
+          keys.e = false // consume
+        }
+
+        // Draw shadow
+        const bobY = Math.sin(ch.bobPhase) * 2
+        ctx.fillStyle = 'rgba(0,0,0,0.06)'
+        ctx.beginPath()
+        ctx.ellipse(ch.x, ch.y + 10, 7, 3, 0, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Draw character — simple isometric figure
+        const charColor = t.character_color || '#E8712B'
+        // Body
+        ctx.fillStyle = charColor
+        ctx.beginPath()
+        ctx.roundRect(ch.x - 4, ch.y - 10 + bobY, 8, 12, 2)
+        ctx.fill()
+        // Head
+        ctx.beginPath()
+        ctx.arc(ch.x, ch.y - 14 + bobY, 5, 0, Math.PI * 2)
+        ctx.fill()
+        // Eyes (tiny white dots)
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(ch.x + ch.facing * 1.5 - 1, ch.y - 15 + bobY, 2, 2)
+        ctx.fillRect(ch.x + ch.facing * 4 - 1, ch.y - 15 + bobY, 2, 2)
+
+        // Legs animation
+        if (isMoving) {
+          const legPhase = Math.sin(ch.bobPhase * 2)
+          ctx.fillStyle = charColor
+          ctx.fillRect(ch.x - 3, ch.y + 2 + bobY, 3, 4 + legPhase * 2)
+          ctx.fillRect(ch.x + 1, ch.y + 2 + bobY, 3, 4 - legPhase * 2)
+        } else {
+          ctx.fillStyle = charColor
+          ctx.fillRect(ch.x - 3, ch.y + 2, 3, 4)
+          ctx.fillRect(ch.x + 1, ch.y + 2, 3, 4)
+        }
+
+        // Region proximity indicator
+        if (ch.nearRegion) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+          ctx.font = "bold 10px 'Inter', sans-serif"
+          ctx.textAlign = 'center'
+          const hint = `Press E — ${ch.nearRegion.name}`
+          const hw = ctx.measureText(hint).width
+          ctx.beginPath()
+          ctx.roundRect(ch.x - hw / 2 - 8, ch.y - 30 + bobY, hw + 16, 16, 8)
+          ctx.fill()
+          ctx.fillStyle = '#4A4540'
+          ctx.fillText(hint, ch.x, ch.y - 20 + bobY)
+        }
+      }
+
       ctx.restore()
 
       // 5. Square particles (screen space) — skip if theme says 'none'
@@ -411,6 +571,14 @@ export default function TerrainCanvas({
         ctx.fillStyle = '#1A1714'
         ctx.textAlign = 'left'
         ctx.fillText(name, tx + 8, ty + 16)
+      }
+
+      // Controls hint (bottom-left, screen space)
+      if (!mini && interactive && !s.character.active) {
+        ctx.fillStyle = 'rgba(74, 69, 64, 0.3)'
+        ctx.font = "11px 'Inter', sans-serif"
+        ctx.textAlign = 'left'
+        ctx.fillText('WASD to walk  ·  E to interact  ·  Shift to run', 16, H - 16)
       }
 
       animFrameRef.current = requestAnimationFrame(render)

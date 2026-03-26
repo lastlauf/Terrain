@@ -39,9 +39,9 @@ export default function ShareCard({ region, checkins = [], milestones = [], quot
     canvas.width = CARD_W
     canvas.height = CARD_H
 
-    // Load Daydream font
+    // Load CalivePixel font
     try {
-      const font = new FontFace('Daydream', 'url(/fonts/Daydream-DEMO.otf)')
+      const font = new FontFace('CalivePixel', 'url(/fonts/CalivePixel.otf)')
       await font.load()
       document.fonts.add(font)
     } catch (e) {
@@ -108,9 +108,9 @@ export default function ShareCard({ region, checkins = [], milestones = [], quot
     ctx.fillStyle = '#1A1510'
     ctx.fillRect(0, 810, CARD_W, 405)
 
-    // Region name in Daydream font
+    // Region name in CalivePixel font
     ctx.fillStyle = regionColor
-    ctx.font = "48px 'Daydream', 'Boogaloo', cursive"
+    ctx.font = "48px 'CalivePixel', 'Boogaloo', cursive"
     ctx.textAlign = 'center'
     ctx.fillText(region.name, CARD_W / 2, 890, CARD_W - 80)
 

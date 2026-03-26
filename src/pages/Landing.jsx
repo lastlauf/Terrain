@@ -215,7 +215,7 @@ function DemoCard({ region, onClose, onSignup }) {
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
         <div style={{ flexShrink: 0 }}><SpriteRenderer type={region.type} scale={8} /></div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontFamily: "'Daydream', var(--font-display)", fontWeight: 400, fontSize: '20px', letterSpacing: '0.06em', color: regionColor, marginBottom: '8px' }}>{region.name}</h3>
+          <h3 style={{ fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400, fontSize: '24px', letterSpacing: '-0.01em', color: regionColor, marginBottom: '8px' }}>{region.name}</h3>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: regionColor, border: `1px solid ${regionColor}`, borderRadius: '2px' }}>{region.type}</span>
             <span style={{ display: 'inline-block', padding: '2px 8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', border: '1px solid var(--border-light)', borderRadius: '2px' }}>{region.category}</span>
@@ -298,9 +298,9 @@ function FeatureSection({ number, title, description, children, reverse, isMobil
           / {number}
         </span>
         <h2 style={{
-          fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-          fontSize: isMobile ? '24px' : 'clamp(24px, 3vw, 36px)',
-          lineHeight: 1.2, letterSpacing: '0.08em',
+          fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400,
+          fontSize: isMobile ? '28px' : 'clamp(28px, 3.5vw, 44px)',
+          lineHeight: 1.2, letterSpacing: '-0.01em',
           color: 'var(--text-primary)', marginBottom: '20px',
         }}>
           {title}
@@ -355,8 +355,8 @@ export default function Landing() {
         borderBottom: '1px solid var(--border-light)',
       }}>
         <span style={{
-          fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-          fontSize: '14px', letterSpacing: '0.1em', color: 'var(--text-primary)',
+          fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400,
+          fontSize: '18px', letterSpacing: '-0.01em', color: 'var(--text-primary)',
         }}>
           Terrain
         </span>
@@ -408,9 +408,9 @@ export default function Landing() {
           {/* Headline */}
           <div style={{ overflow: 'hidden', marginBottom: '24px' }}>
             <h1 style={{
-              fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-              fontSize: isMobile ? 'clamp(28px, 9vw, 44px)' : 'clamp(40px, 4.5vw, 64px)',
-              lineHeight: 1.15, letterSpacing: '0.08em',
+              fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400,
+              fontSize: isMobile ? 'clamp(36px, 12vw, 56px)' : 'clamp(56px, 6vw, 88px)',
+              lineHeight: 1.15, letterSpacing: '-0.01em',
               color: 'var(--text-primary)',
               transform: heroVisible ? 'translateY(0)' : 'translateY(110%)',
               transition: 'transform 0.7s cubic-bezier(0.76, 0, 0.24, 1) 0.3s',
@@ -745,9 +745,9 @@ export default function Landing() {
             / Interactive
           </span>
           <h2 style={{
-            fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-            fontSize: isMobile ? '28px' : 'clamp(32px, 4vw, 48px)',
-            lineHeight: 1.15, letterSpacing: '0.08em',
+            fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400,
+            fontSize: isMobile ? '36px' : 'clamp(40px, 5vw, 64px)',
+            lineHeight: 1.15, letterSpacing: '-0.01em',
             color: 'var(--text-primary)', marginBottom: '16px',
           }}>
             Try the Demo
@@ -833,9 +833,9 @@ export default function Landing() {
             Ready to map your terrain?
           </span>
           <h2 style={{
-            fontFamily: "'Daydream', var(--font-display)", fontWeight: 400,
-            fontSize: isMobile ? '24px' : 'clamp(28px, 3.5vw, 44px)',
-            lineHeight: 1.15, letterSpacing: '0.08em',
+            fontFamily: "'CalivePixel', var(--font-display)", fontWeight: 400,
+            fontSize: isMobile ? '32px' : 'clamp(36px, 4vw, 56px)',
+            lineHeight: 1.15, letterSpacing: '-0.01em',
             color: 'var(--text-primary)',
           }}>
             Start building.

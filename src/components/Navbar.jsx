@@ -34,10 +34,10 @@ export default function Navbar({ onReplayTour }) {
     }}>
       {/* Logo */}
       <Link to="/map" style={{
-        fontFamily: "'Daydream', var(--font-display)",
+        fontFamily: "'CalivePixel', var(--font-display)",
         fontWeight: 400,
-        fontSize: '14px',
-        letterSpacing: '0.1em',
+        fontSize: '18px',
+        letterSpacing: '-0.01em',
         color: 'var(--text-primary)',
         textDecoration: 'none',
       }}>
@@ -63,18 +63,18 @@ export default function Navbar({ onReplayTour }) {
           Map
         </Link>
 
-        <Link to="/explore" style={{
+        <span style={{
           fontFamily: 'var(--font-heading)',
           fontSize: 'var(--text-sm)',
-          color: location.pathname === '/explore' ? 'var(--accent-orange)' : 'var(--text-muted)',
-          fontWeight: location.pathname === '/explore' ? 600 : 400,
+          color: 'var(--text-dim)',
           textDecoration: 'none',
           textTransform: 'uppercase',
           letterSpacing: '1px',
-          transition: 'color var(--duration-fast) var(--ease-out)',
+          opacity: 0.5,
+          cursor: 'default',
         }}>
-          Explore
-        </Link>
+          WASD to walk
+        </span>
 
         {/* User menu */}
         <div style={{ position: 'relative' }}>

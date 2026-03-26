@@ -105,7 +105,7 @@ export default function SignupOverlay({ onClose }) {
             fontFamily: 'var(--font-display)',
             fontWeight: 400,
             fontSize: 'clamp(32px, 8vw, 44px)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
             color: 'var(--text-primary)',
           }}>
             TERRAIN
@@ -120,7 +120,7 @@ export default function SignupOverlay({ onClose }) {
                 <path d="M4 12l20 16 20-16" stroke="var(--accent-orange)" strokeWidth="3" fill="none" />
               </svg>
             </div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)', letterSpacing: '0.06em' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)', letterSpacing: '-0.01em' }}>
               Check your email
             </h2>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -151,7 +151,7 @@ export default function SignupOverlay({ onClose }) {
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-6)',
               textAlign: 'center',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
             }}>
               Create Account
             </h2>

@@ -92,7 +92,7 @@ export default function ExportModal({
           fontSize: 'var(--text-xl)',
           color: 'var(--text-primary)',
           marginBottom: 'var(--space-6)',
-          letterSpacing: '0.06em',
+          letterSpacing: '-0.01em',
         }}>
           {singleRegion ? 'Export Region' : 'Export Your Journey'}
         </h2>

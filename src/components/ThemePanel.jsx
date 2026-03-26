@@ -76,7 +76,7 @@ export default function ThemePanel({ open, onClose, theme, onUpdate, onPreview }
           fontWeight: 400,
           fontSize: 'var(--text-xl)',
           color: 'var(--text-primary)',
-          letterSpacing: '0.06em',
+          letterSpacing: '-0.01em',
         }}>
           THEME
         </h2>

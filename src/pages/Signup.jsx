@@ -61,7 +61,7 @@ export default function Signup() {
             fontFamily: 'var(--font-display)',
             fontWeight: 400,
             fontSize: 'clamp(40px, 10vw, 56px)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
             color: 'var(--text-primary)',
           }}>
             TERRAIN
@@ -84,7 +84,7 @@ export default function Signup() {
           {confirmed ? (
             <div style={{ textAlign: 'center', padding: 'var(--space-6) 0' }}>
               <div style={{ fontSize: '48px', marginBottom: 'var(--space-4)' }}>✉️</div>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)', letterSpacing: '0.06em' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: 'var(--text-xl)', color: 'var(--text-primary)', marginBottom: 'var(--space-3)', letterSpacing: '-0.01em' }}>
                 Check your email
               </h2>
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
@@ -115,7 +115,7 @@ export default function Signup() {
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-6)',
             textAlign: 'center',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
           }}>
             Create Account
           </h2>

@@ -109,7 +109,7 @@ export default function FieldReport({ region, checkins, open, onClose }) {
             fontSize: 'var(--text-xl)',
             color: 'var(--text-primary)',
             marginBottom: 'var(--space-1)',
-            letterSpacing: '0.06em',
+            letterSpacing: '-0.01em',
           }}>
             FIELD REPORT
           </h2>

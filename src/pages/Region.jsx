@@ -229,7 +229,7 @@ export default function Region() {
               fontSize: 'var(--text-3xl)',
               color: region.color || 'var(--accent-orange)',
               marginBottom: 'var(--space-2)',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
             }}>
               {region.name}
             </h1>
@@ -348,7 +348,7 @@ export default function Region() {
               fontSize: 'var(--text-lg)',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-4)',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
             }}>
               Check-in History
             </h2>
@@ -433,7 +433,7 @@ export default function Region() {
               fontSize: 'var(--text-lg)',
               color: 'var(--text-primary)',
               marginBottom: 'var(--space-4)',
-              letterSpacing: '0.06em',
+              letterSpacing: '-0.01em',
             }}>
               Milestones
             </h2>

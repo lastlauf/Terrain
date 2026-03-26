@@ -252,39 +252,40 @@ export default function TerrainCanvas({
       const layout = layoutRef.current
 
       // 2b. Draw isometric dot grid floor (world-space)
-      // Diamond pattern — every other row offset by half
+      // True isometric grid — dots placed on a 2:1 diamond pattern
       {
-        const gridSpacing = 32
-        const dotSize = 2
-        // Compute visible world bounds
-        const worldLeft = -s.offset.x / s.scale - 200
-        const worldTop = -s.offset.y / s.scale - 200
-        const worldRight = worldLeft + W / s.scale + 400
-        const worldBottom = worldTop + H / s.scale + 400
+        const isoW = 40  // horizontal spacing between dots
+        const isoH = 20  // vertical spacing (half of isoW for 2:1 iso ratio)
+        const dotSize = 1.5
+        // Compute visible world bounds with margin
+        const worldLeft = -s.offset.x / s.scale - 300
+        const worldTop = -s.offset.y / s.scale - 300
+        const worldRight = worldLeft + W / s.scale + 600
+        const worldBottom = worldTop + H / s.scale + 600
         // Mouse in world space for interactive glow
         const mwx = (s.mousePos.x - s.offset.x) / s.scale
         const mwy = (s.mousePos.y - s.offset.y) / s.scale
 
-        const startCol = Math.floor(worldLeft / gridSpacing) - 1
-        const endCol = Math.ceil(worldRight / gridSpacing) + 1
-        const halfRow = gridSpacing * 0.5
-        const startRow = Math.floor(worldTop / halfRow) - 1
-        const endRow = Math.ceil(worldBottom / halfRow) + 1
+        const startCol = Math.floor(worldLeft / isoW) - 2
+        const endCol = Math.ceil(worldRight / isoW) + 2
+        const startRow = Math.floor(worldTop / isoH) - 2
+        const endRow = Math.ceil(worldBottom / isoH) + 2
 
         for (let row = startRow; row <= endRow; row++) {
-          const isOddRow = row % 2 !== 0
-          const offsetX = isOddRow ? gridSpacing * 0.5 : 0
+          const isOdd = row & 1
+          const rowOffX = isOdd ? isoW * 0.5 : 0
           for (let col = startCol; col <= endCol; col++) {
-            const gx = col * gridSpacing + offsetX
-            const gy = row * halfRow
+            // Isometric position: shift every other row by half
+            const gx = col * isoW + rowOffX
+            const gy = row * isoH
             // Distance from mouse for interactive glow
             const dx = gx - mwx
             const dy = gy - mwy
             const dist = Math.sqrt(dx * dx + dy * dy)
-            const proximity = Math.max(0, 1 - dist / 160)
-            const baseAlpha = 0.08
-            const alpha = baseAlpha + proximity * 0.25
-            const size = dotSize + proximity * 1.5
+            const proximity = Math.max(0, 1 - dist / 140)
+            const baseAlpha = 0.07
+            const alpha = baseAlpha + proximity * 0.28
+            const size = dotSize + proximity * 2
             ctx.fillStyle = `rgba(168, 158, 142, ${alpha})`
             ctx.beginPath()
             ctx.arc(Math.round(gx), Math.round(gy), size, 0, Math.PI * 2)
@@ -471,53 +472,100 @@ export default function TerrainCanvas({
           keys.e = false // consume
         }
 
-        // Draw shadow
-        const bobY = Math.sin(ch.bobPhase) * 2
-        ctx.fillStyle = 'rgba(0,0,0,0.06)'
+        // Draw shadow (larger)
+        const bobY = Math.sin(ch.bobPhase) * 3
+        ctx.fillStyle = 'rgba(0,0,0,0.08)'
         ctx.beginPath()
-        ctx.ellipse(ch.x, ch.y + 10, 7, 3, 0, 0, Math.PI * 2)
+        ctx.ellipse(ch.x, ch.y + 18, 12, 5, 0, 0, Math.PI * 2)
         ctx.fill()
 
-        // Draw character — simple isometric figure
+        // Draw character — larger isometric figure
         const charColor = t.character_color || '#E8712B'
+        const darkerColor = '#C45A1A'
         // Body
         ctx.fillStyle = charColor
         ctx.beginPath()
-        ctx.roundRect(ch.x - 4, ch.y - 10 + bobY, 8, 12, 2)
+        ctx.roundRect(ch.x - 7, ch.y - 16 + bobY, 14, 20, 3)
+        ctx.fill()
+        // Body highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.15)'
+        ctx.beginPath()
+        ctx.roundRect(ch.x - 4, ch.y - 14 + bobY, 5, 16, 2)
         ctx.fill()
         // Head
+        ctx.fillStyle = charColor
         ctx.beginPath()
-        ctx.arc(ch.x, ch.y - 14 + bobY, 5, 0, Math.PI * 2)
+        ctx.arc(ch.x, ch.y - 24 + bobY, 9, 0, Math.PI * 2)
         ctx.fill()
-        // Eyes (tiny white dots)
+        // Hair / cap
+        ctx.fillStyle = darkerColor
+        ctx.beginPath()
+        ctx.arc(ch.x, ch.y - 26 + bobY, 9, Math.PI, Math.PI * 2)
+        ctx.fill()
+        // Eyes
         ctx.fillStyle = '#FFFFFF'
-        ctx.fillRect(ch.x + ch.facing * 1.5 - 1, ch.y - 15 + bobY, 2, 2)
-        ctx.fillRect(ch.x + ch.facing * 4 - 1, ch.y - 15 + bobY, 2, 2)
+        ctx.beginPath()
+        ctx.arc(ch.x + ch.facing * 3 - 1, ch.y - 25 + bobY, 2.5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(ch.x + ch.facing * 3 + 4, ch.y - 25 + bobY, 2.5, 0, Math.PI * 2)
+        ctx.fill()
+        // Pupils
+        ctx.fillStyle = '#1A1714'
+        ctx.beginPath()
+        ctx.arc(ch.x + ch.facing * 3, ch.y - 25 + bobY, 1.2, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(ch.x + ch.facing * 3 + 5, ch.y - 25 + bobY, 1.2, 0, Math.PI * 2)
+        ctx.fill()
 
-        // Legs animation
+        // Arms
+        ctx.fillStyle = charColor
+        if (isMoving) {
+          const armPhase = Math.sin(ch.bobPhase * 2)
+          ctx.fillRect(ch.x - 10, ch.y - 10 + bobY + armPhase * 3, 4, 10)
+          ctx.fillRect(ch.x + 6, ch.y - 10 + bobY - armPhase * 3, 4, 10)
+        } else {
+          ctx.fillRect(ch.x - 10, ch.y - 10 + bobY, 4, 10)
+          ctx.fillRect(ch.x + 6, ch.y - 10 + bobY, 4, 10)
+        }
+
+        // Legs
+        ctx.fillStyle = darkerColor
         if (isMoving) {
           const legPhase = Math.sin(ch.bobPhase * 2)
-          ctx.fillStyle = charColor
-          ctx.fillRect(ch.x - 3, ch.y + 2 + bobY, 3, 4 + legPhase * 2)
-          ctx.fillRect(ch.x + 1, ch.y + 2 + bobY, 3, 4 - legPhase * 2)
+          ctx.fillRect(ch.x - 5, ch.y + 4 + bobY, 5, 8 + legPhase * 3)
+          ctx.fillRect(ch.x + 1, ch.y + 4 + bobY, 5, 8 - legPhase * 3)
         } else {
-          ctx.fillStyle = charColor
-          ctx.fillRect(ch.x - 3, ch.y + 2, 3, 4)
-          ctx.fillRect(ch.x + 1, ch.y + 2, 3, 4)
+          ctx.fillRect(ch.x - 5, ch.y + 4, 5, 8)
+          ctx.fillRect(ch.x + 1, ch.y + 4, 5, 8)
         }
+
+        // Bouncing indicator arrow above head
+        const indicatorBob = Math.sin(s.time * 3) * 4
+        ctx.fillStyle = charColor
+        ctx.beginPath()
+        ctx.moveTo(ch.x, ch.y - 40 + indicatorBob)
+        ctx.lineTo(ch.x - 6, ch.y - 48 + indicatorBob)
+        ctx.lineTo(ch.x + 6, ch.y - 48 + indicatorBob)
+        ctx.closePath()
+        ctx.fill()
 
         // Region proximity indicator
         if (ch.nearRegion) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-          ctx.font = "bold 10px 'Inter', sans-serif"
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
+          ctx.font = "bold 11px 'Inter', sans-serif"
           ctx.textAlign = 'center'
           const hint = `Press E — ${ch.nearRegion.name}`
           const hw = ctx.measureText(hint).width
           ctx.beginPath()
-          ctx.roundRect(ch.x - hw / 2 - 8, ch.y - 30 + bobY, hw + 16, 16, 8)
+          ctx.roundRect(ch.x - hw / 2 - 10, ch.y - 58 + indicatorBob, hw + 20, 18, 9)
           ctx.fill()
+          ctx.strokeStyle = 'rgba(200, 194, 181, 0.5)'
+          ctx.lineWidth = 1
+          ctx.stroke()
           ctx.fillStyle = '#4A4540'
-          ctx.fillText(hint, ch.x, ch.y - 20 + bobY)
+          ctx.fillText(hint, ch.x, ch.y - 47 + indicatorBob)
         }
       }
 

@@ -146,6 +146,259 @@ function IsometricCity({ size = 200 }) {
   )
 }
 
+// ── Pixel Art Hero Scene (canvas-based) ──
+
+function HeroPixelScene({ visible, isMobile }) {
+  const canvasRef = useRef(null)
+  const frameRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const P = 4 // pixel size
+    let time = 0
+    let running = true
+
+    function resize() {
+      const w = canvas.parentElement.offsetWidth
+      const h = isMobile ? 240 : 360
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      canvas.style.width = w + 'px'
+      canvas.style.height = h + 'px'
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+    resize()
+
+    // Pixel drawing helper
+    function px(x, y, color) {
+      ctx.fillStyle = color
+      ctx.fillRect(x * P, y * P, P, P)
+    }
+
+    // Isometric block base (draws at pixel coords)
+    function isoBlock(bx, by, w, h, d, topColor, leftColor, rightColor) {
+      // Top face (diamond)
+      ctx.fillStyle = topColor
+      ctx.beginPath()
+      ctx.moveTo(bx * P, (by - d) * P)
+      ctx.lineTo((bx + w) * P, (by - d + w / 2) * P)
+      ctx.lineTo(bx * P, (by - d + w) * P)
+      ctx.lineTo((bx - w) * P, (by - d + w / 2) * P)
+      ctx.closePath()
+      ctx.fill()
+      // Left face
+      ctx.fillStyle = leftColor
+      ctx.beginPath()
+      ctx.moveTo((bx - w) * P, (by - d + w / 2) * P)
+      ctx.lineTo(bx * P, (by - d + w) * P)
+      ctx.lineTo(bx * P, (by + h) * P)
+      ctx.lineTo((bx - w) * P, (by + h - w / 2) * P)
+      ctx.closePath()
+      ctx.fill()
+      // Right face
+      ctx.fillStyle = rightColor
+      ctx.beginPath()
+      ctx.moveTo((bx + w) * P, (by - d + w / 2) * P)
+      ctx.lineTo(bx * P, (by - d + w) * P)
+      ctx.lineTo(bx * P, (by + h) * P)
+      ctx.lineTo((bx + w) * P, (by + h - w / 2) * P)
+      ctx.closePath()
+      ctx.fill()
+    }
+
+    // Pixel tree
+    function pixelTree(tx, ty, h) {
+      // Trunk
+      for (let i = 0; i < 3; i++) px(tx, ty + h + i, '#8B6B3E')
+      // Foliage layers
+      const greens = ['#3D7A4A', '#4A8C5C', '#5E9E6E']
+      for (let layer = 0; layer < 3; layer++) {
+        const w = 3 - layer
+        const yy = ty + h - layer * 2
+        for (let dx = -w; dx <= w; dx++) {
+          for (let dy = 0; dy < 2; dy++) {
+            px(tx + dx, yy - dy, greens[layer])
+          }
+        }
+      }
+    }
+
+    // Pixel building
+    function pixelBuilding(bx, by, w, h, wallColor, roofColor, windowColor) {
+      // Wall
+      for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+          px(bx + x, by - y, wallColor)
+        }
+      }
+      // Roof
+      for (let x = -1; x <= w; x++) px(bx + x, by - h, roofColor)
+      for (let x = 0; x < w; x++) px(bx + x, by - h - 1, roofColor)
+      // Windows
+      for (let wy = 2; wy < h - 1; wy += 3) {
+        for (let wx = 1; wx < w - 1; wx += 2) {
+          px(bx + wx, by - wy, windowColor)
+          px(bx + wx, by - wy - 1, windowColor)
+        }
+      }
+    }
+
+    function render() {
+      if (!running) return
+      time += 0.016
+      const W = canvas.width / (window.devicePixelRatio || 1)
+      const H = canvas.height / (window.devicePixelRatio || 1)
+      const cx = W / 2
+
+      ctx.clearRect(0, 0, W, H)
+
+      // Isometric dot grid background
+      const gridS = 24
+      for (let gy = 0; gy < H; gy += gridS) {
+        const isOdd = Math.floor(gy / gridS) & 1
+        for (let gx = isOdd ? gridS / 2 : 0; gx < W; gx += gridS) {
+          ctx.fillStyle = 'rgba(200, 194, 181, 0.12)'
+          ctx.fillRect(Math.round(gx), Math.round(gy), 2, 2)
+        }
+      }
+
+      // Three isometric blocks with pixel content
+      const blockW = isMobile ? 12 : 18
+      const blockD = isMobile ? 4 : 6
+
+      // Forest (left) — staggered iso layout
+      const fx = Math.round(cx / P) - (isMobile ? 24 : 38)
+      const fy = Math.round(H / P / 2) - (isMobile ? 2 : 4)
+      isoBlock(fx, fy, blockW, blockD, blockD, '#5E9E6E', '#8B8680', '#A09A93')
+      pixelTree(fx - 4, fy - blockD - 6, 3)
+      pixelTree(fx - 1, fy - blockD - 8, 4)
+      pixelTree(fx + 3, fy - blockD - 5, 3)
+      // Cabin pixels
+      for (let x = 0; x < 4; x++) for (let y = 0; y < 3; y++) px(fx + 5 + x, fy - blockD - y - 1, '#C4A882')
+      for (let x = 0; x < 5; x++) px(fx + 5 + x, fy - blockD - 4, '#A89070')
+
+      // City (center) — lower for isometric depth
+      const ccx = Math.round(cx / P)
+      const ccy = fy + (isMobile ? 10 : 14)
+      isoBlock(ccx, ccy, blockW, blockD, blockD, '#D4C8A0', '#8B8680', '#A09A93')
+      pixelBuilding(ccx - 5, ccy - blockD, 4, isMobile ? 8 : 12, '#E8E4DC', '#D4CFC6', '#4A6FA5')
+      pixelBuilding(ccx + 2, ccy - blockD, 3, isMobile ? 6 : 9, '#E8E4DC', '#C8C2B5', '#E8712B')
+
+      // Mountains (right)
+      const mx = Math.round(cx / P) + (isMobile ? 24 : 38)
+      const my = fy
+      isoBlock(mx, my, blockW, blockD, blockD, '#6BAF7B', '#8B8680', '#A09A93')
+      // Mountain pixels
+      const mh = isMobile ? 10 : 14
+      for (let row = 0; row < mh; row++) {
+        const w = Math.round((mh - row) * 0.7)
+        for (let dx = -w; dx <= w; dx++) {
+          const c = row < 3 ? '#F5F2ED' : row < 6 ? '#5A82B8' : '#4A6FA5'
+          px(mx + dx, my - blockD - row, c)
+        }
+      }
+      // Smaller peak
+      for (let row = 0; row < Math.round(mh * 0.6); row++) {
+        const w = Math.round((mh * 0.6 - row) * 0.6)
+        for (let dx = -w; dx <= w; dx++) {
+          px(mx + 8 + dx, my - blockD - row, row < 2 ? '#5A82B8' : '#3D5E8C')
+        }
+      }
+
+      // Dotted paths between regions
+      ctx.strokeStyle = 'rgba(200, 194, 181, 0.4)'
+      ctx.lineWidth = 2
+      ctx.setLineDash([4, 4])
+      ctx.beginPath()
+      ctx.moveTo(fx * P + blockW * P, fy * P)
+      ctx.lineTo(ccx * P - blockW * P, ccy * P)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(ccx * P + blockW * P, ccy * P)
+      ctx.lineTo(mx * P - blockW * P, my * P)
+      ctx.stroke()
+      ctx.setLineDash([])
+
+      // Animated character near city
+      const charX = (ccx - 8) * P
+      const charBob = Math.sin(time * 3) * 3
+      const charY = (ccy - blockD - 2) * P + charBob
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.06)'
+      ctx.beginPath()
+      ctx.ellipse(charX, (ccy - blockD) * P + 4, 8, 3, 0, 0, Math.PI * 2)
+      ctx.fill()
+      // Body (pixel blocks)
+      ctx.fillStyle = '#E8712B'
+      ctx.fillRect(charX - 3, charY - 4, 6, 8)
+      // Head
+      ctx.fillRect(charX - 4, charY - 10, 8, 6)
+      // Eyes
+      ctx.fillStyle = '#FFF'
+      ctx.fillRect(charX - 1, charY - 8, 2, 2)
+      ctx.fillRect(charX + 2, charY - 8, 2, 2)
+      // Legs
+      ctx.fillStyle = '#C45A1A'
+      const legPhase = Math.sin(time * 4)
+      ctx.fillRect(charX - 2, charY + 4, 2, 4 + legPhase)
+      ctx.fillRect(charX + 1, charY + 4, 2, 4 - legPhase)
+      // Bouncing indicator
+      const indY = charY - 16 + Math.sin(time * 3) * 3
+      ctx.fillStyle = '#E8712B'
+      ctx.beginPath()
+      ctx.moveTo(charX, indY + 4)
+      ctx.lineTo(charX - 4, indY)
+      ctx.lineTo(charX + 4, indY)
+      ctx.closePath()
+      ctx.fill()
+
+      // Labels
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.font = "bold 10px 'Inter', sans-serif"
+      ctx.textAlign = 'center'
+      const labels = [
+        [fx * P, (fy + blockD + 4) * P, 'Morning Runs'],
+        [ccx * P, (ccy + blockD + 4) * P, 'Side Project'],
+        [mx * P, (my + blockD + 4) * P, 'Fitness Goal'],
+      ]
+      for (const [lx, ly, text] of labels) {
+        const tw = ctx.measureText(text).width
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.fillRect(lx - tw / 2 - 6, ly - 6, tw + 12, 16)
+        ctx.fillStyle = '#4A4540'
+        ctx.fillText(text, lx, ly + 5)
+      }
+
+      frameRef.current = requestAnimationFrame(render)
+    }
+
+    render()
+    window.addEventListener('resize', resize)
+    return () => {
+      running = false
+      if (frameRef.current) cancelAnimationFrame(frameRef.current)
+      window.removeEventListener('resize', resize)
+    }
+  }, [isMobile])
+
+  return (
+    <div style={{
+      position: 'relative', width: '100%', maxWidth: '700px',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(30px)',
+      transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
+    }}>
+      <canvas
+        ref={canvasRef}
+        style={{ display: 'block', width: '100%', imageRendering: 'pixelated' }}
+      />
+    </div>
+  )
+}
+
 // ── Scroll-triggered fade-up hook ──
 
 function useScrollReveal() {
@@ -456,121 +709,11 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Large isometric hero illustration — detailed scene */}
-        <div style={{
-          position: 'relative', width: '100%', maxWidth: '700px',
-          opacity: heroVisible ? 1 : 0,
-          transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s',
-        }}>
-          <svg width="100%" viewBox="0 0 700 400" fill="none" style={{ display: 'block' }}>
-            {/* Isometric ground plane */}
-            <path d="M350 360 L50 200 L350 40 L650 200 Z" fill="#E8E4DC" stroke="#DDD8CE" strokeWidth="1" />
-            {/* Grid lines on ground */}
-            {[1,2,3,4,5].map(i => (
-              <g key={`grid-${i}`} opacity="0.15">
-                <line x1={50 + i*50} y1={200 - i*26.67} x2={350 + i*50} y2={360 - i*26.67} stroke="#C8C2B5" strokeWidth="0.5" />
-                <line x1={350 - i*50} y1={40 + i*26.67} x2={650 - i*50} y2={200 + i*26.67} stroke="#C8C2B5" strokeWidth="0.5" />
-              </g>
-            ))}
-
-            {/* Forest region — left */}
-            <g>
-              <path d="M200 240 L130 200 L130 170 L200 210 Z" fill="#8B8680" />
-              <path d="M200 240 L270 200 L270 170 L200 210 Z" fill="#A09A93" />
-              <path d="M130 170 L200 130 L270 170 L200 210 Z" fill="#5E9E6E" />
-              {/* Trees */}
-              <polygon points="175,95 160,130 190,130" fill="#3D7A4A" />
-              <polygon points="175,85 163,118 187,118" fill="#4A8C5C" />
-              <polygon points="175,75 166,105 184,105" fill="#5E9E6E" />
-              <rect x="173" y="130" width="4" height="8" fill="#8B6B3E" />
-              <polygon points="210,100 198,128 222,128" fill="#3D7A4A" />
-              <polygon points="210,90 200,115 220,115" fill="#4A8C5C" />
-              <rect x="208" y="128" width="4" height="8" fill="#8B6B3E" />
-              {/* Small cabin */}
-              <path d="M155 148 L155 160 L170 153 L170 141 Z" fill="#C4A882" />
-              <path d="M155 148 L148 144 L148 156 L155 160 Z" fill="#A89070" />
-              <path d="M148 144 L155 138 L170 144 L163 148 Z" fill="#D4B892" />
-            </g>
-
-            {/* City region — center */}
-            <g>
-              <path d="M350 280 L280 240 L280 210 L350 250 Z" fill="#8B8680" />
-              <path d="M350 280 L420 240 L420 210 L350 250 Z" fill="#A09A93" />
-              <path d="M280 210 L350 170 L420 210 L350 250 Z" fill="#D4C8A0" />
-              {/* Tall building */}
-              <path d="M330 120 L330 175 L350 185 L350 130 Z" fill="#E8E4DC" />
-              <path d="M350 130 L350 185 L365 177 L365 122 Z" fill="#D4CFC6" />
-              <path d="M330 120 L345 113 L365 122 L350 130 Z" fill="#F5F2ED" />
-              {/* Windows */}
-              <rect x="334" y="132" width="5" height="4" fill="#4A6FA5" opacity="0.4" />
-              <rect x="334" y="142" width="5" height="4" fill="#4A6FA5" opacity="0.6" />
-              <rect x="334" y="152" width="5" height="4" fill="#E8712B" opacity="0.5" />
-              <rect x="342" y="132" width="5" height="4" fill="#4A6FA5" opacity="0.3" />
-              <rect x="342" y="142" width="5" height="4" fill="#4A6FA5" opacity="0.5" />
-              {/* Shorter building */}
-              <path d="M375 155 L375 185 L395 195 L395 165 Z" fill="#E8E4DC" />
-              <path d="M395 165 L395 195 L405 189 L405 159 Z" fill="#C8C2B5" />
-              <path d="M375 155 L388 148 L405 159 L395 165 Z" fill="#F0ECE4" />
-              {/* Tree */}
-              <circle cx="310" cy="195" r="6" fill="#5E9E6E" />
-              <rect x="309" y="195" width="2" height="6" fill="#8B6B3E" />
-            </g>
-
-            {/* Mountain region — right */}
-            <g>
-              <path d="M500 240 L430 200 L430 170 L500 210 Z" fill="#8B8680" />
-              <path d="M500 240 L570 200 L570 170 L500 210 Z" fill="#A09A93" />
-              <path d="M430 170 L500 130 L570 170 L500 210 Z" fill="#6BAF7B" />
-              {/* Mountain peaks */}
-              <polygon points="500,65 460,140 540,140" fill="#4A6FA5" />
-              <polygon points="500,65 475,110 525,110" fill="#5A82B8" />
-              <polygon points="500,65 487,88 513,88" fill="#F5F2ED" />
-              {/* Smaller peak */}
-              <polygon points="540,95 520,140 560,140" fill="#3D5E8C" />
-              <polygon points="540,95 530,118 550,118" fill="#4A6FA5" />
-              {/* Trail */}
-              <path d="M450 185 Q475 175 500 180 Q520 185 545 172" stroke="#D4C8A0" strokeWidth="2" fill="none" strokeDasharray="4 3" opacity="0.6" />
-            </g>
-
-            {/* Animated character — small walking figure */}
-            <g className="hero-character">
-              <circle cx="305" cy="218" r="4" fill="#E8712B" />
-              <rect x="303" y="222" width="4" height="7" rx="1" fill="#E8712B" />
-              {/* Shadow */}
-              <ellipse cx="305" cy="231" rx="5" ry="2" fill="rgba(0,0,0,0.08)" />
-            </g>
-
-            {/* Paths between regions */}
-            <path d="M230 210 Q290 230 320 240" stroke="#C8C2B5" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
-            <path d="M380 240 Q430 230 470 210" stroke="#C8C2B5" strokeWidth="2" strokeDasharray="6 4" opacity="0.4" />
-
-            {/* Labels */}
-            <g>
-              <rect x="160" y="248" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
-              <text x="200" y="262" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Morning Runs</text>
-            </g>
-            <g>
-              <rect x="310" y="288" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
-              <text x="350" y="302" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Side Project</text>
-            </g>
-            <g>
-              <rect x="460" y="248" width="80" height="20" rx="4" fill="rgba(255,255,255,0.9)" />
-              <text x="500" y="262" textAnchor="middle" fill="#4A4540" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="500">Fitness Goal</text>
-            </g>
-          </svg>
-
-          {/* CSS animation for the character bobbing */}
-          <style>{`
-            .hero-character {
-              animation: hero-bob 2s ease-in-out infinite;
-            }
-            @keyframes hero-bob {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-4px); }
-            }
-          `}</style>
-        </div>
+        {/* Large isometric hero — pixel art canvas */}
+        <HeroPixelScene
+          visible={heroVisible}
+          isMobile={isMobile}
+        />
 
         {/* Scroll indicator */}
         <div style={{
